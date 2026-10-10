@@ -1,0 +1,122 @@
+{
+ "id": "qZK7HCqj",
+ "is_public": false,
+ "is_encrypted": false,
+ "title": "LET'S GO PERISH",
+ "format": "VGC Regulation M-C",
+ "teams": [
+  {
+   "name": "Genry",
+   "species": "Gengar",
+   "item": "Gengarite",
+   "ability": "Cursed Body",
+   "moves": [
+    "Perish Song",
+    "Shadow Ball",
+    "Sludge Bomb",
+    "Protect"
+   ],
+   "nature": "Modest",
+   "evs": {
+    "hp": 30,
+    "def": 13,
+    "spd": 16,
+    "spe": 7
+   }
+  },
+  {
+   "name": "BIG MAN",
+   "species": "Snorlax",
+   "item": "Leftovers",
+   "ability": "Thick Fat",
+   "moves": [
+    "Yawn",
+    "Encore",
+    "Fissure",
+    "Protect"
+   ],
+   "nature": "Relaxed",
+   "evs": {
+    "hp": 21,
+    "def": 31,
+    "spd": 14
+   }
+  },
+  {
+   "name": "Incineroar",
+   "species": "Incineroar",
+   "item": "Sitrus Berry",
+   "ability": "Intimidate",
+   "moves": [
+    "Flare Blitz",
+    "Parting Shot",
+    "Fake Out",
+    "Protect"
+   ],
+   "nature": "Relaxed",
+   "evs": {
+    "hp": 32,
+    "def": 25,
+    "spd": 9
+   },
+   "nameTranslation": "Incineroar"
+  },
+  {
+   "name": "Bober",
+   "species": "Scrafty",
+   "item": "Focus Sash",
+   "ability": "Intimidate",
+   "moves": [
+    "Close Combat",
+    "Knock Off",
+    "Fake Out",
+    "Protect"
+   ],
+   "nature": "Impish",
+   "evs": {
+    "hp": 32,
+    "def": 4,
+    "spd": 4,
+    "spe": 26
+   }
+  },
+  {
+   "name": "Whisker",
+   "species": "Dragonite",
+   "item": "Life Orb",
+   "ability": "Inner Focus",
+   "moves": [
+    "Dragon Claw",
+    "Low Kick",
+    "Extreme Speed",
+    "Protect"
+   ],
+   "nature": "Adamant",
+   "evs": {
+    "hp": 29,
+    "atk": 32,
+    "spe": 5
+   }
+  },
+  {
+   "name": "Bibizyana",
+   "species": "Rillaboom",
+   "item": "Eject Button",
+   "ability": "Grassy Surge",
+   "moves": [
+    "Grassy Glide",
+    "U-turn",
+    "Fake Out",
+    "Protect"
+   ],
+   "nature": "Sassy",
+   "evs": {
+    "hp": 32,
+    "def": 4,
+    "spd": 30
+   }
+  }
+ ],
+ "hasPassword": false,
+ "createdAt": 1789118018
+}
