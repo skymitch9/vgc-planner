@@ -87,7 +87,7 @@ e2e/                   Playwright smoke test
 deploy/                nginx config and security headers
 ```
 
-Dependencies point one way: `ui` → `state` → `infra`/`domain`; `domain` imports nothing from the rest. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the reasoning and the path to a server backend.
+Dependencies point one way: `ui` → `state` → `infra`/`domain`; `domain` imports nothing from the rest. See [docs/info/ARCHITECTURE.md](docs/info/ARCHITECTURE.md) for the reasoning and the path to a server backend.
 
 ## Data
 
