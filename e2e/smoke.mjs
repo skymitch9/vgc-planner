@@ -53,7 +53,22 @@ try {
   await page.fill('#nt-paste', mine);
   await page.click('.modal-foot .btn.primary');
   await page.waitForSelector('#team-name');
+  // The builder opens on the first Pokémon, with its Stat Points in the stat table.
+  await page.waitForSelector('.slots .slot.on');
+  assert.equal(await page.inputValue('.sp-in[data-stat="atk"]'), '32');
+  // Pickers only offer legal moves: nothing in Champions can have Spore.
+  await page.click('.move-in[data-move="3"]');
+  await page.keyboard.type('spore');
+  assert.equal(await page.locator('.pick-row').count(), 0);
+  await page.keyboard.press('Escape');
+  // Top builds adds the most common set as a new slot.
+  await page.click('#top-builds');
+  await page.fill('#tb-search', 'incineroar');
+  await page.click('[data-add="Incineroar"]');
+  await page.waitForSelector('.slot.on[title^="Incineroar"]');
+  await page.click('[data-mode="paste"]');
   assert.match(await page.textContent('.mon-grid'), /SP 32 HP \/ 32 Atk \/ 2 Spe/);
+  assert.match(await page.inputValue('#team-paste'), /Incineroar @ Sitrus Berry[\s\S]*- Fake Out/);
 
   // gameplan
   await page.click('.section-head button[data-act="new-plan"]');
@@ -73,10 +88,15 @@ try {
   await page.click('.addbox.first');
   await page.waitForSelector('#drawer:not(.hidden)');
   assert.equal(await page.locator('.act-edit').count(), 4, 'a new turn is seeded with the four leads');
-  await page.fill('#a-move-0', 'Fake Out'); await page.selectOption('#a-target-0', 'Incineroar');
-  await page.fill('#a-move-1', 'Earthquake'); await page.selectOption('#a-target-1', 'Both foes');
-  await page.fill('#a-move-2', 'Flare Blitz'); await page.selectOption('#a-target-2', 'Rillaboom');
-  await page.fill('#a-move-3', 'Protect');
+  // A Pokémon with moves in its paste gets a <select>; one without gets a text box.
+  const setMove = async (i, move) => {
+    const el = page.locator(`#a-move-${i}`);
+    if (await el.evaluate((e) => e.tagName === 'SELECT')) await el.selectOption(move); else await el.fill(move);
+  };
+  await setMove(0, 'Fake Out'); await page.selectOption('#a-target-0', 'Incineroar');
+  await setMove(1, 'Earthquake'); await page.selectOption('#a-target-1', 'Both foes');
+  await setMove(2, 'Flare Blitz'); await page.selectOption('#a-target-2', 'Rillaboom');
+  await setMove(3, 'Protect');
   await page.waitForSelector('.turn-result .hp-row', { timeout: 30_000 }); // first run downloads the calculator
   assert.match(await page.textContent('.turn-result'), /End of turn/);
   await page.click('.rerun');
