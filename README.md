@@ -24,6 +24,10 @@ Plan VGC matchups as flowchart gameplans for Pokémon Champions (Regulation M-C)
 
 ![Sharing a gameplan and opening the link as a teammate](docs/media/share.webp)
 
+**Team builder.** Edit your team like Showdown's teambuilder: search pickers for Pokémon, item, ability and moves, a nature menu, and Stat Points with the resulting stats (and the Mega's, when holding its stone). The pickers only list what is legal in Reg M-C for that Pokémon, popular choices first with their usage, so an illegal set can't be built; pasted teams are checked the same way and every problem is listed. The **Paste** tab still takes Showdown pastes and Poképaste links.
+
+**Top builds.** The format's Pokémon ranked by Smogon usage, each with its most used moves, items, abilities, Stat Point spreads and teammates. One click adds the most common build (or a chosen spread) to your team, respecting Species Clause and Item Clause.
+
 ## Quick start
 
 Requires Node 22.12 or newer.
@@ -49,6 +53,8 @@ The app serves every icon itself from `public/sprites`, in development and in pr
 | `npm test` | Unit tests (Node's built-in runner, no extra dependencies) |
 | `npm run test:e2e` | Browser smoke test against a running build (`BASE_URL` to change host) |
 | `npm run sprites` | Copy the whole vgc-multicalc sprites folder into `public/sprites` |
+| `npm run champions-data` | Rebuild `src/data/champions-mc.json` (legality) with Pokémon Showdown's validator (see [Legality and usage data](#legality-and-usage-data)) |
+| `npm run usage` | Rebuild `src/data/usage-mc.json` (Top builds) from Smogon's latest monthly stats |
 | `npm run check` | typecheck + lint + tests (what CI runs) |
 | `npm run dev:api` | The API Worker locally on :8787 (see [Accounts](#accounts-sign-in-with-discord-or-google)) |
 | `npm run db:migrate:local` | Create or update the local database tables |
@@ -61,6 +67,7 @@ src/
     types.ts             Team / Plan / FlowNode / TurnAction data model
     showdown.ts          Showdown paste parser
     stats.ts             Stat Points and the Champions stat formula
+    dex.ts               Legality checks, usage lookups, Showdown paste writer, building sets from usage
     model.ts             Factories and tree helpers
     codec.ts             Validated reading/writing of stored data and export files, with size limits
     simulation/          Turn simulation (order, damage, boosts, HP carry-over) on top of the calculator
@@ -68,10 +75,12 @@ src/
     repository.ts        LibraryRepository interface + localStorage and in-memory implementations
     prefs.ts             View preferences (kept apart from user data)
     calc-loader.ts       Lazy import of @smogon/calc
+    dex-loader.ts        Lazy import of the legality and usage data
     sprites.ts           Sprite URL building
   state/               AppStore (library + view state + debounced saving) and SimService (calculator lifecycle, caching)
   ui/                  Rendering and event handling; views/ has one module per screen area
   styles/              Plain CSS split by concern
+  data/                Generated: champions-mc.json (what's legal), usage-mc.json (what's played)
 server/                API Worker: sign-in and sessions (src/app.ts), account library (src/library.ts), D1 store, migrations
 tests/                 Unit tests (+ helpers/stub-calc.ts, a deterministic stand-in for the calculator)
 e2e/                   Playwright smoke test
@@ -85,6 +94,14 @@ Dependencies point one way: `ui` → `state` → `infra`/`domain`; `domain` impo
 - **Storage:** the library is saved through a `LibraryRepository` (browser `localStorage` today). Unreadable saved data is never overwritten: a copy is kept under a backup key and the app tells you.
 - **Export/import:** JSON with `format: "vgc-gameplan-planner"` and a `version`. Imports are validated field by field and capped (teams, plans, turns, nesting depth, text length). Teams are merged by name, so an exported gameplan lands in the right folder.
 - **Compatibility:** data saved by the earlier single-file version is picked up automatically when this app runs on the same origin. Browsers keep storage per origin (a `file://` copy and a server are different origins), so in that case use **Export all** in the old version and **Import JSON** here.
+
+## Legality and usage data
+
+Both files in `src/data/` are generated and committed, so a plain checkout builds without network access. They load lazily (about 95 KB gzipped together) the first time a team is shown.
+
+- **`champions-mc.json`**: `npm run champions-data [path/to/pokemon-showdown]` clones and builds [smogon/pokemon-showdown](https://github.com/smogon/pokemon-showdown) (or uses a checkout you point it at) and asks its own `TeamValidator` for `[Gen 9 Champions] VGC 2026 Reg M-C` which species, abilities, items and moves are allowed, move by move for every species. Megas are stored with their base species and stone, the way pastes and the simulator expect them. For a new regulation, change `FORMAT` in `scripts/build-champions-data.mjs`.
+- **`usage-mc.json`**: `npm run usage [YYYY-MM] [0|1500|1630|1760]` downloads Smogon's chaos stats for the format (latest month, 1760+ by default) and keeps, per Pokémon, its usage and its top moves, items, abilities, spreads and teammates as percentages of that Pokémon's games. `--from chaos.json` uses a file you already downloaded. The current file is September 2026, 1760+ (1.63M battles).
+- `tests/dex.test.ts` checks the rules against the real data, including that every Top build comes out legal.
 
 ## Turn results
 
