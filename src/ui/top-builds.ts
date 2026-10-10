@@ -6,6 +6,7 @@
 import type { Dex, Share, UsageMon } from '../domain/dex.ts';
 import { setFromUsage, setProblems, spreadLine, toID } from '../domain/dex.ts';
 import { REGULATION } from '../domain/regulation.ts';
+import { avoidTakenItem } from '../domain/top-teams.ts';
 import type { PokemonSet } from '../domain/types.ts';
 import { pct, typeChip } from './builder-html.ts';
 import { esc } from './dom.ts';
@@ -94,10 +95,9 @@ export function openTopBuilds(dex: Dex, team: readonly PokemonSet[], selectedSlo
   const use = (mon: UsageMon, spread: number): void => {
     const why = blocked(mon);
     if (why) return;
-    const set = setFromUsage(mon, dex, spread);
     // Item Clause: if the top item is already taken, fall back to the next most used one that isn't.
     const taken = new Set(team.filter((_, i) => !full || i !== selectedSlot).map((t) => toID(t.item)));
-    if (taken.has(toID(set.item))) set.item = mon.items.map(([n]) => n).find((n) => !taken.has(toID(n)) && dex.item(n)) ?? '';
+    const set = avoidTakenItem(setFromUsage(mon, dex, spread), mon, dex, taken);
     close();
     apply(set, full ? selectedSlot : null);
   };
