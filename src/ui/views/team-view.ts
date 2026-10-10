@@ -15,7 +15,9 @@ import { itemIcon, monIcon } from '../icons.ts';
 import { openMenu, toast } from '../overlays.ts';
 import { PASTE_LINK_HINT } from '../paste-links.ts';
 import { attachPicker } from '../picker.ts';
+import { createPlanFrom } from '../actions.ts';
 import { openTopBuilds } from '../top-builds.ts';
+import { openTopTeams, topTeamsButton } from '../top-teams.ts';
 import { renderNav } from './sidebar.ts';
 
 type Mode = 'builder' | 'paste';
@@ -249,13 +251,14 @@ export function renderTeamView(main: HTMLElement, team: Team): void {
   <div class="page"><div class="page-inner">
     <div class="section"><div class="section-head"><h3>Team</h3>
       <div class="btn-row">
-        ${dex?.usage ? '<button class="btn sm" id="top-builds">★ Top builds</button>' : ''}
+        ${dex?.usage ? '<button class="btn sm" id="top-builds">★ Top builds</button><button class="btn sm" id="top-teams">★ Top teams</button>' : ''}
         <div class="seg" role="tablist">
           <button class="seg-btn${mode === 'builder' ? ' on' : ''}" data-mode="builder" role="tab" ${dex ? '' : 'disabled title="Loading…"'}>Builder</button>
           <button class="seg-btn${mode === 'paste' ? ' on' : ''}" data-mode="paste" role="tab">Paste</button>
         </div></div></div>
       ${mode === 'builder' && dex ? builderHTML(sets, dex) : `
         <textarea class="paste" id="team-paste" data-team-paste placeholder="Paste your team in Showdown format, ${PASTE_LINK_HINT}">${esc(team.paste)}</textarea>
+        ${topTeamsButton('#team-paste')}
         <div class="btn-row mt-s"><button class="btn primary sm" id="save-paste">Update team</button></div>
         ${pasteProblems.length ? `<div class="problems">${pasteProblems.map((w) => `<div>${esc(w)}</div>`).join('')}</div>` : ''}
         ${sets.length ? `<div class="mon-grid">${sets.map(monCard).join('')}</div>` : '<p class="hint mt-s">No Pokémon parsed yet.</p>'}`}
@@ -295,6 +298,21 @@ export function renderTeamView(main: HTMLElement, team: Team): void {
       save(team, sets);
       toast(replace !== null ? `${built.species} replaced slot ${replace + 1}` : `${built.species} added`);
     });
+  });
+  qs('#top-teams', main)?.addEventListener('click', () => {
+    if (!dex) return;
+    openTopTeams(dex, [
+      {
+        label: 'Use as my team', cls: 'primary',
+        run: (built, top) => {
+          sets.splice(0, sets.length, ...built);
+          Object.assign(view, { slot: 0, mode: 'builder' });
+          save(team, sets);
+          toast(`Team replaced with ${top.name}`);
+        },
+      },
+      { label: 'Plan against this team', run: (built, top) => createPlanFrom(team, top.name, writeTeam(built)) },
+    ]);
   });
   qs('#save-paste', main)?.addEventListener('click', () => {
     team.paste = must<HTMLTextAreaElement>('#team-paste').value;

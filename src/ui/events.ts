@@ -2,7 +2,7 @@ import { config } from '../config.ts';
 import { DataError } from '../domain/codec.ts';
 import type { ActionKind, Side, SlotKind, LineColor } from '../domain/types.ts';
 import { simService, store } from '../state/instance.ts';
-import { addNode, addTab, selectTab, startRenameTab, tabMenu, createPlan, createTeam, deleteNode, deletePlan, deleteTeam, duplicatePlan, editPaste, loadImportFile, pickSlot, renameTeam, showExport, showImport } from './actions.ts';
+import { addNode, addTab, selectTab, startRenameTab, tabMenu, createPlan, createTeam, deleteNode, deletePlan, deleteTeam, duplicatePlan, editPaste, loadImportFile, pickSlot, pickTopTeam, renameTeam, showExport, showImport } from './actions.ts';
 import { accountMenu, openSignIn, signInWith } from './account.ts';
 import { openPalettePicker } from './theme.ts';
 import { requestRender } from './bus.ts';
@@ -97,6 +97,7 @@ async function handleClick(el: HTMLElement, e: MouseEvent): Promise<void> {
     case 'delete-team': return deleteTeam(team);
     case 'export-plan': return showExport({ type: 'plan', teamId: team, planId: plan });
     case 'edit-paste': return editPaste(asSide(d.kind));
+    case 'top-teams': return pickTopTeam(d.target ?? '');
     case 'zoom': setZoom(store.ui.zoom + Number(d.d ?? 0) * config.zoom.step); return;
     case 'pick-slot': pickSlot(el, asSide(d.side), asSlot(d.kind), Number(d.i ?? 0)); return;
     case 'toggle-result': {
