@@ -24,9 +24,11 @@ Plan VGC matchups as flowchart gameplans for Pokémon Champions (Regulation M-C)
 
 ![Sharing a gameplan and opening the link as a teammate](docs/media/share.webp)
 
-**Team builder.** Edit your team like Showdown's teambuilder: search pickers for Pokémon, item, ability and moves, a nature menu, and Stat Points with the resulting stats (and the Mega's, when holding its stone). The pickers only list what is legal in Reg M-C for that Pokémon, popular choices first with their usage, so an illegal set can't be built; pasted teams are checked the same way and every problem is listed. The **Paste** tab still takes Showdown pastes and Poképaste links.
+**Team builder.** Edit your team like Showdown's teambuilder: search pickers for Pokémon, item, ability and moves, a nature menu, and Stat Points with the resulting stats (and the Mega's, when holding its stone). The pickers only list what is legal in Reg M-C for that Pokémon, popular choices first with their usage, so an illegal set can't be built; pasted teams are checked the same way and every problem is listed. The **Paste** tab still takes Showdown pastes and Poképaste links, or a ready-made team from **★ Top teams**.
 
 **Top builds.** The format's Pokémon ranked by Smogon usage, each with its most used moves, items, abilities, Stat Point spreads and teammates. One click adds the most common build (or a chosen spread) to your team, respecting Species Clause and Item Clause.
+
+**Top teams.** Popular six-Pokémon cores, each member with its most used build and a choice of Stat Point spread. Smogon's stats don't publish whole teams, only how often each Pokémon is paired with each other one, so these cores are derived from that teammate data rather than taken from real tournament team lists. Every box that takes a paste has a **★ Top teams** button to load one, and the team page can make one your team or start a gameplan against it in one click.
 
 ## Quick start
 
