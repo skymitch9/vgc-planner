@@ -16,5 +16,6 @@
 - 2026-10-10 17:5x — Owner rule (global for this project): "Always make prs but after the pr merge it." Every branch → PR → merged immediately (merge commit), local main fast-forwarded, branch deleted. Memory: prs-then-merge.
 
 - 2026-10-10 18:00 — NEXT (owner to confirm priorities): (1) App 2 simulation engine (sim/README.md stub, spike measured); (2) the upstream contribution plan docs/info/UPSTREAM-PLAN.md (PR #2 + PR #3 are the candidates; docs/ excluded); (3) vgc-meta GitHub remote (no off-machine backup yet); (4) later: Cloudflare Pages for the feed + KI-2.
-- 2026-10-10 18:05 — Owner: "Swapping to opus, keep the work going." DISPATCHED (Opus): (a) vgc-meta simulation engine v1 on branch `feature/sim` in ..\vgc-meta (Showdown engine, legal-choice player AI, lead/bring enumeration, worker-thread fan-out, report + pokepaste output); (b) docs/info/UPSTREAM-PLAN.md in this repo (what to send upstream from PR #2/#3, how, docs/ excluded, open questions for the maintainers).
 - 2026-10-10 — UPSTREAM-PLAN written (docs/info/UPSTREAM-PLAN.md; upstream = phc4rdoso/vgc-planner, PR #1 must go first); waiting on owner to pick a start date / confirm the upstream repo.
+
+- 2026-10-10 19:05 — NEXT (owner to pick): (1) sim v2: spread optimisation + a stronger AI, and a calibration check of the sim against real results; (2) first upstream PR from docs/info/UPSTREAM-PLAN.md (PR 0 = Top builds) — needs the owner's go, it is outward-facing; (3) a GitHub remote for vgc-meta (no off-machine backup); (4) Cloudflare Pages for the feed + KI-2.
