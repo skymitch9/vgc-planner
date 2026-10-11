@@ -1,0 +1,110 @@
+{
+  "format": "[Gen 9 Champions] VGC 2026 Reg M-C",
+  "generated": "2026-10-11T00:41:40.994Z",
+  "sources": [
+    {
+      "id": "crob",
+      "label": "crob.at",
+      "url": "https://crob.at/teams/vgc",
+      "fetched": "2026-10-11T00:41:05.585Z",
+      "teams": 346
+    },
+    {
+      "id": "limitless",
+      "label": "Limitless VGC",
+      "url": "https://limitlessvgc.com/teams?format=m-c",
+      "fetched": "2026-10-11T00:38:54.995Z",
+      "teams": 342
+    },
+    {
+      "id": "victoryroad",
+      "label": "Victory Road",
+      "url": "https://victoryroad.pro/champions-replica/",
+      "fetched": "2026-10-11T00:41:08.574Z",
+      "teams": 39,
+      "merged": 24
+    },
+    {
+      "id": "youtube",
+      "label": "YouTube",
+      "url": "https://www.youtube.com/",
+      "fetched": "2026-10-11T00:41:20.348Z",
+      "teams": 27,
+      "merged": 40
+    }
+  ],
+  "entries": [
+    {
+      "id": "limitless-7038",
+      "title": "Eric Rios — Regional Frankfurt (1st)",
+      "player": "Eric Rios",
+      "event": "Regional Frankfurt",
+      "date": "2026-09-26",
+      "tier": "regional",
+      "placing": 1,
+      "paste": "pastes/limitless-7038.txt",
+      "spreads": "confirmed",
+      "replicaCodes": [
+        "9NNN3",
+        "N8A4G"
+      ],
+      "source": "https://limitlessvgc.com/teams/7038",
+      "spreadSource": "youtube",
+      "spreadUrl": "https://www.youtube.com/watch?v=R8zUm6AYVEs"
+    },
+    {
+      "id": "limitless-7178",
+      "title": "Juan Francisco Salerno — Regional Recife (1st)",
+      "player": "Juan Francisco Salerno",
+      "event": "Regional Recife",
+      "date": "2026-10-03",
+      "tier": "regional",
+      "placing": 1,
+      "paste": "pastes/limitless-7178.txt",
+      "spreads": "estimated",
+      "source": "https://limitlessvgc.com/teams/7178"
+    },
+    {
+      "id": "victoryroad-0RSMBR6WR8",
+      "title": "Jude Lee — Brisbane Regional Championships (4th)",
+      "player": "Jude Lee",
+      "event": "Brisbane Regional Championships",
+      "date": "2026-09-26",
+      "tier": "regional",
+      "placing": 4,
+      "paste": null,
+      "spreads": "estimated",
+      "replicaCodes": [
+        "0RSMB",
+        "R6WR8"
+      ],
+      "source": "https://victoryroad.pro/champions-replica/"
+    },
+    {
+      "id": "crob-27aScG",
+      "title": "CCManny — CHAMPIONS REG. M-C |👑CROWN FIGHT Bo3 TOUR #89👑 (1st)",
+      "player": "CCManny",
+      "event": "CHAMPIONS REG. M-C |👑CROWN FIGHT Bo3 TOUR #89👑",
+      "date": "2026-10-09",
+      "tier": "online",
+      "placing": 1,
+      "paste": "pastes/crob-27aScG.txt",
+      "spreads": "estimated",
+      "source": "https://crob.at/27aScG"
+    },
+    {
+      "id": "youtube-UlN7dV7hSJg-6375011432a85dce",
+      "title": "CybertronVGC — WIN games QUICKLY with the BEST Mega ABSOL Z team",
+      "player": "CybertronVGC",
+      "event": "WIN games QUICKLY with the BEST Mega ABSOL Z team",
+      "date": "2026-10-08",
+      "tier": "creator",
+      "placing": null,
+      "paste": "pastes/youtube-UlN7dV7hSJg-6375011432a85dce.txt",
+      "spreads": "confirmed",
+      "source": "https://www.youtube.com/watch?v=UlN7dV7hSJg",
+      "spreadSource": "youtube",
+      "spreadUrl": "https://www.youtube.com/watch?v=UlN7dV7hSJg"
+    }
+  ]
+}
