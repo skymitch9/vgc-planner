@@ -30,6 +30,8 @@ Plan VGC matchups as flowchart gameplans for Pokémon Champions (Regulation M-C)
 
 **Top teams.** Load a published team from a [team feed](#team-feed) into any paste box, make it your team, or start a gameplan against it. Spreads the player didn't publish are filled in from usage and labelled *Estimated*.
 
+**Saved teams as opponents.** In **New gameplan** and when editing the opponent, **Use a saved team…** copies one of your own teams into the opponent box (your current team too, for a mirror match). It is a copy: later changes to that team don't change the gameplan.
+
 ## Quick start
 
 Requires Node 22.12 or newer.
