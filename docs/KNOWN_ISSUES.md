@@ -15,3 +15,9 @@ None recorded yet. Each entry carries: Symptom · Status (ACCEPTED/WAIVED/BLOCKE
 - **Status:** ACCEPTED until App 2 (vgc-meta) has a public home.
 - **Why tolerated:** the feed only exists on localhost:4400 today (owner decision 2026-10-10: run App 2 locally until happy); adding an origin before it exists would be a guess.
 - **What would change it:** the vgc-meta feed getting a public URL (Cloudflare Pages). Then add that origin to both CSP files in the same PR that sets the production default feed URL.
+
+## KI-3 · Never `rm -rf` an agent worktree whose `node_modules` may be a junction (gotcha, cost real time 2026-10-11)
+- **Symptom:** `npm run check` on the main tree failed with "'tsc' is not recognized": the main tree's `node_modules` had lost `.bin` and several packages. Cause (inferred from the timeline, not reproduced): on 2026-10-10 ~18:00 a worktree's `node_modules` was a JUNCTION to the main tree's, and the conductor's `rm -rf` of that worktree followed it. The running dev server hid the damage for seven hours because Vite had everything in memory.
+- **Status:** ACCEPTED as a standing hazard; repaired by `npm install` (6 packages added, 15 changed) on 2026-10-11 01:04.
+- **Why tolerated:** cannot be prevented by the repo; it is an operator rule.
+- **What would change it:** agents are briefed to `npm install` in their worktree instead of linking; removal is `git worktree remove` only, and if that refuses, check `(Get-Item <wt>\node_modules).LinkType` before deleting anything by hand. Also `.claude/worktrees/agent-a408f7c610631b9f1` is an empty leftover folder that Windows reports busy; it is harmless and untracked.
