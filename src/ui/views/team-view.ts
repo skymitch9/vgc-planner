@@ -1,6 +1,6 @@
 import type { Dex, DexSpecies } from '../../domain/dex.ts';
 import { emptySet, setFromUsage, setProblems, spOf, spreadLine, teamProblems, toID, writeTeam } from '../../domain/dex.ts';
-import { cleanSelections, clearEstimated, countPlanTurns, oppMons, teamMons } from '../../domain/model.ts';
+import { cleanSelections, clearEstimated, countPlanTurns, setEstimated, oppMons, teamMons } from '../../domain/model.ts';
 import { REGULATION } from '../../domain/regulation.ts';
 import { parseShowdown, teamWarnings } from '../../domain/showdown.ts';
 import { STAT_KEYS, STAT_LABEL, calcStats, spreadText, statPoints } from '../../domain/stats.ts';
@@ -15,12 +15,16 @@ import { itemIcon, monIcon } from '../icons.ts';
 import { openMenu, toast } from '../overlays.ts';
 import { PASTE_LINK_HINT } from '../paste-links.ts';
 import { attachPicker } from '../picker.ts';
+import { createPlanFrom } from '../actions.ts';
 import { openTopBuilds } from '../top-builds.ts';
+import { boxEstimates, estimatedToast, openTopTeams, topTeamsButton } from '../top-teams.ts';
 import { renderNav } from './sidebar.ts';
 
 type Mode = 'builder' | 'paste';
 /** View state that doesn't need saving: which slot is open and which tab of the Team section. */
-const view = { teamId: '', slot: 0, mode: 'builder' as Mode };
+const view = { teamId: '', slot: 0, mode: 'builder' as Mode, estimated: new Set<string>() };
+
+const EST_CHIP = '<span class="est-chip" title="Filled in from Smogon usage: the team was published without this spread. Edit its Stat Points to make it your own.">Estimated spread</span>';
 
 function save(team: Team, sets: PokemonSet[]): void {
   team.paste = writeTeam(sets);
@@ -36,6 +40,7 @@ function monCard(m: PokemonSet): string {
   const sp = statPoints(m);
   return `<div class="mon-card">${monIcon(m.species)}<div class="meta">
     <div class="sp">${esc(m.nickname ? `${m.nickname} (${m.species})` : m.species)}</div>
+    ${view.estimated.has(m.species) ? `<div class="sub">${EST_CHIP}</div>` : ''}
     <div class="sub">${m.item ? itemIcon(m.item, 'xs') + esc(m.item) : '<span class="muted">No item</span>'}</div>
     ${m.ability ? `<div class="sub">${esc(m.ability)}</div>` : ''}
     ${sp ? `<div class="sub" title="Champions Stat Points (max 32 per stat, 66 total)">SP ${esc(spreadText(sp.sp))}${sp.converted ? ' (from EVs)' : ''}</div>` : ''}
@@ -51,7 +56,7 @@ function slotsHTML(sets: PokemonSet[], dex: Dex): string {
       ? `<button class="slot empty${view.slot === i ? ' on' : ''}" data-slot="${i}">+ Add Pokémon</button>`
       : `<div class="slot ghost"></div>`;
     const bad = setProblems(s, dex).length > 0;
-    return `<button class="slot${view.slot === i ? ' on' : ''}${bad ? ' bad' : ''}" data-slot="${i}" title="${esc(s.species)}${bad ? ': has rule problems' : ''}">${monLabel(s.species, s.item)}</button>`;
+    return `<button class="slot${view.slot === i ? ' on' : ''}${bad ? ' bad' : ''}" data-slot="${i}" title="${esc(s.species)}${bad ? ': has rule problems' : ''}">${monLabel(s.species, s.item)}${view.estimated.has(s.species) ? EST_CHIP : ''}</button>`;
   });
   return `<div class="slots">${cells.join('')}</div>`;
 }
@@ -122,7 +127,7 @@ function editorHTML(set: PokemonSet, dex: Dex): string {
       <div class="ed-moves"><label class="lbl">Moves <span class="hint">· only moves ${esc(species.name)} can legally have</span></label>${moveSlots}
         ${mates.length ? `<div class="mates"><span class="lbl">Common teammates</span><div class="mate-row">${mates.slice(0, 6).map(([n, p]) => `<span class="mate" title="${esc(n)}: on ${p}% of its teams">${monIcon(n, 'xs')}${esc(n)}</span>`).join('')}</div></div>` : ''}
       </div>
-      <div class="ed-stats">${statTable(set, species, dex)}</div>
+      <div class="ed-stats">${statTable(set, species, dex)}${view.estimated.has(set.species) ? `<p class="hint est-note">${EST_CHIP} Filled in from Smogon usage because the team was published without it. Change any Stat Point to make it your own.</p>` : ''}</div>
     </div>
     ${problems.length ? `<div class="problems">${problems.map((p) => `<div>${esc(p)}</div>`).join('')}</div>` : ''}
   </div>`;
@@ -241,6 +246,7 @@ export function renderTeamView(main: HTMLElement, team: Team): void {
   const dex = currentDex();
   if (!dex) loadDex().then(() => requestRender()).catch(() => toast('Could not load the Pokémon data; the team builder is unavailable.', true));
   const sets = teamMons(team);
+  view.estimated = new Set(team.estimatedSpreads ?? []);
   const mode: Mode = dex ? view.mode : 'paste';
   const pasteProblems = dex ? [...teamProblems(sets, dex), ...sets.flatMap((s) => setProblems(s, dex))] : teamWarnings(sets);
 
@@ -253,12 +259,14 @@ export function renderTeamView(main: HTMLElement, team: Team): void {
     <div class="section"><div class="section-head"><h3>Team</h3>
       <div class="btn-row">
         ${dex?.usage ? '<button class="btn sm" id="top-builds">★ Top builds</button>' : ''}
+        ${dex ? '<button class="btn sm" id="top-teams">★ Top teams</button>' : ''}
         <div class="seg" role="tablist">
           <button class="seg-btn${mode === 'builder' ? ' on' : ''}" data-mode="builder" role="tab" ${dex ? '' : 'disabled title="Loading…"'}>Builder</button>
           <button class="seg-btn${mode === 'paste' ? ' on' : ''}" data-mode="paste" role="tab">Paste</button>
         </div></div></div>
       ${mode === 'builder' && dex ? builderHTML(sets, dex) : `
         <textarea class="paste" id="team-paste" data-team-paste placeholder="Paste your team in Showdown format, ${PASTE_LINK_HINT}">${esc(team.paste)}</textarea>
+        ${topTeamsButton('#team-paste')}
         <div class="btn-row mt-s"><button class="btn primary sm" id="save-paste">Update team</button></div>
         ${pasteProblems.length ? `<div class="problems">${pasteProblems.map((w) => `<div>${esc(w)}</div>`).join('')}</div>` : ''}
         ${sets.length ? `<div class="mon-grid">${sets.map(monCard).join('')}</div>` : '<p class="hint mt-s">No Pokémon parsed yet.</p>'}`}
@@ -299,9 +307,26 @@ export function renderTeamView(main: HTMLElement, team: Team): void {
       toast(replace !== null ? `${built.species} replaced slot ${replace + 1}` : `${built.species} added`);
     });
   });
+  qs('#top-teams', main)?.addEventListener('click', () => {
+    if (!dex) return;
+    openTopTeams(dex, [
+      {
+        label: 'Use as my team', cls: 'primary',
+        run: (built, label, estimated) => {
+          sets.splice(0, sets.length, ...built);
+          setEstimated(team, estimated);
+          Object.assign(view, { slot: 0, mode: 'builder' });
+          save(team, sets);
+          toast(`Team replaced with ${label}.${estimated.length ? ` ${estimatedToast(estimated)}` : ''}`);
+        },
+      },
+      { label: 'Plan against this team', run: (built, label) => createPlanFrom(team, label, writeTeam(built)) },
+    ]);
+  });
   qs('#save-paste', main)?.addEventListener('click', () => {
-    const paste = must<HTMLTextAreaElement>('#team-paste').value;
-    if (paste !== team.paste) { team.paste = paste; clearEstimated(team); }
+    const box = must<HTMLTextAreaElement>('#team-paste');
+    const paste = box.value;
+    if (paste !== team.paste) { team.paste = paste; setEstimated(team, boxEstimates(box)); }
     const parsed = parseShowdown(team.paste);
     cleanSelections(team.plans, 'me', parsed);
     store.persist();

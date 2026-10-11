@@ -1,16 +1,19 @@
 import { buildExport, DataError, LIMITS, mergeImport, readExport } from '../domain/codec.ts';
 import type { ExportScope } from '../domain/codec.ts';
-import { cleanSelections, clearEstimated, clonePlan, cloneTab, countNodes, findNode, findPlan, findTeam, monsFor, newNode, newPlan, newTab, newTeam, nextTabName, seedActions } from '../domain/model.ts';
+import { cleanSelections, setEstimated, clonePlan, cloneTab, countNodes, findNode, findPlan, findTeam, monsFor, newNode, newPlan, newTab, newTeam, nextTabName, seedActions } from '../domain/model.ts';
 import { parseShowdown, teamWarnings } from '../domain/showdown.ts';
 import { slug } from '../domain/strings.ts';
 import { nextActions } from '../domain/simulation/state.ts';
-import type { Side, SlotKind } from '../domain/types.ts';
+import { writeTeam } from '../domain/dex.ts';
+import type { Side, SlotKind, Team } from '../domain/types.ts';
+import { loadDex } from '../infra/dex-loader.ts';
 import { store } from '../state/instance.ts';
 import { requestRender } from './bus.ts';
 import { esc, must } from './dom.ts';
 import { monIcon } from './icons.ts';
 import { formOf } from './names.ts';
 import { PASTE_LINK_HINT } from './paste-links.ts';
+import { boxEstimates, estimatedToast, markBoxEstimates, openTopTeams, topTeamsButton } from './top-teams.ts';
 import { confirmDialog, modal, openMenu, toast } from './overlays.ts';
 import { turnResult } from './turn-results.ts';
 import type { MenuItem } from './overlays.ts';
@@ -20,18 +23,25 @@ import { renderTabBar, rerenderCanvas } from './views/plan-view.ts';
 /* ------------------------------ teams & plans ------------------------------ */
 
 export async function createTeam(): Promise<void> {
-  const input = await modal<{ name: string; paste: string }>({
+  const input = await modal<{ name: string; paste: string; estimated: string[] }>({
     title: 'New team', desc: `Paste your team in Showdown format, ${PASTE_LINK_HINT}.`,
     body: `<div><label class="lbl" for="nt-name">Team name</label><input class="field" id="nt-name" placeholder="e.g. Rain offense"></div>
-           <div><label class="lbl" for="nt-paste">Showdown paste</label><textarea class="paste" id="nt-paste" data-team-paste data-name-field="#nt-name" placeholder="Rillaboom @ Assault Vest&#10;Ability: Grassy Surge&#10;- Fake Out&#10;- Grassy Glide&#10;&#10;…${PASTE_LINK_HINT}"></textarea></div>`,
+           <div><label class="lbl" for="nt-paste">Showdown paste</label><textarea class="paste" id="nt-paste" data-team-paste data-name-field="#nt-name" placeholder="Rillaboom @ Assault Vest&#10;Ability: Grassy Surge&#10;- Fake Out&#10;- Grassy Glide&#10;&#10;…${PASTE_LINK_HINT}"></textarea>${topTeamsButton('#nt-paste')}</div>`,
     actions: [
       { label: 'Cancel', value: null },
-      { label: 'Create team', cls: 'primary', run: (ov) => ({ name: must<HTMLInputElement>('#nt-name', ov).value.trim(), paste: must<HTMLTextAreaElement>('#nt-paste', ov).value }) },
+      {
+        label: 'Create team', cls: 'primary',
+        run: (ov) => {
+          const box = must<HTMLTextAreaElement>('#nt-paste', ov);
+          return { name: must<HTMLInputElement>('#nt-name', ov).value.trim(), paste: box.value, estimated: boxEstimates(box) };
+        },
+      },
     ],
   });
   if (!input) return;
   const mons = parseShowdown(input.paste);
   const team = newTeam(input.name || (mons[0] ? `${mons[0].species} team` : 'My team'), input.paste);
+  setEstimated(team, input.estimated);
   store.library.teams.push(team);
   Object.assign(store.ui, { teamId: team.id, planId: null });
   store.ui.open[team.id] = true;
@@ -46,17 +56,22 @@ export async function createPlan(teamId: string): Promise<void> {
   const input = await modal<{ name: string; paste: string }>({
     title: 'New gameplan', desc: `Against which team? Gameplans are saved inside “${team.name}”.`,
     body: `<div><label class="lbl" for="np-name">Opponent team name (optional)</label><input class="field" id="np-name" placeholder="e.g. Sun balance from Regionals"></div>
-           <div><label class="lbl" for="np-paste">Opponent Showdown paste (optional)</label><textarea class="paste" id="np-paste" data-team-paste data-name-field="#np-name" placeholder="Showdown paste, ${PASTE_LINK_HINT}"></textarea></div>`,
+           <div><label class="lbl" for="np-paste">Opponent Showdown paste (optional)</label><textarea class="paste" id="np-paste" data-team-paste data-name-field="#np-name" placeholder="Showdown paste, ${PASTE_LINK_HINT}"></textarea>${topTeamsButton('#np-paste')}</div>`,
     actions: [
       { label: 'Cancel', value: null },
       { label: 'Create gameplan', cls: 'primary', run: (ov) => ({ name: must<HTMLInputElement>('#np-name', ov).value.trim(), paste: must<HTMLTextAreaElement>('#np-paste', ov).value }) },
     ],
   });
   if (!input) return;
-  const mons = parseShowdown(input.paste);
-  const label = input.name || mons.slice(0, 2).map((m) => m.species).join(' / ');
-  const plan = newPlan(label ? `vs ${label}` : 'New gameplan', input.paste);
-  plan.opponent.name = input.name;
+  createPlanFrom(team, input.name, input.paste);
+}
+
+/** A new gameplan in `team` against the opponent `paste` (named `name`, optional), opened straight away. */
+export function createPlanFrom(team: Team, name: string, paste: string): void {
+  const mons = parseShowdown(paste);
+  const label = name || mons.slice(0, 2).map((m) => m.species).join(' / ');
+  const plan = newPlan(label ? `vs ${label}` : 'New gameplan', paste);
+  plan.opponent.name = name;
   team.plans.push(plan);
   Object.assign(store.ui, { teamId: team.id, planId: plan.id, tabId: null, selectedNode: null });
   store.ui.open[team.id] = true;
@@ -64,17 +79,47 @@ export async function createPlan(teamId: string): Promise<void> {
   requestRender();
 }
 
+/**
+ * "★ Top teams" under a paste box: the chosen team (with filled-in spreads) replaces the box's text and names an
+ * empty name field; the box remembers which spreads were estimated, so saving it can label them.
+ */
+export async function pickTopTeam(target: string): Promise<void> {
+  let dex;
+  try { dex = await loadDex(); }
+  catch { toast('Could not load the Pokémon data, so teams from a feed can’t be loaded right now. Reload the page and try again.', true); return; }
+  openTopTeams(dex, [{
+    label: 'Use this team', cls: 'primary',
+    run: (sets, label, estimated) => {
+      const box = document.querySelector<HTMLTextAreaElement>(target);
+      if (!box) return;
+      box.value = writeTeam(sets);
+      markBoxEstimates(box, sets, estimated);
+      const nameField = box.dataset.nameField ? document.querySelector<HTMLInputElement>(box.dataset.nameField) : null;
+      if (nameField && !nameField.value.trim()) nameField.value = label;
+      box.dispatchEvent(new Event('input', { bubbles: true }));
+      box.focus();
+      if (estimated.length) toast(estimatedToast(estimated));
+    },
+  }]);
+}
+
 export async function editPaste(kind: Side): Promise<void> {
   const team = store.team; const plan = store.plan;
   if (!team || (kind === 'opp' && !plan)) return;
   const current = kind === 'opp' ? plan!.opponent.paste : team.paste;
-  const input = await modal<{ paste: string; name: string }>({
+  const input = await modal<{ paste: string; name: string; estimated: string[] }>({
     title: kind === 'opp' ? 'Opponent team' : 'Your team', desc: `Paste the team in Showdown format, ${PASTE_LINK_HINT}.`,
     body: (kind === 'opp' ? `<div><label class="lbl" for="ep-name">Team name (optional)</label><input class="field" id="ep-name" value="${esc(plan!.opponent.name)}"></div>` : '')
-      + `<textarea class="paste tall" id="ep-paste" data-team-paste${kind === 'opp' ? ' data-name-field="#ep-name"' : ''} aria-label="Showdown paste">${esc(current)}</textarea>`,
+      + `<textarea class="paste tall" id="ep-paste" data-team-paste${kind === 'opp' ? ' data-name-field="#ep-name"' : ''} aria-label="Showdown paste">${esc(current)}</textarea>${topTeamsButton('#ep-paste')}`,
     actions: [
       { label: 'Cancel', value: null },
-      { label: 'Save', cls: 'primary', run: (ov) => ({ paste: must<HTMLTextAreaElement>('#ep-paste', ov).value, name: (ov.querySelector<HTMLInputElement>('#ep-name')?.value ?? '').trim() }) },
+      {
+        label: 'Save', cls: 'primary',
+        run: (ov) => {
+          const box = must<HTMLTextAreaElement>('#ep-paste', ov);
+          return { paste: box.value, name: (ov.querySelector<HTMLInputElement>('#ep-name')?.value ?? '').trim(), estimated: boxEstimates(box) };
+        },
+      },
     ],
   });
   if (!input) return;
@@ -84,7 +129,7 @@ export async function editPaste(kind: Side): Promise<void> {
     plan.opponent.name = input.name;
     cleanSelections([plan], 'opp', parsed);
   } else {
-    if (input.paste !== team.paste) { team.paste = input.paste; clearEstimated(team); }
+    if (input.paste !== team.paste) { team.paste = input.paste; setEstimated(team, input.estimated); }
     cleanSelections(team.plans, 'me', parsed);
   }
   store.persist();

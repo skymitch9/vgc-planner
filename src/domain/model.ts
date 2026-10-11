@@ -22,6 +22,12 @@ export function clearEstimated(team: Team, species?: readonly string[]): void {
   else delete team.estimatedSpreads;
 }
 
+/** Sets the team's "estimated spread" species (an empty list removes the field). */
+export function setEstimated(team: Team, species: readonly string[]): void {
+  if (species.length) team.estimatedSpreads = [...new Set(species)];
+  else delete team.estimatedSpreads;
+}
+
 export function newTab(name = 'Plan 1'): PlanTab {
   return { id: newId(), name, selection: emptySelection(), children: [] };
 }
