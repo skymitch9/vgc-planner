@@ -9,3 +9,9 @@ None recorded yet. Each entry carries: Symptom · Status (ACCEPTED/WAIVED/BLOCKE
 - **Status:** WATCHING.
 - **Why tolerated:** unit tests (192) cover the simulation; the smoke test's earlier steps still pass; the likely cause is the damage calculator chunk not loading in that environment, not a product defect seen by users (not confirmed).
 - **What would change it:** a run of `npm run build && npm run preview` + `npm run test:e2e` that passes, or a diagnosis showing a real regression (then it becomes a TODO item).
+
+## KI-2 · A deployed build cannot reach a team feed until the production CSP allows its origin
+- **Symptom:** in production the `connect-src` of the Content-Security-Policy (`public/_headers`, `deploy/security-headers.inc`) does not list any feed origin, so the Top teams picker's feed fetch is blocked there. Local dev has no CSP and works (measured 2026-10-10, PR #3).
+- **Status:** ACCEPTED until App 2 (vgc-meta) has a public home.
+- **Why tolerated:** the feed only exists on localhost:4400 today (owner decision 2026-10-10: run App 2 locally until happy); adding an origin before it exists would be a guess.
+- **What would change it:** the vgc-meta feed getting a public URL (Cloudflare Pages). Then add that origin to both CSP files in the same PR that sets the production default feed URL.
