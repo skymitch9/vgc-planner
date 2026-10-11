@@ -8,6 +8,7 @@ import type { PokemonSet, StatKey, StatTable, Team } from '../../domain/types.ts
 import { currentDex, loadDex } from '../../infra/dex-loader.ts';
 import { store } from '../../state/instance.ts';
 import { requestRender } from '../bus.ts';
+import { moveLabel } from '../move-type.ts';
 import { MOVE_HEADER, itemOptions, monLabel, moveOptions, pct, speciesOptions, typeChip } from '../builder-html.ts';
 import { esc, must, qs } from '../dom.ts';
 import { extLinksHTML } from '../ext-links.ts';
@@ -44,7 +45,7 @@ function monCard(m: PokemonSet): string {
     <div class="sub">${m.item ? itemIcon(m.item, 'xs') + esc(m.item) : '<span class="muted">No item</span>'}</div>
     ${m.ability ? `<div class="sub">${esc(m.ability)}</div>` : ''}
     ${sp ? `<div class="sub" title="Champions Stat Points (max 32 per stat, 66 total)">SP ${esc(spreadText(sp.sp))}${sp.converted ? ' (from EVs)' : ''}</div>` : ''}
-    ${m.moves.length ? `<div class="moves">${m.moves.map(esc).join(' · ')}</div>` : ''}</div></div>`;
+    ${m.moves.length ? `<div class="moves">${m.moves.map((x) => moveLabel(x)).join(' · ')}</div>` : ''}</div></div>`;
 }
 
 // ---- Builder ----------------------------------------------------------------------------------------------------

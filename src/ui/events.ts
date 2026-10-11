@@ -9,6 +9,7 @@ import { requestRender } from './bus.ts';
 import { copyShareLink, openShareDialog, redrawSharedLinks, stopSharingPlan } from './share.ts';
 import { session } from '../state/account.ts';
 import { qs } from './dom.ts';
+import { moveTypeChip } from './move-type.ts';
 import { setOutcome } from './outcome-edit.ts';
 import { openReplayImport } from './replay-import.ts';
 import { openImport } from './bulk-import.ts';
@@ -200,6 +201,9 @@ function onInput(e: Event): void {
       const wasLegal = editingTargetRule(action).legal.join('|');
       const wasTarget = action.target;
       action.move = t.value;
+      // The type badge beside the move box follows the pick (a full redraw would lose the caret).
+      const badge = qs(`#a-type-${index}`);
+      if (badge) badge.innerHTML = moveTypeChip(action.move);
       // A new move keeps its target only if it can still aim there; a move with one possible target gets it.
       const rule = editingTargetRule(action);
       if (action.target ? !rule.allowed(action.target) : rule.legal.length === 1) action.target = rule.legal[0] ?? '';

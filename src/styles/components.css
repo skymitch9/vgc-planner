@@ -17,6 +17,10 @@
 .drawer-body { flex: 1; overflow: auto; padding: 16px; display: grid; gap: 14px; align-content: start; }
 .drawer-foot { padding: 12px 16px; border-top: 1px solid var(--line-soft); display: flex; justify-content: space-between; }
 label.lbl { display: block; font-size: 12px; font-weight: 600; color: var(--ink-2); margin-bottom: 4px; }
+/* The "Move" label with the chosen move's type badge beside it (a native <option> cannot hold a colour chip). */
+.lbl-row { display: flex; align-items: center; gap: 6px; font-size: 12px; height: 1.4em; margin-bottom: 4px; }
+.lbl-row label.lbl { margin-bottom: 0; }
+.move-type .type { min-width: 0; }
 .act-edit { border: 1px solid var(--line-soft); border-left-width: 4px; border-radius: 10px; padding: 10px; display: grid; gap: 8px; }
 .act-edit.me { border-left-color: var(--me); }
 .act-edit.opp { border-left-color: var(--opp); }

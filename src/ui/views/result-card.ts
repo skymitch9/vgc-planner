@@ -8,6 +8,7 @@ import type { FlowNode, Side } from '../../domain/types.ts';
 import type { SimView } from '../../state/sim-service.ts';
 import { esc } from '../dom.ts';
 import { monIcon } from '../icons.ts';
+import { moveLabel } from '../move-type.ts';
 import { formOf, renamedForms, showNames } from '../names.ts';
 
 export const ICON_CHEVRON = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>`;
@@ -78,34 +79,34 @@ function logRow(e: LogEntry, n: Names): string {
   let body = '';
   switch (e.type) {
     case 'hit':
-      body = `<b>${esc(e.move)}</b>`
+      body = `<b>${moveLabel(e.move)}</b>`
         + (e.results.length
           ? e.results.map((r) => `<div class="tgt">→ ${icon(r.side, r.mon)} ${name(r.side, r.mon)} ${hitText(r, n)}</div>`).join('')
           : '<div class="tgt muted">no target left</div>')
         + (e.self?.some((c) => c.delta !== 0) ? `<div class="tgt">${name(e.side, e.mon)} ${statChips(e.self)}</div>` : '');
       break;
     case 'boost':
-      body = `<b>${esc(n.text(e.move))}</b> ${statChips(e.changes) || '<span class="muted">no change</span>'}`;
+      body = `<b>${moveLabel(e.move, { text: n.text(e.move) })}</b> ${statChips(e.changes) || '<span class="muted">no change</span>'}`;
       break;
     case 'debuff':
-      body = `<b>${esc(e.move)}</b>${e.targets.map((t) => `<div class="tgt">→ ${icon(t.side, t.mon)} ${name(t.side, t.mon)} ${t.protected ? '<span class="muted">protected</span>' : t.blocked ? `<span class="muted">blocked by ${esc(n.text(t.blocked))}</span>` : (statChips(t.changes) || '<span class="muted">no effect</span>')}</div>`).join('')}`;
+      body = `<b>${moveLabel(e.move)}</b>${e.targets.map((t) => `<div class="tgt">→ ${icon(t.side, t.mon)} ${name(t.side, t.mon)} ${t.protected ? '<span class="muted">protected</span>' : t.blocked ? `<span class="muted">blocked by ${esc(n.text(t.blocked))}</span>` : (statChips(t.changes) || '<span class="muted">no effect</span>')}</div>`).join('')}`;
       break;
     case 'status':
-      body = `<b>${esc(e.move)}</b>${e.targets.map((t) => `<div class="tgt">→ ${icon(t.side, t.mon)} ${name(t.side, t.mon)} ${statusTargetText(t, n)}</div>`).join('')}`;
+      body = `<b>${moveLabel(e.move)}</b>${e.targets.map((t) => `<div class="tgt">→ ${icon(t.side, t.mon)} ${name(t.side, t.mon)} ${statusTargetText(t, n)}</div>`).join('')}`;
       break;
     case 'residual':
       body = `<span class="muted">${esc(e.text)}</span> <span class="dmg">${e.pct > 0 ? '+' : '−'}${fmtPct(Math.abs(e.pct))}%</span>${e.fainted ? ' <span class="ko-tag">KO</span>' : ''}`;
       break;
     case 'cure': body = `<i class="muted">${esc(n.text(e.text))}</i>`; break;
     case 'switch':
-      body = `${e.via ? `<b>${esc(e.via)}</b> ` : ''}${e.replace ? 'fainted, replaced by' : 'switches to'} ${icon(e.side, e.in)} <b>${name(e.side, e.in)}</b>`;
+      body = `${e.via ? `<b>${moveLabel(e.via)}</b> ` : ''}${e.replace ? 'fainted, replaced by' : 'switches to'} ${icon(e.side, e.in)} <b>${name(e.side, e.in)}</b>`;
       break;
     case 'effect': body = `<b>${esc(n.text(e.source))}</b> <span class="muted">${esc(n.text(e.text))}</span>`; break;
     case 'protect':
-    case 'field': body = `<b>${esc(n.text(e.move))}</b> <span class="muted">${esc(n.text(e.text))}</span>`; break;
+    case 'field': body = `<b>${moveLabel(e.move, { text: n.text(e.move) })}</b> <span class="muted">${esc(n.text(e.text))}</span>`; break;
     case 'mega': body = `Mega Evolves into <b>${esc(e.species)}</b>`; break;
     case 'skip': body = `<i class="muted">${esc(n.text(e.why))}</i>`; break;
-    case 'other': body = `<b>${esc(e.move)}</b> <span class="muted">${esc(e.note)}</span>`; break;
+    case 'other': body = `<b>${moveLabel(e.move)}</b> <span class="muted">${esc(e.note)}</span>`; break;
   }
   return `<li class="${e.side}">${icon(e.side, e.mon)}<div class="txt">${body}</div></li>`;
 }

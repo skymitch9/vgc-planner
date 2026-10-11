@@ -1,6 +1,7 @@
-import { store } from '../state/instance.ts';
+import { simService, store } from '../state/instance.ts';
 import { registerRenderer } from './bus.ts';
 import { must } from './dom.ts';
+import { addMoveTypeSource } from './move-type.ts';
 import { renderPlanView } from './views/plan-view.ts';
 import { renderNav } from './views/sidebar.ts';
 import { renderTeamView } from './views/team-view.ts';
@@ -27,3 +28,5 @@ export function render(): void {
 }
 
 registerRenderer(render);
+// Moves the Reg M-C data doesn't list still get their type colour once the calculator has loaded.
+addMoveTypeSource((move) => { const info = simService.moveInfo(move); return info?.exists ? info.type : null; });
