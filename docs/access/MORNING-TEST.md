@@ -36,7 +36,9 @@ Run these in `vgc-meta`. `npm run status` first: it prints every table's counts 
 | 3 | `npm run sim -- --team data/sim-input/sal-z.txt --top 30` | Sal Z vs the top 30: best leads, bring fours, odds (about 17 min at full depth) | ⚠️ the player is still v1 (see below) |
 | 4 | `npm run improve -- --team data/sim-input/sal-z.txt --top 30` | Ranked legal changes to the team + the combined team as a pokepaste (about 30 min) | ⚠️ v1 pushes toward raw damage; treat as leads |
 | 5 | `npm run realdata -- sample` | Five real matches and three real replays, as parsed | — |
-| 6 | `npm run refresh` then `npm run publish` | Re-polls every source (Smogon usage, Limitless, crob.at, Victory Road, YouTube ×18 channels, VGCPastes sheet) and rewrites the feed | a full all-source refresh in one go after tonight's merges |
+| 6 | `npm run teambuild` (or `-- --around "Garchomp"`, or `-- --team data/sim-input/sal-z.txt` for a calc report on your own team) | A legal six as a pokepaste, a spread sheet with calc-justified custom spreads, a lead/bring chart vs 12 common matchups, weaknesses; about 20–30 s. Output folder printed at the end (`data/teambuild/<time>/`) | whether the team wins real games; it re-ranks known teams; it does not check item/terrain synergy yet (default build put Psychic Seed on Sneasler with no Psychic Terrain) |
+| 7 | `npm run calibrate -- report` | How the sim scores against real matches (v1: 53.8% vs 56.6% for player skill alone; no added value) | player v2 |
+| 8 | `npm run refresh` then `npm run publish` | Re-polls every source (Smogon usage, Limitless, crob.at, Victory Road, YouTube ×18 channels, VGCPastes sheet) and rewrites the feed | a full all-source refresh in one go after tonight's merges |
 
 ### The coach (Showdown adviser)
 
@@ -52,7 +54,7 @@ Run these in `vgc-meta`. `npm run status` first: it prints every table's counts 
 - **Player v2** (12 toggleable features: weather/terrain, abilities/items, speed, Fake Out, Protect, speed control, redirection, setup, status, switching, lookahead, Revival Blessing fix). Built and measured on branch `feature/player-v2` in `../vgc-meta-player`; it beat the old player 74.6% with zero illegal choices. ⛔ NOT merged: the `git merge main` it needs was refused by the permission system for the agent and then for the conductor. **Say "approve the merge"** (or run it yourself: steps in `docs/TODO.md`, entry 2026-10-11 01:50).
 - Until that lands, `sim`, `improve`, `matrix` and the coach all use the old player, whose calls on real matches were no better than a coin flip (133 games, 49.6%).
 
-## Still in progress when this was written
+## Still in progress when this was last updated (05:10)
 
-- The measurement build (`../vgc-meta-calibrate`): does the sim predict real match winners, and does the player choose what humans choose? Results → `docs/DONE.md` here and `docs/info/CALIBRATION.md` in vgc-meta when it lands.
+- Tiered all-vs-all sims (`../vgc-meta-tiers`), running. The measurement build and the team builder have LANDED (rows 6 and 7 above).
 - Queued behind player v2: real lead/bring weights, a policy fitted to human choices, tiered all-vs-all sims, then the team builder.
