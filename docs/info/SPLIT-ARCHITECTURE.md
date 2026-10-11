@@ -30,10 +30,10 @@
 
 | Piece | Status | Upstream-friendly because |
 |---|---|---|
-| Load a team from a pokepaste / VR Pastes **link** everywhere a paste box exists | already upstream | — |
+| Load a team from a pokepaste / VR Pastes **link** everywhere a paste box exists | already upstream (verified 2026-10-10: in phc4rdoso/vgc-planner history before our base 7c75463) | — |
 | **Team feed**: a configurable list of feed URLs; the "★ Top teams" picker lists the feed's entries (player, event, date, confirmed/estimated flag, replica codes, source link) and loads the chosen paste through the existing link loader, wherever a paste can be loaded | to build (replaces the in-repo picker on `feature/top-teams`) | a generic "import from a feed" feature with a tiny public JSON format; no scraping, no 840 KB data file, no secrets in the planner |
 | **Top spreads fill-in**: when a loaded set has no Stat Points, use Smogon's most used spread for that Pokémon and label it *Estimated*; keep the player's spread and label it *Confirmed* when the paste has one | to build (the logic exists as `teamSets` on `feature/top-teams-data`; only the labelling UI is new) | reuses the usage data the project already ships for Top builds |
-| Top builds (per-Pokémon usage: items, moves, spreads) | already upstream (PR #1) | — |
+| Top builds (per-Pokémon usage: items, moves, spreads) | in THIS repo only (our PR #1, 7148d22) — ⚠️ NOT upstream; corrected 2026-10-10 18:2x after the upstream plan checked phc4rdoso/vgc-planner, which has no src/data, dex.ts or dex-loader | it is the base PR A/B/C depend on; see [UPSTREAM-PLAN.md](UPSTREAM-PLAN.md) |
 
 What LEAVES the fork (moves to App 2, nothing lost — it is all on branches): `scripts/fetch-teams.mjs` + the four source parsers + `src/data/teams-mc.json` + the derived "usage cores" (`src/domain/top-teams.ts`) + the real-teams picker tab. The branches `feature/top-teams` and `feature/top-teams-data` are the seed of App 2's repo.
 

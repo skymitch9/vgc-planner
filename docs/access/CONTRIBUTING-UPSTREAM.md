@@ -11,15 +11,19 @@
 
 ## How to open an upstream PR without docs/
 
-1. Branch from the commit you want to send, then drop docs/ from that branch only:
+⚠️ **Corrected 2026-10-10 18:2x.** The earlier version said `git rm -r --cached docs`; that would DELETE upstream's own `docs/ARCHITECTURE.md` and `docs/media/` in the PR. Never do that. The right shape:
+
+1. Branch from upstream's default branch and cherry-pick only the code commits:
    ```bash
-   git checkout -b upstream/<topic> <branch-to-send>
-   git rm -r --cached docs && git commit -m "Exclude docs/ from the upstream PR (kept in skymitch9/vgc-planner only)"
+   git fetch upstream                      # upstream = https://github.com/phc4rdoso/vgc-planner.git
+   git checkout -b upstream/<topic> upstream/main
+   git cherry-pick <commit>...             # the commits listed per PR in docs/info/UPSTREAM-PLAN.md; none touch docs/
+   git diff --stat upstream/main...HEAD -- docs   # MUST print nothing
+   npm run check
    ```
-   The test that matters: `git diff --stat <upstream>/main...HEAD -- docs` must print nothing.
 2. Put this line in the PR description: *"docs/ is intentionally excluded from this PR; it lives only in skymitch9/vgc-planner."*
 3. Never `git add -A` on an upstream branch; stage explicit paths.
 
 ## Not verified / open
 
-- As of 2026-10-10 `gh repo view` reports skymitch9/vgc-planner is **not a GitHub fork** and no `upstream` remote exists, so the main project's URL is unknown to this doc. Add it here when the first upstream PR is opened.
+- Upstream identified 2026-10-10 18:2x: **https://github.com/phc4rdoso/vgc-planner** (default branch main, head 6dcd633, 8 commits ahead of our base 7c75463); the `upstream` remote is now configured locally. skymitch9/vgc-planner is still not a GitHub fork, so PR branches need a real fork or a direct push — the owner's call (see UPSTREAM-PLAN.md).
