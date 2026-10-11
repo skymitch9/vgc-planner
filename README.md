@@ -28,6 +28,8 @@ Plan VGC matchups as flowchart gameplans for Pokémon Champions (Regulation M-C)
 
 **Top builds.** The format's Pokémon ranked by Smogon usage, each with its most used moves, items, abilities, Stat Point spreads and teammates. One click adds the most common build (or a chosen spread) to your team, respecting Species Clause and Item Clause.
 
+**Top teams.** Load a published team from a [team feed](#team-feed) into any paste box, make it your team, or start a gameplan against it. Spreads the player didn't publish are filled in from usage and labelled *Estimated*.
+
 ## Quick start
 
 Requires Node 22.12 or newer.
@@ -70,12 +72,14 @@ src/
     dex.ts               Legality checks, usage lookups, Showdown paste writer, building sets from usage
     model.ts             Factories and tree helpers
     codec.ts             Validated reading/writing of stored data and export files, with size limits
+    team-feed.ts         Team feed validation, paste URLs, filling missing spreads from usage
     simulation/          Turn simulation (order, damage, boosts, HP carry-over) on top of the calculator
   infra/               Things that touch the outside world
     repository.ts        LibraryRepository interface + localStorage and in-memory implementations
     prefs.ts             View preferences (kept apart from user data)
     calc-loader.ts       Lazy import of @smogon/calc
     dex-loader.ts        Lazy import of the legality and usage data
+    team-feed.ts         Downloading a team feed and its pastes
     sprites.ts           Sprite URL building
   state/               AppStore (library + view state + debounced saving) and SimService (calculator lifecycle, caching)
   ui/                  Rendering and event handling; views/ has one module per screen area
@@ -124,6 +128,36 @@ Each branch keeps a full battle state (HP, held item, stat stages, condition, fi
 ## Branches from replays
 
 **Add branch from replay** (top bar of a gameplan) takes a Pokémon Showdown replay link (private ones too, with the full link ending in `pw`) and adds what happened as a branch. Both teams must be exactly the gameplan's: the same six Pokémon and, from the open team sheets, the same items, abilities and moves (a different nature is only a warning); otherwise nothing is added and the differences are listed. The branch goes into the tab with the same leads and backs, or a new tab named after the players (tick the box to always use a new tab), which then opens. Every turn records what the replay shows: switches, Mega Evolution, moves and targets, pivots, the chance results, the order things happened in and each Pokémon's HP (the replay's percentages replace the average rolls, so later turns start from what really happened). A Pokémon that fainted before acting, or couldn't move, gets a move marked "not shown in the replay". Importing the same replay again adds nothing; the toast offers Undo. The browser reads the replay straight from Showdown (no cookies, nothing through our server).
+
+## Team feed
+
+A team feed is a small JSON file, published by any site that collects teams, listing tournament and community teams with a link to each one's Showdown paste. **★ Top teams** (under every paste box, and on the team page) loads a feed, lets you search and filter it (official events, online tournaments, ranked, content creators; "Only confirmed spreads"), previews a team's six sets and loads it.
+
+The shape (fields not listed here are ignored; at most 2,000 entries):
+
+```jsonc
+{
+  "format": "[Gen 9 Champions] VGC 2026 Reg M-C",
+  "generated": "2026-10-10T23:40:00Z",
+  "sources": [{ "id": "limitless", "label": "Limitless VGC", "url": "https://…", "teams": 342 }],  // optional, for the counts
+  "entries": [{
+    "id": "limitless-7178",                       // unique
+    "title": "Player — Regional Recife (1st)",
+    "player": "Player", "event": "Regional Recife", "date": "2026-10-03",
+    "tier": "regional",                           // worlds | international | regional | special | online | ranked | creator
+    "placing": 1,                                 // or null
+    "paste": "pastes/limitless-7178.txt",         // relative to the feed (or absolute on the same site); null if only the Pokémon are known
+    "spreads": "estimated",                       // confirmed | partial | estimated
+    "replicaCodes": ["9NNN3", "N8A4G"],           // optional
+    "source": "https://…",                        // where the team was published
+    "spreadSource": "youtube", "spreadUrl": "https://…"   // optional: where the spreads came from
+  }]
+}
+```
+
+Each paste is plain Showdown text. A Pokémon with an `EVs:` line (Stat Points, in Champions) keeps it and is marked **Confirmed**. One without gets the most used spread for that Pokémon from the [usage data](#legality-and-usage-data) (its Mega's when it holds the stone, with the player's nature when one is given) and is marked **Estimated**, in the preview, in a toast when it's loaded, and with an "Estimated spread" chip on the team page until you edit that Pokémon's Stat Points.
+
+**Pointing the app at a feed:** paste the feed's address into the field at the top of the Top teams window and press Load; it's remembered in this browser. Production builds start with no feed; the dev server starts with `http://localhost:4400/feed.json`, so a folder holding a `feed.json` can be served locally with `npx serve <folder> -l 4400 --cors`. The site must allow cross-origin reads (CORS), and a deployment that keeps the Content-Security-Policy must add the feed's origin to `connect-src`. The browser fetches the feed and pastes directly (no cookies, nothing through our server), and a paste on a different site than its feed is refused.
 
 ## Sprites
 
