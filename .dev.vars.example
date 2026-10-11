@@ -13,3 +13,8 @@ APP_URL=http://localhost:5173
 
 # Lets you sign in with just a name, to try accounts without OAuth apps. Local addresses only.
 DEV_LOGIN=true
+
+# YouTube Data API v3 key (console.cloud.google.com -> APIs & Services -> Credentials, with "YouTube Data API v3"
+# enabled). Only the paste harvester (`npm run teams`) reads it, to scan named channels' video descriptions for
+# pokepast.es / vrpastes.com links. Optional: without it that source is skipped and the others still run.
+YOUTUBE_API_KEY=
