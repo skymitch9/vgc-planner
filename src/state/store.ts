@@ -18,6 +18,8 @@ export interface UiState {
   expanded: Record<string, boolean>;
   /** Sidebar folded down to a thin rail. */
   navCollapsed: boolean;
+  /** The team feed chosen in the "★ Top teams" picker (null: the configured default). */
+  teamFeedUrl: string | null;
   /** The turn whose named line is highlighted from the legend (others are dimmed); null for none. */
   focusLine?: string | null;
   scrollX: number;
@@ -30,7 +32,7 @@ export interface UiState {
  */
 export class AppStore {
   library: Library = { teams: [] };
-  ui: UiState = { teamId: null, planId: null, tabId: null, selectedNode: null, open: {}, expanded: {}, zoom: 1, navCollapsed: false, scrollX: 0, scrollY: 0 };
+  ui: UiState = { teamId: null, planId: null, tabId: null, selectedNode: null, open: {}, expanded: {}, zoom: 1, navCollapsed: false, teamFeedUrl: null, scrollX: 0, scrollY: 0 };
   /** False when browser storage is unavailable and data only lives until the tab closes. */
   persistent: boolean;
   /** Set when saved data could not be read on startup. */
@@ -55,6 +57,7 @@ export class AppStore {
     const p = this.prefs.load();
     this.ui.open = p.open;
     this.ui.navCollapsed = p.navCollapsed;
+    this.ui.teamFeedUrl = p.teamFeedUrl ?? null;
     this.ui.zoom = Math.max(config.zoom.min, Math.min(config.zoom.max, p.zoom));
     this.restoreSelection(p.teamId, p.planId, p.tabId);
   }
@@ -120,7 +123,7 @@ export class AppStore {
 
   async flush(): Promise<void> {
     if (this.timer !== null) { clearTimeout(this.timer); this.timer = null; }
-    this.prefs.save({ teamId: this.ui.teamId, planId: this.ui.planId, tabId: this.ui.tabId, open: this.ui.open, zoom: this.ui.zoom, navCollapsed: this.ui.navCollapsed });
+    this.prefs.save({ teamId: this.ui.teamId, planId: this.ui.planId, tabId: this.ui.tabId, open: this.ui.open, zoom: this.ui.zoom, navCollapsed: this.ui.navCollapsed, teamFeedUrl: this.ui.teamFeedUrl });
     this.setSaveState('saving');
     try {
       await this.repo.save(this.library);

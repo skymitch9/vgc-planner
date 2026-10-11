@@ -215,22 +215,39 @@ function readPlan(raw: unknown, path: string, keepIds: boolean, flowKey: 'childr
   };
 }
 
+/** Species with a usage-estimated spread (optional; older data has none): bounded, de-duplicated, empty means unset. */
+export const ESTIMATED_LIMIT = 24;
+function readEstimated(v: unknown, path: string): string[] {
+  const out: string[] = [];
+  for (const [i, s] of asArr(v, path, ESTIMATED_LIMIT).entries()) {
+    const name = asStr(s, `${path}[${i}]`, LIMITS.nameLength).trim();
+    if (name && !out.includes(name)) out.push(name);
+  }
+  return out;
+}
+
 function readTeam(raw: unknown, path: string, keepIds: boolean, planKey: 'plans', flowKey: 'children' | 'flow'): Team {
   const o = asObj(raw, path);
-  return {
+  const team: Team = {
     id: keepIds && typeof o.id === 'string' && o.id ? o.id : newId(),
     name: asStr(o.name, `${path}.name`, LIMITS.nameLength) || 'Imported team',
     paste: asStr(o.paste, `${path}.paste`),
     plans: asArr(o[planKey], `${path}.plans`, LIMITS.plansPerTeam).map((p, i) => readPlan(p, `${path}.plans[${i}]`, keepIds, flowKey)),
   };
+  const estimated = readEstimated(o.estimatedSpreads, `${path}.estimatedSpreads`);
+  if (estimated.length) team.estimatedSpreads = estimated;
+  return team;
 }
 
 /* ------------------------ single records (account API) ------------------------ */
 
 /** A team's own fields (its gameplans are stored separately), validated. */
-export function readTeamFields(raw: unknown): Pick<Team, 'name' | 'paste'> {
+export function readTeamFields(raw: unknown): Pick<Team, 'name' | 'paste' | 'estimatedSpreads'> {
   const o = asObj(raw, 'team');
-  return { name: asStr(o.name, 'team.name', LIMITS.nameLength) || 'Imported team', paste: asStr(o.paste, 'team.paste') };
+  const fields: Pick<Team, 'name' | 'paste' | 'estimatedSpreads'> = { name: asStr(o.name, 'team.name', LIMITS.nameLength) || 'Imported team', paste: asStr(o.paste, 'team.paste') };
+  const estimated = readEstimated(o.estimatedSpreads, 'team.estimatedSpreads');
+  if (estimated.length) fields.estimatedSpreads = estimated;
+  return fields;
 }
 
 /** One gameplan with its tabs and turns, validated and capped like an import; `id` and the turn/tab ids are kept. */
@@ -265,6 +282,8 @@ export interface ExportedPlan { name: string; opponent: { name: string; paste: s
 export interface ExportedTeam {
   name: string;
   paste: string;
+  /** Species whose spread was estimated from usage (see {@link Team.estimatedSpreads}); absent when none. */
+  estimatedSpreads?: string[];
   /** Read-only summary for people and other tools; ignored on import (the paste is the source of truth). */
   pokemon: { species: string; item: string; ability: string; moves: string[] }[];
   plans: ExportedPlan[];
@@ -289,6 +308,7 @@ function exportTeam(team: Team, onlyPlanId?: string): ExportedTeam {
   return {
     name: team.name,
     paste: team.paste,
+    ...(team.estimatedSpreads?.length ? { estimatedSpreads: [...team.estimatedSpreads] } : {}),
     pokemon: parseShowdown(team.paste).map((m) => ({ species: m.species, item: m.item, ability: m.ability, moves: m.moves })),
     plans: team.plans
       .filter((p) => !onlyPlanId || p.id === onlyPlanId)

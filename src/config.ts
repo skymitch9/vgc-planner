@@ -23,4 +23,15 @@ export const config = {
     saveDelayMs: 200,
   },
   zoom: { min: 0.4, max: 1.6, step: 0.1 },
+  teamFeed: {
+    /**
+     * The feed the "★ Top teams" picker opens with until the user picks one. None in production builds: a team feed
+     * is something the user chooses. In development, a feed served locally (e.g. `npx serve <dir> -l 4400 --cors`).
+     */
+    defaultUrl: env?.DEV ? 'http://localhost:4400/feed.json' : '',
+    timeoutMs: 15_000,
+    /** Size caps for what a feed site sends back. */
+    maxFeedChars: 3_000_000,
+    maxPasteChars: 20_000,
+  },
 } as const;

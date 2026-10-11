@@ -6,7 +6,8 @@ import { RepositoryError } from './repository.ts';
 /** What the server last confirmed for one record: its version, and the JSON we sent (to spot changes). */
 interface Synced { version: number; json: string }
 
-const teamBody = (team: Team, position: number): string => JSON.stringify({ position, name: team.name, paste: team.paste });
+const teamBody = (team: Team, position: number): string =>
+  JSON.stringify({ position, name: team.name, paste: team.paste, ...(team.estimatedSpreads?.length ? { estimatedSpreads: team.estimatedSpreads } : {}) });
 const planBody = (plan: Plan, teamId: string, position: number): string =>
   JSON.stringify({ position, teamId, name: plan.name, opponent: plan.opponent, tabs: plan.tabs });
 

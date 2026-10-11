@@ -57,12 +57,16 @@ test('store restores the last open plan from preferences and reports save errors
   const prefs = new LocalStoragePrefs(storage, 'prefs');
   const team = newTeam('A', ''); const plan = newPlan('p'); team.plans.push(plan);
   await repo.save({ teams: [team] });
-  prefs.save({ teamId: team.id, planId: plan.id, tabId: null, open: {}, zoom: 5, navCollapsed: true });
+  prefs.save({ teamId: team.id, planId: plan.id, tabId: null, open: {}, zoom: 5, navCollapsed: true, teamFeedUrl: 'https://teams.example/feed.json' });
   const store = new AppStore(repo, prefs);
   await store.init();
   assert.equal(store.plan?.id, plan.id);
   assert.equal(store.ui.zoom, 1.6, 'zoom is clamped to the allowed range');
   assert.equal(store.ui.navCollapsed, true, 'the collapsed sidebar is remembered');
+  assert.equal(store.ui.teamFeedUrl, 'https://teams.example/feed.json', 'the chosen team feed is remembered');
+  store.ui.teamFeedUrl = '';
+  await store.flush();
+  assert.equal(prefs.load().teamFeedUrl, '', 'clearing the feed is remembered too');
 
   const errors: string[] = [];
   store.onError = (m) => errors.push(m);
