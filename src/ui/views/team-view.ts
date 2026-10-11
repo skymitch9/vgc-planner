@@ -254,6 +254,7 @@ export function renderTeamView(main: HTMLElement, team: Team): void {
   main.innerHTML = `
   <div class="topbar"><input class="title-input" id="team-name" value="${esc(team.name)}" aria-label="Team name">
     <span class="chip">${esc(REGULATION.label)}</span><span class="spacer"></span>
+    <button class="btn" data-act="duplicate-team" data-team="${esc(team.id)}">Duplicate</button>
     <button class="btn" data-act="export-team" data-team="${esc(team.id)}">Export team</button>
     <button class="btn danger" data-act="delete-team" data-team="${esc(team.id)}">Delete</button>${extLinksHTML()}</div>
   <div class="page"><div class="page-inner">
