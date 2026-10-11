@@ -312,7 +312,8 @@ export async function showExport(scope: ExportScope): Promise<void> {
   });
 }
 
-function importText(text: string): string {
+/** Merges this app's export file (as JSON text) into the library and returns the summary line; throws DataError on a bad file. The Import dialog (bulk-import.ts) calls it. */
+export function importText(text: string): string {
   let raw: unknown;
   try { raw = JSON.parse(text); }
   catch (e) { throw new DataError(`That text isn't valid JSON: ${e instanceof Error ? e.message : ''}`); }
@@ -324,34 +325,6 @@ function importText(text: string): string {
   store.persist();
   const t = summary.newTeams; const p = summary.plans;
   return `Imported ${t} new team${t === 1 ? '' : 's'} and ${p} gameplan${p === 1 ? '' : 's'}${summary.regulationWarning ? ` (${summary.regulationWarning})` : ''}.`;
-}
-
-export async function showImport(): Promise<void> {
-  const message = await modal<string>({
-    title: 'Import JSON', desc: 'Choose a file or paste the JSON. Teams with the same name are merged, so gameplans land in the right folder.',
-    body: `<input type="file" id="imp-file" aria-label="JSON file" accept=".json,application/json"><textarea class="paste short" id="imp-text" aria-label="JSON text" placeholder="Paste JSON here"></textarea><div class="hint err-text" id="imp-err" role="alert"></div>`,
-    actions: [
-      { label: 'Cancel', value: null },
-      {
-        label: 'Import', cls: 'primary',
-        run: (ov) => {
-          const text = must<HTMLTextAreaElement>('#imp-text', ov).value.trim();
-          const error = must('#imp-err', ov);
-          if (!text) { error.textContent = 'Choose a file or paste some JSON first.'; return false; }
-          try { return importText(text); }
-          catch (e) { error.textContent = e instanceof DataError ? e.message : 'Import failed.'; return false; }
-        },
-      },
-    ],
-  });
-  if (message) { requestRender(); toast(message); }
-}
-
-/** Fills the import box from a chosen file. */
-export function loadImportFile(file: File): void {
-  const reader = new FileReader();
-  reader.onload = () => { const box = document.querySelector<HTMLTextAreaElement>('#imp-text'); if (box) box.value = String(reader.result); };
-  reader.readAsText(file);
 }
 
 /* ------------------------------ flowchart ------------------------------ */

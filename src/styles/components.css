@@ -62,6 +62,7 @@ code.k { background: var(--line-soft); padding: 1px 5px; border-radius: 4px; fon
 .mt-s { margin-top: 10px; }
 .icon-row { display: flex; }
 .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-row.center { justify-content: center; }
 textarea.paste.tall { min-height: 240px; }
 textarea.paste.medium { min-height: 220px; }
 textarea.paste.short { min-height: 160px; }

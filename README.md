@@ -26,6 +26,8 @@ Plan VGC matchups as flowchart gameplans for Pokémon Champions (Regulation M-C)
 
 **Team builder.** Edit your team like Showdown's teambuilder: search pickers for Pokémon, item, ability and moves, a nature menu, and Stat Points with the resulting stats (and the Mega's, when holding its stone). The pickers only list what is legal in Reg M-C for that Pokémon, popular choices first with their usage, so an illegal set can't be built; pasted teams are checked the same way and every problem is listed. The **Paste** tab still takes Showdown pastes and Poképaste links.
 
+**Bulk import.** Add many teams at once: paste several Showdown teams, pokepast.es / vrpastes.com links or a Showdown teambuilder backup into **Import → Teams from pastes** (or choose a `.txt` file), check the preview, and import the ones you ticked. See [Importing teams in bulk](#importing-teams-in-bulk).
+
 **Top builds.** The format's Pokémon ranked by Smogon usage, each with its most used moves, items, abilities, Stat Point spreads and teammates. One click adds the most common build (or a chosen spread) to your team, respecting Species Clause and Item Clause.
 
 **Top teams.** Load a published team from a [team feed](#team-feed) into any paste box, make it your team, or start a gameplan against it. Spreads the player didn't publish are filled in from usage and labelled *Estimated*.
@@ -73,6 +75,7 @@ src/
     model.ts             Factories and tree helpers
     codec.ts             Validated reading/writing of stored data and export files, with size limits
     team-feed.ts         Team feed validation, paste URLs, filling missing spreads from usage
+    bulk-import.ts       Cutting one block of text into teams (links, backup headers, separators, groups of six)
     simulation/          Turn simulation (order, damage, boosts, HP carry-over) on top of the calculator
   infra/               Things that touch the outside world
     repository.ts        LibraryRepository interface + localStorage and in-memory implementations
@@ -96,8 +99,19 @@ Dependencies point one way: `ui` → `state` → `infra`/`domain`; `domain` impo
 ## Data
 
 - **Storage:** the library is saved through a `LibraryRepository` (browser `localStorage` today). Unreadable saved data is never overwritten: a copy is kept under a backup key and the app tells you.
-- **Export/import:** JSON with `format: "vgc-gameplan-planner"` and a `version`. Imports are validated field by field and capped (teams, plans, turns, nesting depth, text length). Teams are merged by name, so an exported gameplan lands in the right folder.
-- **Compatibility:** data saved by the earlier single-file version is picked up automatically when this app runs on the same origin. Browsers keep storage per origin (a `file://` copy and a server are different origins), so in that case use **Export all** in the old version and **Import JSON** here.
+- **Export/import:** **Import → Backup file (JSON)** reads the file that **Export** writes: JSON with `format: "vgc-gameplan-planner"` and a `version`. Imports are validated field by field and capped (teams, plans, turns, nesting depth, text length). Teams are merged by name, so an exported gameplan lands in the right folder.
+- **Compatibility:** data saved by the earlier single-file version is picked up automatically when this app runs on the same origin. Browsers keep storage per origin (a `file://` copy and a server are different origins), so in that case use **Export all** in the old version and **Import → Backup file (JSON)** here.
+
+## Importing teams in bulk
+
+**Import** (bottom of the sidebar) or **Bulk import** (next to **New team**) opens one dialog with two tabs. **Backup file (JSON)** restores an export of this app; text that is such a file switches to that tab by itself. **Teams from pastes** takes any mix of:
+
+- **Showdown pastes**, with a line of three or more dashes or equals signs (`---`, `=====`) between teams. Blank lines between the Pokémon of a team are fine.
+- **A Showdown teambuilder backup**: each `=== [format] Folder/Team name ===` header starts a team and names it (the format tag and the folder are dropped).
+- **pokepast.es and vrpastes.com links**, each alone on its line. They are downloaded one at a time when you press Preview; a link that can't be loaded is listed with the reason and skipped.
+- **A run of more than six Pokémon** with nothing between them is cut into teams of six; a leftover of one to five is kept and marked *partial team*.
+
+**Preview** (Ctrl+Enter) lists every team found with an editable name, its Pokémon, how many rule problems it has (click to read them), and *duplicate of …* when the same sets are already in your library (unticked by default). Nothing is created until you press **Import N teams**. With "Fill missing spreads from usage" ticked, sets without a spread get the most used one and are labelled *Estimated*, as with [Top teams](#team-feed). One import takes up to 50 teams; a library holds 200.
 
 ## Legality and usage data
 
