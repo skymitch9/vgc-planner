@@ -4,4 +4,5 @@
 
 | Doc | Covers |
 |---|---|
+| [SPLIT-ARCHITECTURE.md](SPLIT-ARCHITECTURE.md) | The App 1 (this fork) / App 2 (meta + simulation) split, joined by pokepastes and a feed.json; open questions |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Layers (ui → state → infra → domain), rendering safety, persistence, path to a backend |
