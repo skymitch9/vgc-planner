@@ -212,3 +212,6 @@ ul.tree.focusing .tree-item::before, ul.tree.focusing .tree-item::after { border
 .tag-x { border: 0; background: none; color: inherit; font-size: 13px; line-height: 1; padding: 0 3px; cursor: pointer; opacity: .75; }
 .tag-x:hover { opacity: 1; }
 .tag-input { flex: 1; min-width: 120px; border: 0; outline: none; background: transparent; color: var(--ink); font: inherit; font-size: 12.5px; padding: 3px 2px; }
+
+/* ---------- "Use a saved team…" above an opponent paste box ---------- */
+.saved-team .hint { margin-top: 4px; }

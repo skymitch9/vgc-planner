@@ -12,6 +12,7 @@ import { requestRender } from './bus.ts';
 import { esc, must } from './dom.ts';
 import { monIcon } from './icons.ts';
 import { formOf } from './names.ts';
+import { savedTeamPicker } from './saved-teams.ts';
 import { PASTE_LINK_HINT } from './paste-links.ts';
 import { boxEstimates, estimatedToast, markBoxEstimates, openTopTeams, topTeamsButton } from './top-teams.ts';
 import { confirmDialog, modal, openMenu, toast } from './overlays.ts';
@@ -56,6 +57,7 @@ export async function createPlan(teamId: string): Promise<void> {
   const input = await modal<{ name: string; paste: string }>({
     title: 'New gameplan', desc: `Against which team? Gameplans are saved inside “${team.name}”.`,
     body: `<div><label class="lbl" for="np-name">Opponent team name (optional)</label><input class="field" id="np-name" placeholder="e.g. Sun balance from Regionals"></div>
+           ${savedTeamPicker('#np-paste', team.id)}
            <div><label class="lbl" for="np-paste">Opponent Showdown paste (optional)</label><textarea class="paste" id="np-paste" data-team-paste data-name-field="#np-name" placeholder="Showdown paste, ${PASTE_LINK_HINT}"></textarea>${topTeamsButton('#np-paste')}</div>`,
     actions: [
       { label: 'Cancel', value: null },
@@ -109,7 +111,7 @@ export async function editPaste(kind: Side): Promise<void> {
   const current = kind === 'opp' ? plan!.opponent.paste : team.paste;
   const input = await modal<{ paste: string; name: string; estimated: string[] }>({
     title: kind === 'opp' ? 'Opponent team' : 'Your team', desc: `Paste the team in Showdown format, ${PASTE_LINK_HINT}.`,
-    body: (kind === 'opp' ? `<div><label class="lbl" for="ep-name">Team name (optional)</label><input class="field" id="ep-name" value="${esc(plan!.opponent.name)}"></div>` : '')
+    body: (kind === 'opp' ? `<div><label class="lbl" for="ep-name">Team name (optional)</label><input class="field" id="ep-name" value="${esc(plan!.opponent.name)}"></div>${savedTeamPicker('#ep-paste', team.id)}` : '')
       + `<textarea class="paste tall" id="ep-paste" data-team-paste${kind === 'opp' ? ' data-name-field="#ep-name"' : ''} aria-label="Showdown paste">${esc(current)}</textarea>${topTeamsButton('#ep-paste')}`,
     actions: [
       { label: 'Cancel', value: null },
