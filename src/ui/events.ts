@@ -12,7 +12,7 @@ import { qs } from './dom.ts';
 import { setOutcome } from './outcome-edit.ts';
 import { openReplayImport } from './replay-import.ts';
 import { openMenu, toast } from './overlays.ts';
-import { isPivotMove, renderDrawer } from './views/drawer.ts';
+import { editingTargetRule, isPivotMove, renderDrawer } from './views/drawer.ts';
 import { rerenderCanvas, setZoom } from './views/plan-view.ts';
 import { applyNavCollapsed, renderNav } from './views/sidebar.ts';
 import { LINE_COLORS } from '../domain/types.ts';
@@ -179,14 +179,30 @@ function onInput(e: Event): void {
     const action = found.node.actions[index];
     if (!action) return;
     if (a === 'kind') action.kind = asKind(t.value);
-    else if (a === 'mon' || a === 'target') action[a] = t.value;
+    else if (a === 'target' && action.kind !== 'switch') {
+      // The picker only offers legal targets; this catches saved data and anything else that gets past it.
+      if (!editingTargetRule(action).allowed(t.value)) {
+        toast(`${action.move || 'That move'} can't target ${t.value}`, true);
+        renderDrawer();
+        return;
+      }
+      // Picking over a saved target the move can't have drops its flagged entry from the picker.
+      const wasIllegal = !editingTargetRule(action).allowed(action.target);
+      action.target = t.value;
+      if (wasIllegal) renderDrawer();
+    } else if (a === 'mon' || a === 'target') action[a] = t.value;
     else if (a === 'pivot') { if (t.value) action.pivot = t.value; else delete action.pivot; }
     else if (a === 'move') {
       const wasPivot = isPivotMove(action.move);
+      const wasLegal = editingTargetRule(action).legal.join('|');
+      const wasTarget = action.target;
       action.move = t.value;
-      if (wasPivot !== isPivotMove(action.move)) {
-        // Show or hide the "Then switch to" picker right away, keeping the caret in the move box.
-        if (!isPivotMove(action.move)) delete action.pivot;
+      // A new move keeps its target only if it can still aim there; a move with one possible target gets it.
+      const rule = editingTargetRule(action);
+      if (action.target ? !rule.allowed(action.target) : rule.legal.length === 1) action.target = rule.legal[0] ?? '';
+      if (wasPivot !== isPivotMove(action.move) || wasTarget !== action.target || wasLegal !== rule.legal.join('|')) {
+        // Show or hide the "Then switch to" picker and refresh the target picker right away, keeping the caret in the move box.
+        if (wasPivot && !isPivotMove(action.move)) delete action.pivot;
         const caret = t instanceof HTMLInputElement ? t.selectionStart : null;
         renderDrawer();
         const box = qs<HTMLInputElement>(`#a-move-${index}`);
