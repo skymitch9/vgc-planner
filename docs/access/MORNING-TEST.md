@@ -1,6 +1,6 @@
 # Morning test guide — what was built overnight and how to try each piece
 
-> Audience: the owner, testing on the morning of 2026-10-11. Status: TRACKED (fork-only docs). Last verified: 2026-10-11 03:35 Phoenix — the servers below were answering at that time; each item says what was and was NOT verified. Rewritten as the night goes on; see `docs/TODO.md` for the live state.
+> Audience: the owner, testing on the morning of 2026-10-11. Status: TRACKED (fork-only docs). Last verified: 2026-10-11 06:55 Phoenix — the servers below were answering at that time; each item says what was and was NOT verified. Rewritten as the night goes on; see `docs/TODO.md` for the live state.
 
 ## What should already be running on this machine
 
@@ -38,7 +38,8 @@ Run these in `vgc-meta`. `npm run status` first: it prints every table's counts 
 | 5 | `npm run realdata -- sample` | Five real matches and three real replays, as parsed | — |
 | 6 | `npm run teambuild` (or `-- --around "Garchomp"`, or `-- --team data/sim-input/sal-z.txt` for a calc report on your own team) | A legal six as a pokepaste, a spread sheet with calc-justified custom spreads, a lead/bring chart vs 12 common matchups, weaknesses; about 20–30 s. Output folder printed at the end (`data/teambuild/<time>/`) | whether the team wins real games; it re-ranks known teams; it does not check item/terrain synergy yet (default build put Psychic Seed on Sneasler with no Psychic Terrain) |
 | 7 | `npm run calibrate -- report` | How the sim scores against real matches (v1: 53.8% vs 56.6% for player skill alone; no added value) | player v2 |
-| 8 | `npm run refresh` then `npm run publish` | Re-polls every source (Smogon usage, Limitless, crob.at, Victory Road, YouTube ×18 channels, VGCPastes sheet) and rewrites the feed | a full all-source refresh in one go after tonight's merges |
+| 8 | `npm run tiers -- --dry-run`, then `npm run tiers -- --tier official --keep1 60 --keep2 16 --opponents 24` to resume last night's run | The plan with battle counts and an ETA; the official-tier run resumes round 2 (about 1.5 h) then round 3 (about 1 h) and writes `data/sim/tiers-<time>/tiers.md` | the full feed (8.5–14 h); rankings are "for the v1 player" |
+| 9 | `npm run refresh` then `npm run publish` | Re-polls every source (Smogon usage, Limitless, crob.at, Victory Road, YouTube ×18 channels, VGCPastes sheet) and rewrites the feed | a full all-source refresh in one go after tonight's merges |
 
 ### The coach (Showdown adviser)
 
@@ -54,7 +55,6 @@ Run these in `vgc-meta`. `npm run status` first: it prints every table's counts 
 - **Player v2** (12 toggleable features: weather/terrain, abilities/items, speed, Fake Out, Protect, speed control, redirection, setup, status, switching, lookahead, Revival Blessing fix). Built and measured on branch `feature/player-v2` in `../vgc-meta-player`; it beat the old player 74.6% with zero illegal choices. ⛔ NOT merged: the `git merge main` it needs was refused by the permission system for the agent and then for the conductor. **Say "approve the merge"** (or run it yourself: steps in `docs/TODO.md`, entry 2026-10-11 01:50).
 - Until that lands, `sim`, `improve`, `matrix` and the coach all use the old player, whose calls on real matches were no better than a coin flip (133 games, 49.6%).
 
-## Still in progress when this was last updated (05:10)
+## State when this was last updated (06:55)
 
-- Tiered all-vs-all sims (`../vgc-meta-tiers`), running. The measurement build and the team builder have LANDED (rows 6 and 7 above).
-- Queued behind player v2: real lead/bring weights, a policy fitted to human choices, tiered all-vs-all sims, then the team builder.
+Nothing is running. Everything that did not depend on the player-v2 merge has landed: 3 planner PRs and 8 vgc-meta PRs overnight. The start-here block at the end of `docs/TODO.md` lists what waits on you, in order.
