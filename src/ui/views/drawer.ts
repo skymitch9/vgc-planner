@@ -1,10 +1,13 @@
 import { monsFor } from '../../domain/model.ts';
 import type { BattleState } from '../../domain/simulation/state.ts';
 import { bench, canMegaEvolve, fieldAfterReplacements, syncTurnActions } from '../../domain/simulation/state.ts';
+import { isLegalTarget, legalTargets } from '../../domain/simulation/targets.ts';
+import type { TargetWho } from '../../domain/simulation/targets.ts';
 import { CHANCE_EFFECTS, chanceEffects, hasMoveData, PIVOT_MOVES, PROTECT_FAMILY } from '../../domain/simulation/tables.ts';
 import { toID } from '../../domain/strings.ts';
 import type { FlowNode, Side, TurnAction, LineColor } from '../../domain/types.ts';
 import { TARGET_KEYWORDS } from '../../domain/types.ts';
+import { currentDex, loadDex } from '../../infra/dex-loader.ts';
 import { simService, store } from '../../state/instance.ts';
 import { esc, must } from '../dom.ts';
 import { monIcon } from '../icons.ts';
@@ -66,19 +69,71 @@ function canOfferMega(a: TurnAction, st: BattleState | null, actions: readonly T
 }
 
 /**
- * Who a move can target: the Pokémon on the field once this turn's replacements are in (both sides), then the
- * keywords. Without a simulated state, the leads on the first turn or everyone brought later.
+ * The move's Showdown target type, or '' while it isn't known (the editor then stays permissive). It comes from the
+ * Reg M-C move data (Pokémon Showdown's own): the calculator keeps a target type only for spread moves and reports
+ * every other move as "any", so Protect or Tailwind would look single-target. The data loads on first use and the
+ * editor redraws; until then, or for a move missing from it, the calculator's spread types still count.
  */
-function targetChoices(a: TurnAction, st: BattleState | null, depth: number, actions: readonly TurnAction[]): string[] {
+const moveTargetType = (move: string): string => {
+  if (!move) return '';
+  const dex = currentDex();
+  if (!dex) loadDex().then(() => renderDrawer()).catch(() => { /* stays permissive; the team view reports the failure */ });
+  const known = dex?.move(move)?.target;
+  if (known) return known;
+  const info = simService.moveInfo(move);
+  return info?.exists && (info.target === 'allAdjacentFoes' || info.target === 'allAdjacent') ? info.target : '';
+};
+
+/** Which side a Pokémon named as `a`'s target is on (foes first, as the simulation resolves a name). */
+function whoIs(a: TurnAction, v: string, st: BattleState | null): TargetWho {
+  const foe: Side = a.side === 'me' ? 'opp' : 'me';
+  if (st ? !!st.mons[foe][v] : orderedMons(foe).includes(v)) return 'foe';
+  return v === a.mon ? 'self' : 'ally';
+}
+
+/** What the target picker offers for a move action, and whether a value may be saved. */
+interface TargetRule {
+  /** The legal choices on the field now, in display order. */
+  legal: string[];
+  /** Whether `v` may be saved as the target: legal for the move, even if that Pokémon has left the field since. */
+  allowed: (v: string) => boolean;
+}
+
+/**
+ * Who a move can target: only what its target type allows (see {@link legalTargets}), among the Pokémon on the field
+ * once this turn's replacements are in. Without a simulated state, the leads on the first turn or everyone brought
+ * later. Without move data, everything, as before.
+ */
+function targetRule(a: TurnAction, st: BattleState | null, depth: number, actions: readonly TurnAction[]): TargetRule {
   const foe: Side = a.side === 'me' ? 'opp' : 'me';
   const onField = (side: Side): string[] => {
     if (st) return fieldAfterReplacements(st, actions)[side];
     if (depth === 1) return (store.tab?.selection[side].lead ?? []).filter((n): n is string => !!n);
     return orderedMons(side);
   };
-  const list = [...new Set([...onField(foe), TARGET_KEYWORDS[0], ...onField(a.side).filter((v) => v !== a.mon), ...TARGET_KEYWORDS.slice(1)])];
+  const type = moveTargetType(a.move);
+  const legal = legalTargets(type, { foes: onField(foe), allies: onField(a.side).filter((v) => v !== a.mon) });
+  return { legal, allowed: (v) => legal.includes(v) || isLegalTarget(type, v, whoIs(a, v, st)) };
+}
+
+/** {@link targetRule} for an action of the turn open in the editor (for the event handlers). */
+export function editingTargetRule(a: TurnAction): TargetRule {
+  const found = store.currentNode();
+  if (!found) return { legal: [], allowed: () => true };
+  return targetRule(a, startStateOf(found.parent?.id), found.depth, found.node.actions);
+}
+
+/** The target `<select>` for a move action. */
+function targetField(a: TurnAction, i: number, st: BattleState | null, depth: number, actions: readonly TurnAction[], label: (v: string) => string): string {
+  const { legal, allowed } = targetRule(a, st, depth, actions);
+  const open = `<select class="field" id="a-target-${i}" data-a="target" data-i="${i}"`;
+  // Only one thing it can aim at (Heat Wave, Protect, Trick Room...): shown, and nothing else can be picked.
+  if (legal.length === 1 && (!a.target || a.target === legal[0])) return `${open} disabled>${options(legal, legal[0]!, undefined, label)}</select>`;
+  if (!a.target || legal.includes(a.target)) return `${open}>${options(legal, a.target, '—', label)}</select>`;
   // A target chosen earlier that is no longer on the field stays visible; the move hits whoever took its place.
-  return a.target && !list.includes(a.target) ? [...list, a.target] : list;
+  if (allowed(a.target)) return `${open}>${options([...legal, a.target], a.target, '—', label)}</select>`;
+  // A saved target the move can't have stays visible once, flagged, so nothing is lost silently; any pick replaces it.
+  return `${open}>${options([...legal, a.target], a.target, undefined, (v) => (v === a.target ? `${label(v)} (not a legal target)` : label(v)))}</select>`;
 }
 
 /** A Pokémon already on the field acts as itself; only a slot left by a fainted Pokémon lets you pick who comes in. */
@@ -198,7 +253,6 @@ function outcomeEditor(a: TurnAction, i: number, st: BattleState | null, depth: 
 function actionEditor(a: TurnAction, i: number, st: BattleState | null, depth: number, actions: readonly TurnAction[]): string {
   const team = store.team; const plan = store.sheet;
   const set = team && plan ? monsFor(a.side, team, plan).find((m) => m.species === a.mon) : undefined;
-  const targets = targetChoices(a, st, depth, actions);
   const foe: Side = a.side === 'me' ? 'opp' : 'me';
   const own = (v: string): string => formOf(st, a.side, v);
   // Targets mix both sides (and the keywords, which stay as they are).
@@ -242,7 +296,7 @@ function actionEditor(a: TurnAction, i: number, st: BattleState | null, depth: n
       ? `<div><label class="lbl" for="a-target-${i}">Switch to</label><select class="field" id="a-target-${i}" data-a="target" data-i="${i}">${options(incoming, a.target, 'Choose…', own)}</select></div>${outcomeEditor(a, i, st, depth, actions)}`
       : `<div class="row2">
       <div><label class="lbl" for="a-move-${i}">Move</label>${moveField}</div>
-      <div><label class="lbl" for="a-target-${i}">Target</label><select class="field" id="a-target-${i}" data-a="target" data-i="${i}">${options(targets, a.target, '—', anyone)}</select></div>
+      <div><label class="lbl" for="a-target-${i}">Target</label>${targetField(a, i, st, depth, actions, anyone)}</div>
     </div>${lockNote}${pivot}${outcomeEditor(a, i, st, depth, actions)}`}
   </div>`;
 }

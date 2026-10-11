@@ -94,7 +94,10 @@ try {
     if (await el.evaluate((e) => e.tagName === 'SELECT')) await el.selectOption(move); else await el.fill(move);
   };
   await setMove(0, 'Fake Out'); await page.selectOption('#a-target-0', 'Incineroar');
-  await setMove(1, 'Earthquake'); await page.selectOption('#a-target-1', 'Both foes');
+  // Earthquake hits everyone around it: its target is fixed to "All" (only legal targets are offered).
+  await setMove(1, 'Earthquake');
+  await page.waitForFunction(() => document.querySelector('#a-target-1')?.disabled === true, null, { timeout: 30_000 });
+  assert.equal(await page.inputValue('#a-target-1'), 'All');
   await setMove(2, 'Flare Blitz'); await page.selectOption('#a-target-2', 'Rillaboom');
   await setMove(3, 'Protect');
   await page.waitForSelector('.turn-result .hp-row', { timeout: 30_000 }); // first run downloads the calculator
