@@ -1,6 +1,6 @@
 # Secrets — names and custody (never values)
 
-> Audience: future Claude sessions and the owner. Status: TRACKED (so: NAMES ONLY, no values, ever). Last verified: 2026-10-10 (vault created and listed with `op vault list`; the key item itself not yet checked — the owner adds it).
+> Audience: future Claude sessions and the owner. Status: TRACKED (so: NAMES ONLY, no values, ever). Last verified: 2026-10-10 17:10 Phoenix (vault and item `YOUTUBE_API_KEY` exist, id 5qynicoj4wgi7carpuz2hqwjue; value filled by the owner; `.dev.vars` filled from it via `op read`, never through chat).
 
 | Name | What it buys | Custody (where a copy lives / where it is re-minted) |
 |---|---|---|
