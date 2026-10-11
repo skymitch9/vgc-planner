@@ -1,6 +1,7 @@
 import { buildExport, DataError, LIMITS, mergeImport, readExport } from '../domain/codec.ts';
 import type { ExportScope } from '../domain/codec.ts';
-import { cleanSelections, setEstimated, clonePlan, cloneTab, countNodes, findNode, findPlan, findTeam, monsFor, newNode, newPlan, newTab, newTeam, nextTabName, seedActions } from '../domain/model.ts';
+import { cleanSelections, setEstimated, clonePlan, cloneTab, cloneTeam, countNodes, findNode, findPlan, findTeam, monsFor, newNode, newPlan, newTab, newTeam, nextTabName, seedActions } from '../domain/model.ts';
+import { copyNameFor } from '../domain/bulk-import.ts';
 import { parseShowdown, teamWarnings } from '../domain/showdown.ts';
 import { slug } from '../domain/strings.ts';
 import { nextActions } from '../domain/simulation/state.ts';
@@ -147,6 +148,44 @@ export async function renameTeam(id: string): Promise<void> {
     actions: [{ label: 'Cancel', value: null }, { label: 'Save', cls: 'primary', run: (ov) => must<HTMLInputElement>('#rn', ov).value.trim() || team.name }],
   });
   if (name) { team.name = name; store.persist(); requestRender(); }
+}
+
+/** "Duplicate team": asks for the copy's name and whether its gameplans come along, then adds it right after the original. */
+export async function duplicateTeam(id: string): Promise<void> {
+  const team = findTeam(store.library, id);
+  if (!team) return;
+  const full = (): boolean => store.library.teams.length >= LIMITS.teams;
+  const refuse = (): void => toast(`Your library already holds ${LIMITS.teams} teams, the most it can. Delete a team you no longer need, then duplicate this one.`, true);
+  if (full()) { refuse(); return; }
+  const suggested = copyNameFor(team.name, store.library.teams.map((t) => t.name));
+  const n = team.plans.length;
+  const input = await modal<{ name: string; withPlans: boolean }>({
+    title: 'Duplicate team', desc: `A separate copy of “${team.name}” with the same Pokémon. Changing one never changes the other.`,
+    body: `<div><label class="lbl" for="dt-name">Name of the copy</label><input class="field" id="dt-name" maxlength="${LIMITS.nameLength}" value="${esc(suggested)}"></div>`
+      + (n ? `<label class="oc-check"><input type="checkbox" id="dt-plans">Copy its gameplans too (${n})</label>` : ''),
+    actions: [
+      { label: 'Cancel', value: null },
+      {
+        label: 'Duplicate', cls: 'primary',
+        run: (ov) => ({
+          name: must<HTMLInputElement>('#dt-name', ov).value.trim().slice(0, LIMITS.nameLength) || suggested,
+          withPlans: ov.querySelector<HTMLInputElement>('#dt-plans')?.checked === true,
+        }),
+      },
+    ],
+  });
+  if (!input) return;
+  // The library may have changed while the dialog was open (an account sync, another tab's import).
+  if (full()) { refuse(); return; }
+  const copy = cloneTeam(team, input);
+  const { teams } = store.library;
+  const at = teams.findIndex((t) => t.id === id);
+  teams.splice(at < 0 ? teams.length : at + 1, 0, copy);
+  Object.assign(store.ui, { teamId: copy.id, planId: null, tabId: null, selectedNode: null });
+  store.ui.open[copy.id] = true;
+  store.persist();
+  requestRender();
+  toast(`Duplicated ${team.name}`);
 }
 
 export async function deleteTeam(id: string): Promise<void> {

@@ -28,6 +28,8 @@ Plan VGC matchups as flowchart gameplans for Pokémon Champions (Regulation M-C)
 
 **Bulk import.** Add many teams at once: paste several Showdown teams, pokepast.es / vrpastes.com links or a Showdown teambuilder backup into **Import → Teams from pastes** (or choose a `.txt` file), check the preview, and import the ones you ticked. See [Importing teams in bulk](#importing-teams-in-bulk).
 
+**Duplicate a team.** **Duplicate** (on the team page, or in a team's ⋯ menu) makes a separate copy right below the original, with its gameplans too if you tick the box: handy for teams one or two Pokémon apart, or to test a variation.
+
 **Top builds.** The format's Pokémon ranked by Smogon usage, each with its most used moves, items, abilities, Stat Point spreads and teammates. One click adds the most common build (or a chosen spread) to your team, respecting Species Clause and Item Clause.
 
 **Top teams.** Load a published team from a [team feed](#team-feed) into any paste box, make it your team, or start a gameplan against it. Spreads the player didn't publish are filled in from usage and labelled *Estimated*.

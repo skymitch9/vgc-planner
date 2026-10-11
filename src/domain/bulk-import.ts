@@ -123,11 +123,24 @@ export function capBulk(items: readonly BulkItem[], existingTeams: number): Bulk
 export function nameFor(sets: readonly PokemonSet[], hint?: string, taken: readonly string[] = []): string {
   const room = LIMITS.nameLength - 8;
   const base = ((hint ?? '').trim() || sets.slice(0, 2).map((s) => s.species).join(' / ') || 'Team').slice(0, room).trim();
-  const used = new Set(taken.map((n) => n.trim().toLowerCase()));
-  if (!used.has(base.toLowerCase())) return base;
-  let n = 2;
-  while (used.has(`${base} (${n})`.toLowerCase())) n++;
-  return `${base} (${n})`;
+  return firstFree(taken, (n) => (n === 1 ? base : `${base} (${n})`));
+}
+
+/**
+ * A name for a duplicate of the team called `name`: "name (copy)", then "name (copy 2)", "name (copy 3)"... so that
+ * it is not in `taken` (compared without case).
+ */
+export function copyNameFor(name: string, taken: readonly string[] = []): string {
+  const base = name.trim().slice(0, LIMITS.nameLength - 12).trim() || 'Team';
+  return firstFree(taken, (n) => (n === 1 ? `${base} (copy)` : `${base} (copy ${n})`));
+}
+
+/** `candidate(1)`, `candidate(2)`... : the first one not in `taken` (compared without case). */
+function firstFree(taken: readonly string[], candidate: (n: number) => string): string {
+  const used = new Set(taken.map((t) => t.trim().toLowerCase()));
+  let n = 1;
+  while (used.has(candidate(n).toLowerCase())) n++;
+  return candidate(n);
 }
 
 /** Two pastes with the same key hold the same sets, whatever their spacing or line endings. */

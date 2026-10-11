@@ -111,6 +111,22 @@ export function clonePlan(plan: Plan): Plan {
   return copy;
 }
 
+/**
+ * Deep copy of a team with fresh ids, for "duplicate team": its paste and "estimated spread" labels, and, when
+ * `withPlans`, its gameplans under their own names (fresh ids for every gameplan, tab and turn). Shares nothing with
+ * the original.
+ */
+export function cloneTeam(team: Team, options: { name: string; withPlans: boolean }): Team {
+  const copy: Team = {
+    id: newId(),
+    name: options.name,
+    paste: team.paste,
+    plans: options.withPlans ? team.plans.map((p) => ({ ...clonePlan(p), name: p.name })) : [],
+  };
+  if (team.estimatedSpreads?.length) copy.estimatedSpreads = [...team.estimatedSpreads];
+  return copy;
+}
+
 /** Drops picks that are no longer in the pasted team, in every tab of every gameplan given. */
 export function cleanSelections(plans: readonly Plan[], side: Side, mons: readonly PokemonSet[]): void {
   for (const plan of plans) for (const tab of plan.tabs) cleanSelection(tab.selection[side], mons);
