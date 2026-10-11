@@ -150,6 +150,11 @@ export interface Team {
   name: string;
   paste: string;
   plans: Plan[];
+  /**
+   * Species whose spread was filled in from usage stats when the team was loaded from a team feed, because the
+   * paste published none. Shown as "Estimated spread"; a species leaves the list once its spread is edited by hand.
+   */
+  estimatedSpreads?: string[];
 }
 
 /** Everything the user owns. This is the unit that gets persisted. */

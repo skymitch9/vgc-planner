@@ -1,6 +1,6 @@
 import type { Dex, DexSpecies } from '../../domain/dex.ts';
 import { emptySet, setFromUsage, setProblems, spOf, spreadLine, teamProblems, toID, writeTeam } from '../../domain/dex.ts';
-import { cleanSelections, countPlanTurns, oppMons, teamMons } from '../../domain/model.ts';
+import { cleanSelections, clearEstimated, countPlanTurns, oppMons, teamMons } from '../../domain/model.ts';
 import { REGULATION } from '../../domain/regulation.ts';
 import { parseShowdown, teamWarnings } from '../../domain/showdown.ts';
 import { STAT_KEYS, STAT_LABEL, calcStats, spreadText, statPoints } from '../../domain/stats.ts';
@@ -24,6 +24,7 @@ const view = { teamId: '', slot: 0, mode: 'builder' as Mode };
 
 function save(team: Team, sets: PokemonSet[]): void {
   team.paste = writeTeam(sets);
+  clearEstimated(team, []);
   cleanSelections(team.plans, 'me', sets);
   store.persist();
   requestRender();
@@ -195,6 +196,7 @@ function wireEditor(main: HTMLElement, team: Team, sets: PokemonSet[], dex: Dex)
       sp[k] = Math.min(wanted, maxSpPerStat, Math.max(0, maxSpTotal - others));
       if (sp[k] < wanted) toast(`Capped at ${sp[k]}: ${maxSpPerStat} per stat, ${maxSpTotal} in total`);
       set.evs = spreadLine(sp);
+      clearEstimated(team, [set.species]);
       commit();
     });
   });
@@ -208,6 +210,7 @@ function wireEditor(main: HTMLElement, team: Team, sets: PokemonSet[], dex: Dex)
     built.nickname = set.nickname;
     const clash = sets.findIndex((other, j) => j !== i && built.item && toID(other.item) === toID(built.item));
     if (clash >= 0) { toast(`${sets[clash]!.species} already holds ${built.item}; kept this Pokémon's item.`, true); built.item = set.item; }
+    clearEstimated(team, [set.species]);
     sets[i] = built;
     save(team, sets);
   };
@@ -297,7 +300,8 @@ export function renderTeamView(main: HTMLElement, team: Team): void {
     });
   });
   qs('#save-paste', main)?.addEventListener('click', () => {
-    team.paste = must<HTMLTextAreaElement>('#team-paste').value;
+    const paste = must<HTMLTextAreaElement>('#team-paste').value;
+    if (paste !== team.paste) { team.paste = paste; clearEstimated(team); }
     const parsed = parseShowdown(team.paste);
     cleanSelections(team.plans, 'me', parsed);
     store.persist();

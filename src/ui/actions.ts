@@ -1,6 +1,6 @@
 import { buildExport, DataError, LIMITS, mergeImport, readExport } from '../domain/codec.ts';
 import type { ExportScope } from '../domain/codec.ts';
-import { cleanSelections, clonePlan, cloneTab, countNodes, findNode, findPlan, findTeam, monsFor, newNode, newPlan, newTab, newTeam, nextTabName, seedActions } from '../domain/model.ts';
+import { cleanSelections, clearEstimated, clonePlan, cloneTab, countNodes, findNode, findPlan, findTeam, monsFor, newNode, newPlan, newTab, newTeam, nextTabName, seedActions } from '../domain/model.ts';
 import { parseShowdown, teamWarnings } from '../domain/showdown.ts';
 import { slug } from '../domain/strings.ts';
 import { nextActions } from '../domain/simulation/state.ts';
@@ -84,7 +84,7 @@ export async function editPaste(kind: Side): Promise<void> {
     plan.opponent.name = input.name;
     cleanSelections([plan], 'opp', parsed);
   } else {
-    team.paste = input.paste;
+    if (input.paste !== team.paste) { team.paste = input.paste; clearEstimated(team); }
     cleanSelections(team.plans, 'me', parsed);
   }
   store.persist();

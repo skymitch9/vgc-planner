@@ -210,6 +210,14 @@ export function fillSpreads(sets: readonly PokemonSet[], dex: Dex): { sets: Poke
   return { sets: out, estimated };
 }
 
+/**
+ * Which of the filled-in spreads are still there after the paste was edited: `filled` maps each estimated species
+ * to the Stat Points line it was given; a species whose set is gone or whose spread changed is no longer estimated.
+ */
+export function stillEstimated(sets: readonly PokemonSet[], filled: Readonly<Record<string, string>>): string[] {
+  return sets.filter((s) => Object.hasOwn(filled, s.species) && filled[s.species] === s.evs.trim()).map((s) => s.species);
+}
+
 /** A placing as an ordinal: 1 → "1st", 23 → "23rd", 112 → "112th"; null → "". */
 export function placingLabel(placing: number | null): string {
   if (placing === null) return '';

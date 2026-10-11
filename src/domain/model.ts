@@ -10,6 +10,18 @@ export function newTeam(name = '', paste = ''): Team {
   return { id: newId(), name: name || 'My team', paste, plans: [] };
 }
 
+/**
+ * Drops species from the team's "estimated spread" list: the given ones (their spread was just edited by hand), or
+ * all of them when none are given (the paste was replaced). Species no longer on the team are dropped too.
+ */
+export function clearEstimated(team: Team, species?: readonly string[]): void {
+  if (!team.estimatedSpreads) return;
+  const onTeam = new Set(parseShowdown(team.paste).map((m) => m.species));
+  const keep = species ? team.estimatedSpreads.filter((s) => !species.includes(s) && onTeam.has(s)) : [];
+  if (keep.length) team.estimatedSpreads = keep;
+  else delete team.estimatedSpreads;
+}
+
 export function newTab(name = 'Plan 1'): PlanTab {
   return { id: newId(), name, selection: emptySelection(), children: [] };
 }

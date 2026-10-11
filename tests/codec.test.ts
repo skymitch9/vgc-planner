@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { DataError, EXPORT_FORMAT, LIMITS, buildExport, mergeImport, readExport, readLibrary, writeLibrary } from '../src/domain/codec.ts';
+import { DataError, EXPORT_FORMAT, LIMITS, buildExport, mergeImport, readExport, readLibrary, readTeamFields, writeLibrary } from '../src/domain/codec.ts';
 import type { ExportFile } from '../src/domain/codec.ts';
-import { clonePlan, cloneTab, countNodes, newNode, newPlan, newTab, newTeam } from '../src/domain/model.ts';
+import { clearEstimated, clonePlan, cloneTab, countNodes, newNode, newPlan, newTab, newTeam } from '../src/domain/model.ts';
 import type { Library } from '../src/domain/types.ts';
 
 function sampleLibrary(): Library {
@@ -218,4 +218,38 @@ test('tags: an old branch condition becomes a tag; tags are trimmed, de-duplicat
   const back: Library = { teams: [] };
   mergeImport(back, readExport(JSON.parse(JSON.stringify(buildExport(readLibrary(raw), { type: 'all' })))));
   assert.deepEqual(back.teams[0]!.plans[0]!.tabs[0]!.children[0]!.tags, tags, 'tags survive export and import');
+});
+
+test('a team keeps its estimated-spread species through storage and export; older data without them still loads', () => {
+  const lib = sampleLibrary();
+  const team = lib.teams[0]!;
+  team.estimatedSpreads = ['Rillaboom'];
+  assert.deepEqual(readLibrary(JSON.parse(JSON.stringify(writeLibrary(lib)))).teams[0]!.estimatedSpreads, ['Rillaboom']);
+  const imported: Library = { teams: [] };
+  mergeImport(imported, readExport(JSON.parse(JSON.stringify(buildExport(lib, { type: 'all' })))));
+  assert.deepEqual(imported.teams[0]!.estimatedSpreads, ['Rillaboom']);
+  assert.deepEqual(readTeamFields({ name: 'A', paste: '', estimatedSpreads: ['Rillaboom'] }).estimatedSpreads, ['Rillaboom']);
+
+  const old = readLibrary({ schemaVersion: 2, teams: [{ id: 't', name: 'Old', paste: 'Rillaboom', plans: [] }] });
+  assert.ok(!('estimatedSpreads' in old.teams[0]!));
+  assert.ok(!('estimatedSpreads' in readTeamFields({ name: 'Old', paste: '' })));
+  const deduped = readLibrary({ teams: [{ name: 'X', paste: '', estimatedSpreads: [' Rillaboom ', 'Rillaboom', '', 'Incineroar'] }] });
+  assert.deepEqual(deduped.teams[0]!.estimatedSpreads, ['Rillaboom', 'Incineroar']);
+  assert.throws(() => readLibrary({ teams: [{ name: 'X', estimatedSpreads: Array.from({ length: 25 }, (_, i) => `m${i}`) }] }), DataError);
+  assert.throws(() => readLibrary({ teams: [{ name: 'X', estimatedSpreads: 'Rillaboom' }] }), DataError);
+  assert.throws(() => readLibrary({ teams: [{ name: 'X', estimatedSpreads: [42] }] }), DataError);
+});
+
+test('clearEstimated drops edited species, species no longer on the team, or everything', () => {
+  const team = newTeam('T', 'Rillaboom\nEVs: 32 HP\n\nIncineroar\nEVs: 32 HP');
+  team.estimatedSpreads = ['Rillaboom', 'Incineroar', 'Gone'];
+  clearEstimated(team, []);
+  assert.deepEqual(team.estimatedSpreads, ['Rillaboom', 'Incineroar']);
+  clearEstimated(team, ['Rillaboom']);
+  assert.deepEqual(team.estimatedSpreads, ['Incineroar']);
+  clearEstimated(team, ['Incineroar']);
+  assert.ok(!('estimatedSpreads' in team), 'an empty list is removed');
+  team.estimatedSpreads = ['Rillaboom'];
+  clearEstimated(team);
+  assert.ok(!('estimatedSpreads' in team));
 });

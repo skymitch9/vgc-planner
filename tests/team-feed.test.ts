@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { DataError } from '../src/domain/codec.ts';
 import { Dex, type DexData, type UsageData } from '../src/domain/dex.ts';
 import { parseShowdown } from '../src/domain/showdown.ts';
-import { FEED_LIMITS, fillSpreads, placingLabel, readFeed, resolvePaste } from '../src/domain/team-feed.ts';
+import { FEED_LIMITS, fillSpreads, placingLabel, readFeed, resolvePaste, stillEstimated } from '../src/domain/team-feed.ts';
 
 const read = <T>(file: string): T => JSON.parse(readFileSync(new URL(`../src/data/${file}`, import.meta.url), 'utf8')) as T;
 const dex = new Dex(read<DexData>('champions-mc.json'), read<UsageData>('usage-mc.json'));
@@ -137,6 +137,12 @@ test('fillSpreads leaves unknown species alone and does not list them', () => {
   const { sets, estimated } = fillSpreads(parseShowdown('Missingno\n- Water Gun'), dex);
   assert.equal(sets[0]!.evs, '');
   assert.deepEqual(estimated, []);
+});
+
+test('stillEstimated keeps only species whose filled-in spread is unchanged', () => {
+  const sets = parseShowdown('Sylveon\nEVs: 32 HP / 32 SpA\n- Hyper Voice\n\nCharizard\nEVs: 1 HP\n- Heat Wave');
+  assert.deepEqual(stillEstimated(sets, { Sylveon: '32 HP / 32 SpA', Charizard: '32 Spe', Gone: '1 HP' }), ['Sylveon']);
+  assert.deepEqual(stillEstimated(sets, {}), []);
 });
 
 test('placings read as ordinals', () => {
