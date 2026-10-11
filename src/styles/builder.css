@@ -150,3 +150,21 @@ select.input { padding-right: 4px; }
 @media (max-width: 520px) {
   .tt-cards { grid-template-columns: 1fr; }
 }
+
+/* ---------- import dialog (teams from pastes / backup file) ---------- */
+.imp-modal [hidden] { display: none; }
+.imp-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.imp-controls #imp-file { flex: 1 1 220px; min-width: 0; font-size: 12.5px; }
+.imp-rows { display: grid; gap: 6px; }
+.imp-row { display: grid; grid-template-columns: auto minmax(150px, 1fr) auto minmax(0, auto); align-items: center; gap: 4px 10px; padding: 6px 10px; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--bg); }
+.imp-row.off .imp-mons { opacity: .45; }
+.imp-row.err { grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); border-color: var(--bad-soft); background: var(--bad-soft); font-size: 12.5px; }
+.imp-src { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--ink-2); }
+.imp-mons { display: flex; gap: 2px; min-height: 28px; }
+.imp-problems { grid-column: 2 / -1; font-size: 12px; color: var(--danger); }
+.imp-problems summary { cursor: pointer; font-weight: 600; width: fit-content; }
+@media (max-width: 720px) {
+  .imp-row { grid-template-columns: auto minmax(0, 1fr); }
+  .imp-row .imp-mons, .imp-row .tt-badges { grid-column: 2; justify-content: flex-start; }
+  .imp-row.err { grid-template-columns: 1fr; }
+}

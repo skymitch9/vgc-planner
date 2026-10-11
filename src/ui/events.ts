@@ -2,7 +2,7 @@ import { config } from '../config.ts';
 import { DataError } from '../domain/codec.ts';
 import type { ActionKind, Side, SlotKind, LineColor } from '../domain/types.ts';
 import { simService, store } from '../state/instance.ts';
-import { addNode, addTab, selectTab, startRenameTab, tabMenu, createPlan, createTeam, deleteNode, deletePlan, deleteTeam, duplicatePlan, editPaste, loadImportFile, pickSlot, pickTopTeam, renameTeam, showExport, showImport } from './actions.ts';
+import { addNode, addTab, selectTab, startRenameTab, tabMenu, createPlan, createTeam, deleteNode, deletePlan, deleteTeam, duplicatePlan, editPaste, pickSlot, pickTopTeam, renameTeam, showExport } from './actions.ts';
 import { accountMenu, openSignIn, signInWith } from './account.ts';
 import { openPalettePicker } from './theme.ts';
 import { requestRender } from './bus.ts';
@@ -11,6 +11,7 @@ import { session } from '../state/account.ts';
 import { qs } from './dom.ts';
 import { setOutcome } from './outcome-edit.ts';
 import { openReplayImport } from './replay-import.ts';
+import { openImport } from './bulk-import.ts';
 import { openMenu, toast } from './overlays.ts';
 import { editingTargetRule, isPivotMove, renderDrawer } from './views/drawer.ts';
 import { rerenderCanvas, setZoom } from './views/plan-view.ts';
@@ -40,7 +41,8 @@ async function handleClick(el: HTMLElement, e: MouseEvent): Promise<void> {
   const plan = d.plan ?? '';
   switch (d.act) {
     case 'new-team': return createTeam();
-    case 'import': if (el.tagName === 'A') e.preventDefault(); return showImport();
+    case 'import': if (el.tagName === 'A') e.preventDefault(); openImport(d.tab === 'backup' ? 'backup' : 'pastes'); return;
+    case 'bulk-import': openImport('pastes'); return;
     case 'export-all':
       if (store.library.teams.length) return showExport({ type: 'all' });
       toast('Nothing to export yet', true);
@@ -236,7 +238,6 @@ function onInput(e: Event): void {
 /** Some edits change what the editor itself should offer (move suggestions, switch target list). */
 function onChange(e: Event): void {
   const t = e.target;
-  if (t instanceof HTMLInputElement && t.id === 'imp-file' && t.files?.[0]) { loadImportFile(t.files[0]); return; }
   if (!isField(t) || !t.closest('#drawer')) return;
   const a = t.dataset.a;
   const found = store.currentNode();

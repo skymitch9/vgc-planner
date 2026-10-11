@@ -20,7 +20,9 @@ export interface BulkPaste {
   /** The leftover of a run of Pokémon that was cut into teams of six (1 to 5 Pokémon). */
   partial?: true;
 }
-export type BulkItem = BulkLink | BulkPaste;
+/** A line that is a web address but not a team link this app can read; reported, never imported. */
+export interface BulkBadLink { kind: 'badlink'; url: string }
+export type BulkItem = BulkLink | BulkPaste | BulkBadLink;
 
 /** The most teams one bulk import takes. */
 export const BULK_MAX_ITEMS = 50;
@@ -29,6 +31,9 @@ export const BULK_MAX_ITEMS = 50;
 const SEPARATOR = /^(?:-{3,}|={3,})$/;
 /** `=== [gen9vgc2026] Folder/Team name ===` (the format tag and the folder are optional). */
 const HEADER = /^===\s*(?:\[[^\]]*\]\s*)?(.*?)\s*===$/;
+
+/** A web address alone on its line (so not a Pokémon's head line, which never looks like one). */
+const ADDRESS = /^(?:https?:\/\/|www\.)\S+$|^(?:pokepast\.es|vrpastes\.com)(?:\/\S*)?$/i;
 
 /** The team name in a teambuilder header (no format tag, no folder), or null when the line isn't one. */
 function headerName(line: string): string | null {
@@ -55,8 +60,9 @@ function chunkItems(lines: readonly string[], name: string | undefined): BulkPas
 
 /**
  * Cuts `text` into teams, in the order they appear. In order of precedence: a line that is a paste link is a team of
- * its own; a teambuilder header starts a team and names it; a line of dashes or equals signs ends a team; what is
- * left is cut every six Pokémon. Blank lines between the Pokémon of a team are ordinary and never cut it.
+ * its own (any other web address alone on a line is kept as a bad link, for the caller to report); a teambuilder
+ * header starts a team and names it; a line of dashes or equals signs ends a team; what is left is cut every six
+ * Pokémon. Blank lines between the Pokémon of a team are ordinary and never cut it.
  * Not capped: see {@link capBulk}.
  */
 export function splitBulk(text: string | null | undefined): BulkItem[] {
@@ -74,6 +80,11 @@ export function splitBulk(text: string | null | undefined): BulkItem[] {
     if (link) {
       flush();
       items.push({ kind: 'link', url: line, site: link.site });
+      continue;
+    }
+    if (ADDRESS.test(line)) {
+      flush();
+      items.push({ kind: 'badlink', url: line });
       continue;
     }
     if (SEPARATOR.test(line)) { flush(); continue; }

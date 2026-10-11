@@ -9,8 +9,8 @@ import { extLinksHTML } from './ext-links.ts';
 const EMPTY_STATE = (storageNote: string): string => `<div class="topbar bare"><span class="spacer"></span>${extLinksHTML()}</div><div class="page"><div class="empty">
   <h2>Plan your matchups</h2>
   <p>Add your team with a Showdown paste, then build a flowchart gameplan for each opponent you expect to face.</p>
-  <button class="btn primary" data-act="new-team">New team</button>
-  <p class="hint mt">Already have an export? <a href="#" data-act="import">Import JSON</a>.${storageNote}</p></div></div>`;
+  <div class="btn-row center"><button class="btn primary" data-act="new-team">New team</button><button class="btn" data-act="bulk-import">Bulk import</button></div>
+  <p class="hint mt">Already have an export? <a href="#" data-act="import" data-tab="backup">Import JSON</a>.${storageNote}</p></div></div>`;
 
 /** Draws the whole screen from the store: sidebar plus whichever view is selected. */
 export function render(): void {

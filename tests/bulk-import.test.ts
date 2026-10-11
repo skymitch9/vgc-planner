@@ -24,6 +24,17 @@ test('a link inside a sentence is not a link item', () => {
   assert.deepEqual(splitBulk('see https://pokepast.es/d8dd7d70dff01410 for the team').map((i) => i.kind), ['paste']);
 });
 
+test('any other web address alone on a line is a bad link, not a Pokémon', () => {
+  const items = splitBulk(`${team(0, 2)}
+https://pokepast.es/nope
+${team(2, 2)}
+www.example.com/team
+pokepast.es
+http://example.com/x?y=1`);
+  assert.deepEqual(items.map((i) => i.kind), ['paste', 'badlink', 'paste', 'badlink', 'badlink', 'badlink']);
+  assert.deepEqual(items[1], { kind: 'badlink', url: 'https://pokepast.es/nope' });
+});
+
 test('teambuilder headers start a team and name it, without the format tag or the folder', () => {
   const items = pastes(splitBulk(`=== [gen9championsvgc2026regmc] My Rain ===\n\n${team(0, 6)}\n\n=== [gen9vgc2026] Worlds/Sun balance ===\n\n${team(6, 4)}\n\n=== Untagged ===\n${team(10, 1)}`));
   assert.deepEqual(items.map((i) => i.name), ['My Rain', 'Sun balance', 'Untagged']);
@@ -69,7 +80,7 @@ test('a header’s name goes to every team cut from its run', () => {
 test('mixed input keeps its order: links, headers and raw teams', () => {
   const text = [team(0, 2), '---', team(2, 2), '=== [gen9championsvgc2026regmc] My Rain ===', team(4, 6), 'https://pokepast.es/d8dd7d70dff01410', team(10, 2), 'vrpastes.com/abcd1234'].join('\n\n');
   const items = splitBulk(text);
-  assert.deepEqual(items.map((i) => (i.kind === 'link' ? i.url : i.name ?? species(i).join('+'))), [
+  assert.deepEqual(items.map((i) => (i.kind === 'paste' ? i.name ?? species(i).join('+') : i.url)), [
     'Rillaboom+Incineroar', 'Garchomp+Kingambit', 'My Rain', 'https://pokepast.es/d8dd7d70dff01410', 'Gholdengo+Whimsicott', 'vrpastes.com/abcd1234',
   ]);
 });
