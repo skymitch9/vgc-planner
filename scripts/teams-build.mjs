@@ -36,6 +36,9 @@ const MAX_PAGES = 30;
 /** Showdown text sets -> raw sets; real EVs (above Stat Point range) become Stat Points the app's way. */
 function pasteSets(paste) {
   return parseShowdown(paste).map((s) => {
+    // Some exporters write "Nature: Brave" instead of "Brave Nature".
+    const natureLine = s.extra.map((l) => l.match(/^Nature:\s*(\w+)/i)?.[1]).find(Boolean);
+    if (!s.nature && natureLine) s.nature = natureLine;
     const reading = statPoints(s);
     const evs = reading ? spreadLine(reading.sp) : '';
     return { species: s.species, item: s.item, ability: s.ability, nature: s.nature, moves: s.moves, ...(evs ? { evs } : {}) };
@@ -55,11 +58,23 @@ const surname = (name) => toID(String(name ?? '').trim().split(/\s+/).at(-1));
  * @param {number} [o.limit]  at most this many teams fetched per source
  * @param {string} o.today  YYYY-MM-DD
  * @param {(line: string) => void} [o.log]
+ * @param {number} [o.crobCapBytes]  past this many bytes of JSON, crob.at teams are kept only for a top 8 finish
+ *   or a field of 64+ (Infinity keeps them all)
  */
-export async function buildTeams({ load, dexData, usageData = null, sources = ['limitless', 'crob', 'victoryroad'], limit = Infinity, today, log = () => {} }) {
-  const resolve = makeResolver(dexData);
+export async function buildTeams({
+  load,
+  dexData,
+  usageData = null,
+  sources = ['limitless', 'crob', 'victoryroad'],
+  limit = Infinity,
+  today,
+  log = () => {},
+  crobCapBytes = 350_000,
+}) {
+  const resolve = makeResolver(dexData, usageData);
   const dex = new Dex(dexData, usageData);
   const skipped = [];
+  const notes = [];
   const skip = (id, reason) => {
     skipped.push({ id, reason });
     log(`  skip ${id}: ${reason}`);
@@ -73,6 +88,7 @@ export async function buildTeams({ load, dexData, usageData = null, sources = ['
     for (const raw of rawSets) {
       const r = normaliseSet(raw, resolve);
       if (r.error) { skip(id, r.error); return null; }
+      if (r.note) notes.push({ id, note: r.note });
       sets.push(r.set);
     }
     if (sets.length !== 6) { skip(id, `${sets.length} Pokémon, not 6`); return null; }
@@ -176,6 +192,11 @@ export async function buildTeams({ load, dexData, usageData = null, sources = ['
       }
       if (!t) {
         skip(id, 'no Reg M-C team in it');
+        continue;
+      }
+      // crob.at also lists teams people simply uploaded; only tournament results are top teams.
+      if (t.placing === null) {
+        skip(id, 'not a tournament result (no placing)');
         continue;
       }
       if (!t.date) {
@@ -297,7 +318,13 @@ export async function buildTeams({ load, dexData, usageData = null, sources = ['
   // Duplicate ids (a team listed twice by one source) keep the first, best-placed copy.
   legal.sort(compareTeams);
   const ids = new Set();
-  const out = legal.filter((t) => (ids.has(t.id) ? false : ids.add(t.id)));
+  let out = legal.filter((t) => (ids.has(t.id) ? false : ids.add(t.id)));
+  if (JSON.stringify(out).length > crobCapBytes) {
+    const before = out.length;
+    out = out.filter((t) => t.source !== 'crob' || (t.placing ?? Infinity) <= 8 || (t.fieldSize ?? 0) >= 64);
+    log(`over ${Math.round(crobCapBytes / 1000)} KB: kept crob.at teams with a top 8 finish or 64+ players (${before - out.length} dropped)`);
+    for (const t of legal) if (t.source === 'crob' && !out.includes(t)) skipped.push({ id: t.id, reason: `size cap: placing ${t.placing ?? '?'} of ${t.fieldSize ?? '?'}` });
+  }
   for (const t of out) for (const k of Object.keys(t)) if (t[k] === undefined) delete t[k];
 
   const sourceList = sources
@@ -309,5 +336,10 @@ export async function buildTeams({ load, dexData, usageData = null, sources = ['
       teams: out.filter((t) => t.source === s).length,
       ...(info[s].merged !== undefined ? { merged: info[s].merged } : {}),
     }));
-  return { data: { format: FORMAT_NAME, generated: today, sources: sourceList, teams: out }, skipped };
+  const kept = new Set(out.map((t) => t.id));
+  return {
+    data: { format: FORMAT_NAME, generated: today, sources: sourceList, teams: out },
+    skipped,
+    notes: notes.filter((n) => kept.has(n.id)),
+  };
 }

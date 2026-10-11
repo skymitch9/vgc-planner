@@ -88,7 +88,7 @@ const NOISE = new Set(['breed', 'form', 'forme', 'style', 'mode']);
  * "Paldean Tauros Aqua Breed", "Female Indeedee", "Indeedee ♀", "Eternal Flower Floette", "Heat Rotom",
  * "Garchomp Mega Z", "Meowstic F Mega", and cosmetic forms the dex doesn't split ("Alcremie Rainbow Swirl").
  */
-export function makeResolver(dex) {
+export function makeResolver(dex, usage = null) {
   const speciesById = new Map(dex.species.map((s) => [s.id, s]));
   const megaOf = new Map(); // "garchompmegaz" -> { species: "Garchomp", item: "Garchompite Z" }
   for (const s of dex.species) for (const m of s.megas ?? []) megaOf.set(toID(m.name), { species: s.name, item: m.item });
@@ -129,6 +129,26 @@ export function makeResolver(dex) {
       }
       return null;
     },
+    /** The species a Mega Stone belongs to ("Floettite" -> "Floette-Eternal"), or null. */
+    stoneOwner(raw) {
+      const id = toID(raw);
+      for (const m of megaOf.values()) if (toID(m.item) === id) return m.species;
+      return null;
+    },
+    /**
+     * Pastes exported from a Mega often carry the Mega's ability ("Charizard @ Charizardite Y / Ability: Drought").
+     * The base form can't have it, so it becomes the base form's most used ability in Smogon usage (its first
+     * ability without usage). Returns that ability, or null when `ability` isn't such a case.
+     */
+    baseAbilityForMega(species, item, ability) {
+      const s = speciesById.get(toID(species));
+      if (!s || s.abilities.some((a) => toID(a) === toID(ability))) return null;
+      const mega = (s.megas ?? []).find((m) => toID(m.item) === toID(item));
+      if (!mega || toID(mega.ability) !== toID(ability)) return null;
+      const used = new Map();
+      for (const u of usage?.mons ?? []) if (toID(u.species) === s.id) for (const [a, pct] of u.abilities) used.set(toID(a), (used.get(toID(a)) ?? 0) + pct);
+      return [...s.abilities].sort((a, b) => (used.get(toID(b)) ?? 0) - (used.get(toID(a)) ?? 0))[0] ?? null;
+    },
     item: (raw) => itemById.get(toID(raw)) ?? null,
     ability: (raw) => abilityById.get(toID(raw)) ?? null,
     move: (raw) => dex.moves[toID(raw)]?.name ?? null,
@@ -139,11 +159,16 @@ export function makeResolver(dex) {
 /**
  * One raw set ({ species, item, ability, nature, moves, evs? }) in the dex's names. Returns `{ set }`, or
  * `{ error }` naming the first thing that doesn't resolve. A Mega species name without an item gets its stone.
+ * `note` says when a Mega's ability was written as its base form's.
  */
 export function normaliseSet(raw, resolve) {
-  const sp = resolve.species(raw.species);
+  let sp = resolve.species(raw.species);
+  // "Floette @ Floettite": the stone names the form the dex knows (Floette-Eternal), so the stone decides.
+  const owner = sp ? null : resolve.stoneOwner(raw.item);
+  if (owner && toID(owner).startsWith(toID(raw.species))) sp = { species: owner };
   if (!sp) return { error: `unknown species "${raw.species}"` };
   const set = { species: sp.species, item: '', ability: '', nature: '', moves: [] };
+  let note;
   const itemRaw = String(raw.item ?? '').trim();
   if (itemRaw) {
     const item = resolve.item(itemRaw);
@@ -155,6 +180,11 @@ export function normaliseSet(raw, resolve) {
     const ability = resolve.ability(abilityRaw);
     if (!ability) return { error: `${sp.species}: unknown ability "${abilityRaw}"` };
     set.ability = ability;
+    const base = resolve.baseAbilityForMega(set.species, set.item, ability);
+    if (base) {
+      set.ability = base;
+      note = `${sp.species}: Mega ability ${ability} written as ${base}`;
+    }
   }
   const natureRaw = String(raw.nature ?? '').trim();
   if (natureRaw) {
@@ -162,13 +192,14 @@ export function normaliseSet(raw, resolve) {
     if (!nature) return { error: `${sp.species}: unknown nature "${natureRaw}"` };
     set.nature = nature;
   }
-  for (const m of raw.moves ?? []) {
+  // Limitless shows an empty move slot as "-".
+  for (const m of (raw.moves ?? []).filter((x) => x && x.trim() !== '-')) {
     const move = resolve.move(m);
     if (!move) return { error: `${sp.species}: unknown move "${m}"` };
     set.moves.push(move);
   }
   if (raw.evs) set.evs = raw.evs;
-  return { set };
+  return note ? { set, note } : { set };
 }
 
 // ---- Fetching -------------------------------------------------------------------------------------------------

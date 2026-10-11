@@ -6,6 +6,7 @@
  *   npm run teams                               # every source, live
  *   npm run teams -- --source limitless         # one source (limitless | crob | victoryroad); repeatable
  *   npm run teams -- --limit 5                  # at most 5 teams fetched per source (a quick run)
+ *   npm run teams -- --all-crob                 # keep every crob.at team even past the 350 KB size cap
  *   npm run teams -- --offline tests/fixtures/teams --out /tmp/teams.json
  *                                               # saved pages instead of the network (see below)
  *
@@ -69,7 +70,7 @@ async function load(kind, key) {
 
 const today = new Date().toISOString().slice(0, 10);
 console.log(`Refreshing Reg M-C top teams from ${sources.join(', ')}${offline ? ` (offline: ${offline})` : ''}...`);
-const { data, skipped } = await buildTeams({
+const { data, skipped, notes } = await buildTeams({
   load,
   dexData: JSON.parse(fs.readFileSync(DEX, 'utf8')),
   usageData: fs.existsSync(USAGE) ? JSON.parse(fs.readFileSync(USAGE, 'utf8')) : null,
@@ -77,6 +78,7 @@ const { data, skipped } = await buildTeams({
   limit,
   today,
   log: (line) => console.log(line),
+  crobCapBytes: args.includes('--all-crob') ? Infinity : undefined,
 });
 
 const json = JSON.stringify(data);
@@ -89,6 +91,10 @@ const known = data.teams.filter((t) => t.setsKnown);
 const spreads = data.teams.filter((t) => t.sets.some((s) => s.evs));
 console.log(`  ${known.length} with full sets, ${data.teams.length - known.length} species only; ${spreads.length} with published spreads` +
   (count('victoryroad') ? `; ${data.teams.filter((t) => t.replicaCodes).length} with replica codes` : ''));
+if (notes.length) {
+  console.log(`Adjusted ${notes.length} set(s):`);
+  for (const n of notes) console.log(`  ${n.id}: ${n.note}`);
+}
 if (skipped.length) {
   console.log(`Skipped ${skipped.length}:`);
   for (const s of skipped) console.log(`  ${s.id}: ${s.reason}`);

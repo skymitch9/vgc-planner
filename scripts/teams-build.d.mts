@@ -12,4 +12,5 @@ export function buildTeams(options: {
   limit?: number;
   today: string;
   log?: (line: string) => void;
-}): Promise<{ data: TopTeamsData; skipped: { id: string; reason: string }[] }>;
+  crobCapBytes?: number;
+}): Promise<{ data: TopTeamsData; skipped: { id: string; reason: string }[]; notes: { id: string; note: string }[] }>;

@@ -120,6 +120,16 @@ test('names from every site resolve to the dex: regional forms, genders, Megas, 
   assert.equal(r.species('Iron Hands'), null);
   assert.equal(r.nature('Naïve'), 'Naive');
   assert.match(normaliseSet({ species: 'Garchomp', item: 'Not An Item' }, r).error!, /unknown item/);
+  // "Floette @ Floettite": the stone names the only Floette the format has.
+  assert.equal(normaliseSet({ species: 'Floette', item: 'Floettite', moves: ['Protect'] }, r).set?.species, 'Floette-Eternal');
+  assert.match(normaliseSet({ species: 'Floette', item: 'Leftovers' }, r).error!, /unknown species/);
+  // A paste exported from the Mega carries the Mega's ability; the base form gets one it can have.
+  const zard = normaliseSet({ species: 'Charizard', item: 'Charizardite Y', ability: 'Drought', moves: ['Heat Wave', '-'] }, makeResolver(dexData, usageData));
+  assert.ok(dex.species('Charizard')!.abilities.includes(zard.set!.ability), zard.set!.ability);
+  assert.match(zard.note!, /Mega ability Drought/);
+  assert.deepEqual(zard.set!.moves, ['Heat Wave']);
+  // An ability that is nobody's Mega ability stays, for the legality check to reject.
+  assert.equal(normaliseSet({ species: 'Garchomp', item: 'Choice Scarf', ability: 'Levitate' }, r).set?.ability, 'Levitate');
 });
 
 test('the whole pipeline over the fixtures: merging codes onto the official team, real spreads only from pastes', async () => {
