@@ -1,5 +1,7 @@
 # vgc-planner docs — the map
 
+> ⚠️ **Scope of docs/ (owner rule, 2026-10-10):** docs/ is tracked in THIS repo (skymitch9/vgc-planner) only. When a PR is sent back to the main/upstream project, **exclude docs/ from that PR** and say so in the PR description. See [access/CONTRIBUTING-UPSTREAM.md](access/CONTRIBUTING-UPSTREAM.md).
+
 > Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-10 (scaffold only; nothing measured beyond the repo tree).
 
 | File | Answers |
