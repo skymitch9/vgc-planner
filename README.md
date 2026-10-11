@@ -34,6 +34,8 @@ Plan VGC matchups as flowchart gameplans for Pokémon Champions (Regulation M-C)
 
 **Saved teams as opponents.** In **New gameplan** and when editing the opponent, **Use a saved team…** copies one of your own teams into the opponent box (your current team too, for a mirror match). It is a copy: later changes to that team don't change the gameplan.
 
+**Move type colours.** Every move name carries its type's colour (a bar and a light tint, in every theme) on turn cards, in turn results, on team cards and in Top builds / Top teams; hover it for the type's name, and the turn editor shows the chosen move's type badge beside the move box.
+
 ## Quick start
 
 Requires Node 22.12 or newer.

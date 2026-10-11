@@ -14,6 +14,7 @@ import { checkFeedUrl, fetchFeedPaste, loadFeed } from '../infra/team-feed.ts';
 import { store } from '../state/instance.ts';
 import { esc } from './dom.ts';
 import { itemIcon, monIcon } from './icons.ts';
+import { moveLabel } from './move-type.ts';
 
 export interface TopTeamAction {
   label: string;
@@ -85,7 +86,7 @@ const formatDate = (iso: string): string => {
   return Number.isNaN(t) ? '' : new Date(t).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 };
 
-function setCard(set: PokemonSet, confirmed: boolean, estimated: boolean): string {
+function setCard(set: PokemonSet, confirmed: boolean, estimated: boolean, dex: Dex): string {
   const spread = set.evs
     ? `${esc(set.nature ? `${set.nature} · ` : '')}${esc(set.evs)}`
     : '<span class="muted">No spread (no usage data for it)</span>';
@@ -94,7 +95,7 @@ function setCard(set: PokemonSet, confirmed: boolean, estimated: boolean): strin
     <div class="tt-card-head">${monIcon(set.species, 'sm')}<span class="tt-card-name"><b>${esc(set.species)}</b>
       <span class="tt-card-item">${set.item ? `${itemIcon(set.item, 'xs')}${esc(set.item)}` : 'No item'}</span></span></div>
     ${set.ability ? `<div class="tt-card-ability">${esc(set.ability)}</div>` : ''}
-    <ul class="tt-moves">${set.moves.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>
+    <ul class="tt-moves">${set.moves.map((m) => `<li>${moveLabel(m, { type: dex.move(m)?.type ?? null })}</li>`).join('')}</ul>
     <div class="tt-spread">${badge}<span>${spread}</span></div>
   </div>`;
 }
@@ -161,7 +162,7 @@ export function openTopTeams(dex: Dex, actions: TopTeamAction[]): void {
     if (!p || p.state === 'loading') return '<p class="hint" role="status">Loading the team…</p>';
     if (p.state === 'error') return `<p class="err-text" role="alert">${esc(p.message)}</p>`;
     if (!p.sets.length) return '<p class="err-text">This paste has no Pokémon in it.</p>';
-    return `<div class="tt-cards">${p.sets.map((s, i) => setCard(s, p.confirmed.has(i), p.estimated.includes(s.species))).join('')}</div>`;
+    return `<div class="tt-cards">${p.sets.map((s, i) => setCard(s, p.confirmed.has(i), p.estimated.includes(s.species), dex)).join('')}</div>`;
   };
 
   const detailHTML = (e: FeedEntry): string => {

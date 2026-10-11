@@ -3,9 +3,10 @@ import type { Dex, DexItem, DexMove, DexSpecies } from '../domain/dex.ts';
 import { toID } from '../domain/dex.ts';
 import { esc } from './dom.ts';
 import { itemIcon, monIcon } from './icons.ts';
+import { typeChip } from './move-type.ts';
 import type { PickOption } from './picker.ts';
 
-export const typeChip = (type: string): string => `<span class="type t-${esc(type.toLowerCase())}">${esc(type)}</span>`;
+export { typeChip };
 const CAT: Record<string, string> = { Physical: 'Phys', Special: 'Spec', Status: 'Status' };
 export const catChip = (cat: string): string => `<span class="cat c-${esc(cat.toLowerCase())}">${esc(CAT[cat] ?? cat)}</span>`;
 export const pct = (n: number | undefined): string => (n === undefined ? '' : `${n >= 10 ? n.toFixed(0) : n.toFixed(1)}%`);

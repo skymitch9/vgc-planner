@@ -7,6 +7,9 @@ import { applyDynamicStyles, esc, must, qs } from '../dom.ts';
 import { itemIcon, monIcon } from '../icons.ts';
 import type { BattleState, Outcome } from '../../domain/simulation/state.ts';
 import { formOf } from '../names.ts';
+import { currentDex, loadDex } from '../../infra/dex-loader.ts';
+import { requestRender } from '../bus.ts';
+import { moveLabel } from '../move-type.ts';
 import { isPivotMove, refreshDrawerFoot, renderDrawer } from './drawer.ts';
 import { fieldStripHTML, hasDetails, ICON_CHEVRON, noticeHTML, resultHTML, summaryHTML } from './result-card.ts';
 import { session } from '../../state/account.ts';
@@ -63,7 +66,7 @@ function nodeHTML(n: FlowNode, depth: number, sim: SimView, start: BattleState |
   const selected = store.ui.selectedNode === n.id;
   const action = (a: TurnAction): string => {
     const foe: Side = a.side === 'me' ? 'opp' : 'me';
-    const what = a.kind === 'switch' ? `Switch to ${esc(a.target ? nameAt(start, a.side, a.target) : '?')}` : `${a.kind === 'mega' ? 'Mega + ' : ''}${esc(a.move || '—')}`;
+    const what = a.kind === 'switch' ? `Switch to ${esc(a.target ? nameAt(start, a.side, a.target) : '?')}` : `${a.kind === 'mega' ? 'Mega + ' : ''}${a.move ? moveLabel(a.move) : '—'}`;
     const target = a.kind === 'switch' || !a.target ? '' : `→ ${esc(nameAt(start, foe, a.target))}`;
     const pivot = a.kind !== 'switch' && a.pivot && isPivotMove(a.move) ? `then ${esc(nameAt(start, a.side, a.pivot))}` : '';
     const sub = [target, pivot].filter(Boolean).join(' · ');
@@ -165,6 +168,8 @@ export function renderTabBar(): void {
 export function renderPlanView(main: HTMLElement, team: Team, plan: Plan): void {
   const sheet = store.sheet;
   if (!sheet) return;
+  // Move names take their type colour from the Reg M-C data: fetch it once and redraw (plain names until then, or if it fails).
+  if (!currentDex()) loadDex().then(() => requestRender()).catch(() => { /* names stay plain; the team view reports the failure */ });
   const sim = simService.compute(team, sheet);
   main.innerHTML = `
   <div class="topbar">

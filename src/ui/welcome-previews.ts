@@ -5,6 +5,7 @@
  */
 import { esc } from './dom.ts';
 import { itemIcon, monIcon } from './icons.ts';
+import { moveLabel } from './move-type.ts';
 import { ICON_CHEVRON } from './views/result-card.ts';
 
 const MY_TEAM = [
@@ -30,8 +31,14 @@ const slots = (side: 'me' | 'opp', lead: [string, string], back: [string, string
     <div class="slots-label">Back</div><div class="slots">${slot(back[0])}${slot(back[1])}</div></div>`;
 };
 
-const act = (side: 'me' | 'opp', mon: string, move: string, target = ''): string =>
-  `<div class="act ${side}">${monIcon(mon, 'xs')}<div class="txt"><div class="mv">${esc(move)}</div>${target ? `<div class="tg">→ ${esc(target)}</div>` : ''}</div></div>`;
+/** The example's moves and their types: the tour is drawn before any move data has loaded. */
+const TYPE_OF: Readonly<Record<string, string>> = {
+  'Wood Hammer': 'Grass', Flamethrower: 'Fire', 'Nasty Plot': 'Dark', 'Fake Out': 'Normal', 'Clangorous Soul': 'Dragon', 'Focus Blast': 'Fighting',
+};
+const mv = (move: string): string => moveLabel(move, { type: TYPE_OF[move] ?? null });
+
+const act = (side: 'me' | 'opp', mon: string, move: string, target = '', mega = false): string =>
+  `<div class="act ${side}">${monIcon(mon, 'xs')}<div class="txt"><div class="mv">${mega ? 'Mega + ' : ''}${mv(move)}</div>${target ? `<div class="tg">→ ${esc(target)}</div>` : ''}</div></div>`;
 
 const turnCard = (title: string, mine: string[], theirs: string[], extra = '', cls = '', head = ''): string =>
   `<div class="turn ${cls}"><div class="turn-head"><span class="ttl">${esc(title)}</span><span class="spacer"></span>${head}</div>
@@ -41,7 +48,7 @@ const miniHp = (mon: string, pct: number): string =>
   `<span class="mini-hp ${pct ? '' : 'ko'}">${monIcon(mon, 'xs')}${pct ? `<span class="hp-bar"><i class="ok" data-w="${pct}"></i></span>` : '<span class="ko-tag">KO</span>'}</span>`;
 
 const TURN_1_ME = [act('me', 'Rillaboom', 'Wood Hammer', 'Raichu'), act('me', 'Kommo-o', 'Flamethrower', 'Gholdengo')];
-const TURN_1_OPP = [act('opp', 'Gholdengo', 'Nasty Plot'), act('opp', 'Raichu', 'Mega + Fake Out', 'Kommo-o')];
+const TURN_1_OPP = [act('opp', 'Gholdengo', 'Nasty Plot'), act('opp', 'Raichu', 'Fake Out', 'Kommo-o', true)];
 const TURN_1_SUMMARY = `<div class="sum-hp"><div class="me">${miniHp('Rillaboom', 100)}${miniHp('Kommo-o', 92)}</div><div class="opp">${miniHp('Gholdengo', 100)}${miniHp('Raichu-Mega-Y', 0)}</div></div>
   <div class="fx-strip"><span class="fx">Grassy Terrain<small>4 left</small></span></div>`;
 
@@ -68,6 +75,6 @@ export const PREVIEWS = {
   /** A turn card with who is left, and its open log. */
   results: turnCard('Turn 1', TURN_1_ME, TURN_1_OPP, `${TURN_1_SUMMARY}
     <div class="turn-result"><ol class="res-log">
-      <li class="me">${monIcon('Rillaboom', 'xs')}<div class="txt"><b>Wood Hammer</b><div class="tgt">→ ${monIcon('Raichu-Mega-Y', 'xs')} Raichu-Mega-Y <span class="dmg">147.9–174.9%</span> <span class="ko-tag">KO</span></div></div></li>
+      <li class="me">${monIcon('Rillaboom', 'xs')}<div class="txt"><b>${mv('Wood Hammer')}</b><div class="tgt">→ ${monIcon('Raichu-Mega-Y', 'xs')} Raichu-Mega-Y <span class="dmg">147.9–174.9%</span> <span class="ko-tag">KO</span></div></div></li>
     </ol></div>`, 'open', `<span class="card-btn expand open">${ICON_CHEVRON}</span>`),
 } as const;

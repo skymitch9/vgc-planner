@@ -37,15 +37,19 @@ select.input { padding-right: 4px; }
 @media (max-width: 760px) { .ed-top { grid-template-columns: auto 1fr; } .ed-actions { grid-column: 1 / -1; justify-items: start; grid-auto-flow: column; justify-content: start; } .ed-bottom { grid-template-columns: 1fr; } }
 @media (max-width: 560px) { .ed-top { grid-template-columns: 1fr; } .ed-portrait { grid-auto-flow: column; justify-content: start; align-items: center; } .ed-portrait .mon-icon, .ed-portrait .mon-fallback { width: 56px; height: 56px; } }
 
-/* Type and category chips (Showdown's palette, white text works on all of them). */
-.type { display: inline-flex; justify-content: center; align-items: center; min-width: 54px; padding: 1px 6px; border-radius: 5px; font-size: 10.5px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: .02em; text-shadow: 0 1px 0 rgba(0,0,0,.25); }
+/* Type and category chips (Showdown's palette, white text works on all of them). Each .t-* class only names its colour (--type);
+   the chip fills with it, a move name (.mvl) takes a bar and a tint of it. One colour per type, here and nowhere else. */
+.type { display: inline-flex; justify-content: center; align-items: center; min-width: 54px; padding: 1px 6px; border-radius: 5px; font-size: 10.5px; font-weight: 700; color: #fff; background: var(--type); text-transform: uppercase; letter-spacing: .02em; text-shadow: 0 1px 0 rgba(0,0,0,.25); }
 .pk-types { display: inline-flex; gap: 3px; }
-.t-none { background: var(--line-soft); color: var(--ink-3); text-shadow: none; }
-.t-normal { background: #9fa19f; } .t-fire { background: #e62829; } .t-water { background: #2980ef; } .t-electric { background: #d8b700; }
-.t-grass { background: #3fa129; } .t-ice { background: #3dcef3; } .t-fighting { background: #ff8000; } .t-poison { background: #9141cb; }
-.t-ground { background: #915121; } .t-flying { background: #81b9ef; } .t-psychic { background: #ef4179; } .t-bug { background: #91a119; }
-.t-rock { background: #afa981; } .t-ghost { background: #704170; } .t-dragon { background: #5060e1; } .t-dark { background: #624d4e; }
-.t-steel { background: #60a1b8; } .t-fairy { background: #ef70ef; } .t-stellar { background: #40b5a5; }
+.t-none { --type: var(--line-soft); color: var(--ink-3); text-shadow: none; }
+.t-normal { --type: #9fa19f; } .t-fire { --type: #e62829; } .t-water { --type: #2980ef; } .t-electric { --type: #d8b700; }
+.t-grass { --type: #3fa129; } .t-ice { --type: #3dcef3; } .t-fighting { --type: #ff8000; } .t-poison { --type: #9141cb; }
+.t-ground { --type: #915121; } .t-flying { --type: #81b9ef; } .t-psychic { --type: #ef4179; } .t-bug { --type: #91a119; }
+.t-rock { --type: #afa981; } .t-ghost { --type: #704170; } .t-dragon { --type: #5060e1; } .t-dark { --type: #624d4e; }
+.t-steel { --type: #60a1b8; } .t-fairy { --type: #ef70ef; } .t-stellar { --type: #40b5a5; }
+/* A move name in its type's colour, wherever a move is named: a bar and a light tint behind the usual text colour, so it reads
+   the same in every palette (the bar is mixed toward the text colour: darker on light themes, lighter on dark ones). */
+.mvl { padding: 0 4px; border-left: 3px solid color-mix(in srgb, var(--type) 70%, var(--ink)); border-radius: 4px; color: var(--ink); background: color-mix(in srgb, var(--type) 14%, transparent); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .cat { display: inline-flex; justify-content: center; min-width: 40px; padding: 1px 5px; border-radius: 5px; font-size: 10.5px; font-weight: 700; }
 .c-physical { background: #f4dcd4; color: #a8361b; } .c-special { background: #dde3f6; color: #3b4fa8; } .c-status { background: var(--line-soft); color: var(--ink-2); }
 

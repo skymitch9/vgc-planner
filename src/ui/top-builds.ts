@@ -10,6 +10,7 @@ import type { PokemonSet } from '../domain/types.ts';
 import { pct, typeChip } from './builder-html.ts';
 import { esc } from './dom.ts';
 import { itemIcon, monIcon } from './icons.ts';
+import { moveLabel } from './move-type.ts';
 
 export type ApplyBuild = (set: PokemonSet, replaceSlot: number | null) => void;
 
@@ -77,7 +78,7 @@ export function openTopBuilds(dex: Dex, team: readonly PokemonSet[], selectedSlo
         <div class="tb-summary" role="button" tabindex="0" data-toggle="${esc(m.name)}">
           <span class="tb-rank">#${rank}</span>${monIcon(m.name, 'sm')}
           <span class="tb-name"><b>${esc(m.name)}</b><span class="tb-use">${pct(m.usage)} of teams</span></span>
-          <span class="tb-set">${top.item ? `${itemIcon(top.item, 'xs')}${esc(top.item)} · ` : ''}${top.moves.map(esc).join(' / ')}</span>
+          <span class="tb-set">${top.item ? `${itemIcon(top.item, 'xs')}${esc(top.item)} · ` : ''}${top.moves.map((x) => moveLabel(x, { type: dex.move(x)?.type ?? null })).join(' / ')}</span>
           <button class="btn sm primary" data-add="${esc(m.name)}" ${no ? `disabled title="${esc(no)}"` : ''}>${full ? 'Replace' : 'Add'}</button>
         </div>${open === m.name ? detailHTML(m, dex) : ''}</div>`;
     }).join('') || '<p class="hint">Nothing matches.</p>';

@@ -11,6 +11,7 @@ import { currentDex, loadDex } from '../../infra/dex-loader.ts';
 import { simService, store } from '../../state/instance.ts';
 import { esc, must } from '../dom.ts';
 import { monIcon } from '../icons.ts';
+import { moveLabel, moveTypeChip } from '../move-type.ts';
 import { formOf } from '../names.ts';
 import { startStateOf, turnResult } from '../turn-results.ts';
 import { rerenderCanvas } from './plan-view.ts';
@@ -282,7 +283,7 @@ function actionEditor(a: TurnAction, i: number, st: BattleState | null, depth: n
   const lock = current && st?.active[a.side].includes(a.mon) ? moveLock(st, current) : null;
   const known = lock ? [lock.move] : set?.moves ?? [];
   const moveList = a.move && !known.some((m) => m.toLowerCase() === a.move.toLowerCase()) ? [...known, a.move] : known;
-  const lockNote = lock ? `<div class="hint">Locked into ${esc(lock.move)} by ${esc(lock.reason)}: it can use only that move, or switch out.</div>` : '';
+  const lockNote = lock ? `<div class="hint">Locked into ${moveLabel(lock.move)} by ${esc(lock.reason)}: it can use only that move, or switch out.</div>` : '';
   const moveField = known.length
     ? `<select class="field" id="a-move-${i}" data-a="move" data-i="${i}">${options(moveList, a.move, 'Choose…', (v) => (known.includes(v) ? v : `${v} (not in the paste)`))}</select>`
     : `<input class="field" id="a-move-${i}" data-a="move" data-i="${i}" value="${esc(a.move)}" placeholder="Move name">`;
@@ -295,7 +296,7 @@ function actionEditor(a: TurnAction, i: number, st: BattleState | null, depth: n
     ${a.kind === 'switch'
       ? `<div><label class="lbl" for="a-target-${i}">Switch to</label><select class="field" id="a-target-${i}" data-a="target" data-i="${i}">${options(incoming, a.target, 'Choose…', own)}</select></div>${outcomeEditor(a, i, st, depth, actions)}`
       : `<div class="row2">
-      <div><label class="lbl" for="a-move-${i}">Move</label>${moveField}</div>
+      <div><div class="lbl-row"><label class="lbl" for="a-move-${i}">Move</label><span class="move-type" id="a-type-${i}">${moveTypeChip(a.move)}</span></div>${moveField}</div>
       <div><label class="lbl" for="a-target-${i}">Target</label>${targetField(a, i, st, depth, actions, anyone)}</div>
     </div>${lockNote}${pivot}${outcomeEditor(a, i, st, depth, actions)}`}
   </div>`;
