@@ -75,3 +75,7 @@ WAITING ON THE OWNER, in order of value:
 5. First real-site test of the coach extension (only the owner can do it).
 
 Housekeeping the conductor did NOT do: vgc-meta/data holds ~826 MB of gitignored database backups and run copies (`*.before-*.sqlite`, `*-run.sqlite`, `calibrate-v1.sqlite`, `matrix-cache.sqlite`, `realdata.sqlite`) inside a OneDrive-synced folder; they are safe to delete once the owner is happy with the live database, but deleting is his call.
+
+## STATE after the approval (2026-10-11 ~07:35) — supersedes the 06:55 block's item 1
+
+Player v2 is MERGED (vgc-meta PR #9 + fix PR #10). RUNNING in the background on this machine (local CPU, no Claude usage): `npm run calibrate -- --features all --depth light --budget-minutes 150 --workers 31` on the live database, started ~07:35, due ~10:05; its result decides the default feature set. NEXT, in order: (1) read that calibration (bar: v1 53.8% sim-only, added-value interval −0.0058..+0.0038); (2) if v2 is better, write `data/sim-features.json` in vgc-meta as the default and restart the coach with it; (3) `npm run tiers` on the official tier, then the full feed; (4) re-run Sal Z `sim` / `improve` / `teambuild --sim`; (5) build the two remaining toggles (real lead/bring weights; policy fitted to human choices); (6) the v2 gaps measured above: switching and Mega timing.
