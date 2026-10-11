@@ -201,8 +201,12 @@ test('teams-mc.json: six different Pokémon of the format on every team, unique 
     assert.match(t.date, /^\d{4}-\d\d-\d\d$/, t.id);
     assert.ok(TIERS.includes(t.tier), t.id);
     for (const c of t.replicaCodes ?? []) assert.match(c, /^[A-Z0-9]{5}$/, t.id);
+    // A spread is never unlabelled: a team with any spread says where it came from, and links it.
+    assert.equal(!!t.spreadSource, t.sets.some((x) => !!x.evs), t.id);
+    if (t.spreadSource) assert.match(t.spreadUrl ?? '', /^https:\/\//, t.id);
+    if (t.source === 'youtube') assert.deepEqual([t.tier, t.placing, t.spreadSource], ['creator', null, 'youtube'], t.id);
   }
-  for (const source of ['limitless', 'crob', 'victoryroad'] as const) {
+  for (const source of ['limitless', 'crob', 'victoryroad', 'youtube'] as const) {
     assert.ok(data.teams.some((t) => t.source === source), `no ${source} teams`);
     assert.equal(data.sources.find((s) => s.id === source)?.teams, data.teams.filter((t) => t.source === source).length);
   }

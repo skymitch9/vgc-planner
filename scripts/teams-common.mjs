@@ -55,7 +55,7 @@ export function dayMonthYear(text) {
 
 // ---- Tiers and ordering ---------------------------------------------------------------------------------------
 
-export const TIERS = ['worlds', 'international', 'regional', 'special', 'online', 'ranked'];
+export const TIERS = ['worlds', 'international', 'regional', 'special', 'online', 'ranked', 'creator'];
 
 /** The tier of an official event from its name (Limitless and Victory Road both use the TPCi names), or null. */
 export function officialTier(event) {

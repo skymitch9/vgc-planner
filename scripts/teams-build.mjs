@@ -10,6 +10,8 @@
  *   crob-team               slug         API JSON text
  *   victoryroad             'page'       replica page HTML
  *   pokepaste / vrpastes    paste id     the paste site's JSON text
+ *   youtube-channel         handle       channels.list JSON
+ *   youtube-playlist        playlistKey  playlistItems.list JSON (see teams-youtube.mjs)
  *
  * `load` returns null for something that isn't there (offline mode); a live failure throws and is logged as a skip.
  */
@@ -23,18 +25,20 @@ import { FORMAT_ID, compareTeams, makeResolver, normaliseSet, toID } from './tea
 import * as limitless from './teams-limitless.mjs';
 import * as crob from './teams-crob.mjs';
 import * as vr from './teams-victoryroad.mjs';
+import * as yt from './teams-youtube.mjs';
 
 export const FORMAT_NAME = '[Gen 9 Champions] VGC 2026 Reg M-C';
 export const SOURCE_INFO = {
   limitless: { label: 'Limitless VGC', url: 'https://limitlessvgc.com/teams?format=m-c' },
   crob: { label: 'crob.at', url: 'https://crob.at/teams/vgc' },
   victoryroad: { label: 'Victory Road', url: vr.VR_URL },
+  youtube: { label: 'YouTube', url: 'https://www.youtube.com/' },
 };
 const PAGE_SIZE = 100;
 const MAX_PAGES = 30;
 
 /** Showdown text sets -> raw sets; real EVs (above Stat Point range) become Stat Points the app's way. */
-function pasteSets(paste) {
+export function pasteSets(paste) {
   return parseShowdown(paste).map((s) => {
     // Some exporters write "Nature: Brave" instead of "Brave Nature".
     const natureLine = s.extra.map((l) => l.match(/^Nature:\s*(\w+)/i)?.[1]).find(Boolean);
@@ -65,7 +69,7 @@ export async function buildTeams({
   load,
   dexData,
   usageData = null,
-  sources = ['limitless', 'crob', 'victoryroad'],
+  sources = ['limitless', 'crob', 'victoryroad', 'youtube'],
   limit = Infinity,
   today,
   log = () => {},
@@ -82,20 +86,31 @@ export async function buildTeams({
   const info = {};
   const teams = [];
 
-  /** Normalises raw sets into the dex's names; null (and a skip) when the team can't be used. */
-  function normaliseTeam(id, rawSets, { needSets = true } = {}) {
+  /**
+   * Normalises raw sets into the dex's names; null (and a skip) when the team can't be used. `onFail` replaces
+   * the skip (YouTube pastes from older regulations are dropped with a count, not listed one by one).
+   */
+  function normaliseTeam(id, rawSets, { needSets = true, onFail = (reason) => skip(id, reason) } = {}) {
     const sets = [];
+    const pending = [];
     for (const raw of rawSets) {
       const r = normaliseSet(raw, resolve);
-      if (r.error) { skip(id, r.error); return null; }
-      if (r.note) notes.push({ id, note: r.note });
+      if (r.error) { onFail(r.error); return null; }
+      if (r.note) pending.push({ id, note: r.note });
       sets.push(r.set);
     }
-    if (sets.length !== 6) { skip(id, `${sets.length} Pokémon, not 6`); return null; }
-    if (new Set(sets.map((s) => toID(s.species))).size !== 6) { skip(id, 'the same species twice'); return null; }
-    if (needSets && sets.some((s) => !s.moves.length)) { skip(id, 'a Pokémon without moves'); return null; }
+    if (sets.length !== 6) { onFail(`${sets.length} Pokémon, not 6`); return null; }
+    if (new Set(sets.map((s) => toID(s.species))).size !== 6) { onFail('the same species twice'); return null; }
+    if (needSets && sets.some((s) => !s.moves.length)) { onFail('a Pokémon without moves'); return null; }
+    notes.push(...pending);
     return sets;
   }
+
+  /** The app's own legality problems for a team's sets (with usage-filled spreads where none was published). */
+  const legalityProblems = (t) => {
+    const { sets } = teamSets(t, dex);
+    return [...sets.flatMap((s) => setProblems(s, dex)), ...teamProblems(sets, dex)];
+  };
 
   const safeLoad = async (id, kind, key) => {
     try {
@@ -270,9 +285,14 @@ export async function buildTeams({
       if (target) {
         target.replicaCodes = row.replicaCodes;
         if (row.country) target.country = row.country;
+        let gotEvs = false;
         if (sets) for (const s of target.sets) if (!s.evs) {
           const evs = sets.find((p) => toID(p.species) === toID(s.species))?.evs;
-          if (evs) s.evs = evs;
+          if (evs) { s.evs = evs; gotEvs = true; }
+        }
+        if (gotEvs) {
+          target.spreadSource = 'player';
+          target.spreadUrl = row.pasteUrl;
         }
         merged++;
         log(`  merge ${id} -> ${target.id} (${row.player})`);
@@ -295,18 +315,102 @@ export async function buildTeams({
         sourceUrl: vr.VR_URL,
         replicaCodes: row.replicaCodes,
         setsKnown: !!sets,
+        ...(sets?.some((s) => s.evs) ? { spreadSource: 'player', spreadUrl: row.pasteUrl } : {}),
         sets: sets ?? species,
       });
     }
     info.victoryroad = { fetched: new Date().toISOString(), merged };
   }
 
+  // ---- YouTube: creators' paste links, merged onto the same team or added as a creator team -------------------
+  let youtube = null;
+  if (sources.includes('youtube')) {
+    const { videos, calls } = await yt.harvestVideos({
+      load: (kind, key) => safeLoad(`youtube ${kind} ${key}`, kind, key),
+      log,
+    });
+    const st = { calls, videos: videos.length, links: 0, repeats: 0, pastes: 0, dropped: 0, legal: 0, merged: 0, spreadsAttached: 0, added: 0 };
+    const reasons = new Map();
+    const drop = (reason) => {
+      st.dropped++;
+      const k = String(reason).replace(/"[^"]*"/g, '"…"').replace(/^[^:"]+: /, '');
+      reasons.set(k, (reasons.get(k) ?? 0) + 1);
+    };
+    const seen = new Set();
+    let n = 0;
+    for (const v of videos) {
+      for (const link of yt.descriptionLinks(v.description)) {
+        st.links++;
+        if (seen.has(`${link.site}:${link.id}`)) {
+          st.repeats++;
+          continue;
+        }
+        seen.add(`${link.site}:${link.id}`);
+        if (n >= limit) continue;
+        n++;
+        const id = `youtube-${v.id}-${link.id}`;
+        const text = await safeLoad(id, link.site === 'pokepaste' ? 'pokepaste' : 'vrpastes', link.id);
+        if (!text) continue;
+        st.pastes++;
+        let raw;
+        try {
+          raw = pasteSets((link.site === 'pokepaste' ? readPokepaste(JSON.parse(text)) : readVrPaste(JSON.parse(text))).paste);
+        } catch (err) {
+          drop(`unreadable paste: ${err.message}`);
+          continue;
+        }
+        const sets = normaliseTeam(id, raw, { onFail: drop });
+        if (!sets) continue;
+        const problems = legalityProblems({ sets });
+        if (problems.length) {
+          drop(problems[0]);
+          continue;
+        }
+        st.legal++;
+        // The same six Pokémon with the same items, from any source (an earlier video included): spreads, not a copy.
+        const target = teams.find((t) => t.setsKnown && yt.sameTeam(t.sets, sets));
+        if (target) {
+          st.merged++;
+          const got = yt.attachSpreads(target, sets);
+          if (got) {
+            st.spreadsAttached += got;
+            target.spreadSource ??= 'youtube';
+            target.spreadUrl ??= v.url;
+          }
+          log(`  youtube merge ${id} -> ${target.id} (${got} spread${got === 1 ? '' : 's'} attached)`);
+          continue;
+        }
+        st.added++;
+        teams.push({
+          id,
+          source: 'youtube',
+          event: v.title,
+          date: v.date,
+          tier: 'creator',
+          placing: null,
+          player: v.channel,
+          sourceUrl: v.url,
+          setsKnown: true,
+          ...(sets.some((s) => s.evs) ? { spreadSource: 'youtube', spreadUrl: v.url } : {}),
+          sets,
+        });
+      }
+    }
+    log(
+      `youtube: ${st.calls} API calls, ${st.videos} videos, ${st.links} paste links (${st.repeats} repeats), ${st.pastes} pastes read, ` +
+        `${st.legal} legal for Reg M-C (${st.dropped} dropped), ${st.merged} merged onto existing teams (${st.spreadsAttached} spreads attached), ` +
+        `${st.added} added`,
+    );
+    if (reasons.size) log(`  youtube dropped: ${[...reasons].sort((a, b) => b[1] - a[1]).map(([r, c]) => `${c}× ${r}`).join('; ')}`);
+    youtube = st;
+    info.youtube = { fetched: new Date().toISOString(), merged: st.merged };
+  }
+
   // ---- Legality: a team the app would flag is dropped, never loosened ------------------------------------------
   const legal = [];
   for (const t of teams) {
     if (t.setsKnown) {
-      const { sets } = teamSets(t, dex);
-      const problems = [...sets.flatMap((s) => setProblems(s, dex)), ...teamProblems(sets, dex)];
+      const problems = legalityProblems(t);
       if (problems.length) {
         skip(t.id, `not legal in the dex: ${problems.join(' ')}`);
         continue;
@@ -339,6 +443,7 @@ export async function buildTeams({
   const kept = new Set(out.map((t) => t.id));
   return {
     data: { format: FORMAT_NAME, generated: today, sources: sourceList, teams: out },
+    youtube,
     skipped,
     notes: notes.filter((n) => kept.has(n.id)),
   };

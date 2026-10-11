@@ -2,7 +2,8 @@
  * Top players' teams for the current regulation, as plain data plus helpers to turn one into pasteable sets.
  *
  * The data is generated, never edited by hand: `src/data/teams-mc.json` (`npm run teams`, scripts/fetch-teams.mjs)
- * from Limitless VGC (official events), crob.at (community online tournaments) and Victory Road (replica codes).
+ * from Limitless VGC (official events), crob.at (community online tournaments), Victory Road (replica codes) and
+ * YouTube creators' video descriptions (paste links, usually with the real spread).
  * Most sources publish no spreads; `teamSets` fills those from Smogon usage and says which ones it filled.
  *
  * No DOM here.
@@ -10,11 +11,11 @@
 import { emptySet, spreadLine, toID, type Dex, type UsageData, type UsageMon } from './dex.ts';
 import type { PokemonSet } from './types.ts';
 
-export type TeamSource = 'limitless' | 'crob' | 'victoryroad';
-export type Tier = 'worlds' | 'international' | 'regional' | 'special' | 'online' | 'ranked';
+export type TeamSource = 'limitless' | 'crob' | 'victoryroad' | 'youtube';
+export type Tier = 'worlds' | 'international' | 'regional' | 'special' | 'online' | 'ranked' | 'creator';
 
 /** Best first: the order teams are sorted in. */
-export const TIERS: readonly Tier[] = ['worlds', 'international', 'regional', 'special', 'online', 'ranked'] as const;
+export const TIERS: readonly Tier[] = ['worlds', 'international', 'regional', 'special', 'online', 'ranked', 'creator'] as const;
 
 export const TIER_LABEL: Readonly<Record<Tier, string>> = {
   worlds: 'World Championships',
@@ -23,6 +24,7 @@ export const TIER_LABEL: Readonly<Record<Tier, string>> = {
   special: 'Special Event',
   online: 'Online tournament',
   ranked: 'Ranked Battles',
+  creator: 'Creator team',
 };
 
 export interface TournamentSet {
@@ -32,7 +34,7 @@ export interface TournamentSet {
   ability: string;
   nature: string;
   moves: string[];
-  /** Stat Points line ("32 HP / 2 Def / 32 Spe"), only when the player published a spread. */
+  /** Stat Points line ("32 HP / 2 Def / 32 Spe"), only when a published paste gave one (see `spreadSource`). */
   evs?: string;
 }
 
@@ -57,6 +59,13 @@ export interface TournamentTeam {
   replicaCodes?: string[];
   /** False when only the six Pokémon (and their Megas) are known. */
   setsKnown: boolean;
+  /**
+   * Where the `evs` came from: the player's own paste ('player', Victory Road rows) or a creator's paste of the same
+   * six Pokémon and items in a YouTube video description ('youtube'). Absent when no set has `evs`.
+   */
+  spreadSource?: 'player' | 'youtube';
+  /** The paste (player) or video (youtube) the spreads were taken from. */
+  spreadUrl?: string;
   sets: TournamentSet[];
 }
 
@@ -68,7 +77,7 @@ export interface TeamSourceInfo {
   fetched: string;
   /** Teams in `teams` from this source. */
   teams: number;
-  /** Victory Road rows whose codes were attached to a team from another source instead. */
+  /** Victory Road rows whose codes, or YouTube pastes whose spreads, were attached to a team from another source. */
   merged?: number;
 }
 
