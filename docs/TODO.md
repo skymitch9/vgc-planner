@@ -24,7 +24,6 @@
 7. Whether to run `tiers` on the full feed (1,271 teams; ~8.5–14 h of CPU, estimate) on the sixteen-feature player.
 8. Go/no-go for the first upstream PR — see "Upstream".
 9. Cloudflare Pages for the feed (closes KI-2) — needs vgc-meta made public first (owner rule: no GitHub Actions on a private repo).
-10. NEW (docs pass, 17:5x): upstream `main` gained two bug fixes our fork lacks — `90167eb` negative priority (Trick Room, Roar, Counter… move last) and `ffca430` Floette-Mega / Aegislash; merge `upstream/main` into our `main`? (UPSTREAM-PLAN, "Upstream has moved").
 11. NEW (docs pass): a stale Vite server (PID 61596, since 2026-10-10 17:57) still runs from the deleted worktree `.claude/worktrees/agent-a408f7c610631b9f1` and keeps that empty folder busy (KI-3); stop it?
 12. Housekeeping: ~826 MB of gitignored database backups and run copies in `vgc-meta/data` (OneDrive-synced); deleting them is his call (06:55 STATE block, now in DONE).
 

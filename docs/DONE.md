@@ -2,6 +2,14 @@
 
 > Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-11 ~18:00 Phoenix — the newest block was moved from TODO.md verbatim in this session after reading each entry's body against the repos (`git log`, `gh pr list`, the running processes, the feed); the older entries below it were not re-verified (archive: never edited). APPEND ONLY, newest first.
 
+## 2026-10-11 18:2x — upstream bug fixes taken (owner: "Yes take your suggestion for 1")
+
+Moved whole from TODO.md "Waiting on the owner":
+
+10. NEW (docs pass, 17:5x): upstream `main` gained two bug fixes our fork lacks — `90167eb` negative priority (Trick Room, Roar, Counter… move last) and `ffca430` Floette-Mega / Aegislash; merge `upstream/main` into our `main`? (UPSTREAM-PLAN, "Upstream has moved").
+
+Resolution: planner PR #5 "Upstream bug fixes" — `90167eb` and `ffca430` cherry-picked with `-x` onto `fix/upstream-priority-and-formes`, both applied cleanly, `npm run check` 249 tests (239 + 10 new), merged on opening per the owner’s rule. The other 8 upstream commits (copy a turn, keep a turn in view, the news box) remain NOT merged; they are features, not fixes, and upstream PR branches are still cut from `upstream/main` (UPSTREAM-PLAN).
+
 ## Moved from TODO.md on 2026-10-11 ~18:00 (docs refresh) — verbatim, newest first
 
 Each item below was cut whole from TODO.md once every part of its body was finished or superseded; nothing was reworded. The three STATE blocks (06:55, 10:28, 13:05) are history: a fresh one heads TODO.md.
