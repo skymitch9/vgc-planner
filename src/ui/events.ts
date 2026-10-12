@@ -2,7 +2,7 @@ import { config } from '../config.ts';
 import { DataError } from '../domain/codec.ts';
 import type { ActionKind, Side, SlotKind, LineColor } from '../domain/types.ts';
 import { simService, store } from '../state/instance.ts';
-import { addNode, addTab, selectTab, startRenameTab, tabMenu, createPlan, createTeam, deleteNode, deletePlan, deleteTeam, duplicatePlan, duplicateTeam, editPaste, pickSlot, pickTopTeam, renameTeam, showExport } from './actions.ts';
+import { addNode, addTab, selectTab, startRenameTab, tabMenu, createPlan, createTeam, deleteNode, deletePlan, deleteTeam, duplicatePlan, duplicateTeam, editPaste, pickSlot, pickTopTeam, renameTeam, showExport, copyShowdownPaste, downloadShowdownPaste } from './actions.ts';
 import { accountMenu, openSignIn, signInWith } from './account.ts';
 import { openPalettePicker } from './theme.ts';
 import { requestRender } from './bus.ts';
@@ -76,6 +76,7 @@ async function handleClick(el: HTMLElement, e: MouseEvent): Promise<void> {
         { label: 'Duplicate', run: () => void duplicateTeam(team) },
         { label: 'New gameplan', run: () => void createPlan(team) },
         { label: 'Export team', run: () => void showExport({ type: 'team', teamId: team }) },
+        { label: 'Copy Showdown paste', run: () => copyShowdownPaste(team) },
         '-',
         { label: 'Delete', cls: 'danger', run: () => void deleteTeam(team) },
       ]);
@@ -98,6 +99,8 @@ async function handleClick(el: HTMLElement, e: MouseEvent): Promise<void> {
     case 'copy-share': copyShareLink(plan); return;
     case 'stop-share': if (await stopSharingPlan(plan)) redrawSharedLinks(); return;
     case 'export-team': return showExport({ type: 'team', teamId: team });
+    case 'copy-showdown': copyShowdownPaste(team); return;
+    case 'download-showdown': downloadShowdownPaste(team); return;
     case 'duplicate-team': return duplicateTeam(team);
     case 'delete-team': return deleteTeam(team);
     case 'export-plan': return showExport({ type: 'plan', teamId: team, planId: plan });

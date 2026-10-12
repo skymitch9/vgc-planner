@@ -8,6 +8,7 @@
  *
  * No DOM here, so the same checks can run on a server.
  */
+import { parseShowdown } from './showdown.ts';
 import { STAT_KEYS, readSpread, statPoints } from './stats.ts';
 import type { PokemonSet, StatKey, StatTable } from './types.ts';
 
@@ -253,6 +254,12 @@ export function writeSet(set: PokemonSet): string {
 }
 
 export const writeTeam = (sets: readonly PokemonSet[]): string => sets.map(writeSet).join('\n\n') + (sets.length ? '\n' : '');
+
+/**
+ * A team's paste as clean Showdown export text, for Showdown's teambuilder: parsed and written again with
+ * {@link writeTeam}, so empty slots, "=== [format] ===" headers and stray blank lines are dropped.
+ */
+export const showdownPaste = (paste: string | null | undefined): string => writeTeam(parseShowdown(paste));
 
 /**
  * The most common build for a usage entry: its top item (or Mega Stone), ability, four most used moves, and the
