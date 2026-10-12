@@ -20,7 +20,6 @@
 3. YouTube collector start date (79 creator entries predate the format; collector SINCE = 2026-08-01) — DONE 02:57.
 4. Should the simulator fill opponent spreads from the set library (changes most team hashes → full re-run) — 01:35 entry below.
 5. One in-game check of what the VGCPastes "Extracted" label means (one replica code vs its paste; 410 entries rest on it).
-6. First real-site test of the coach extension (only he can).
 7. Whether to run `tiers` on the full feed (1,271 teams; ~8.5–14 h of CPU, estimate) on the sixteen-feature player.
 8. Go/no-go for the first upstream PR — see "Upstream".
 9. Cloudflare Pages for the feed (closes KI-2) — needs vgc-meta made public first (owner rule: no GitHub Actions on a private repo).

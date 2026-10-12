@@ -2,6 +2,12 @@
 
 > Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-11 ~18:00 Phoenix — the newest block was moved from TODO.md verbatim in this session after reading each entry's body against the repos (`git log`, `gh pr list`, the running processes, the feed); the older entries below it were not re-verified (archive: never edited). APPEND ONLY, newest first.
 
+## 2026-10-11 21:30 — FIRST REAL-SITE COACH TEST: it works (owner played on play.pokemonshowdown.com)
+
+6. First real-site test of the coach extension (only he can).
+
+Measured by `npm run coach -- review`: battle `battle-gen9championsvgc2026regmc-2696928390-…` at 21:30 Phoenix, the owner (skymitch) vs FallenJedi97 (Floette-Eternal / Volcarona / Pawmot / Rillaboom / Incineroar / Basculegion), **win in 8 turns**, Live suggestions ON (the overlay showed them on the real client), known-team match 5 of 6 (limitless-7059), the owner chose the coach's suggestion in 17 of 17 decisions, the opponent's move was the coach's top prediction 4 of 12 times and in its top three 10 of 12. So the extension's tap of the classic client (`app.receive`, `app.send`, `room.battle.stepQueue`, request/choice) holds on the live site, the panel counted lines, and the recording path filled `coach_battles` / `coach_turns`. The recorded game was then exported as a planner gameplan (`npm run planner -- coach <battle id>` and `GET /api/planner/coach?battle=…` answered 200) and the one-click import link was given to the owner. KNOWN_ISSUES (vgc-meta) "Coach: the extension is verified against a mock… not the real site" can move from WATCHING to verified (one real game; the newer Preact client still unsupported).
+
 ## 2026-10-11 21:15 — Machine and Human re-added to the planner (owner: "i dont see the teams we made in that sim reported loaded into the vgcplanner app")
 
 Re-imported from a fresh tab through Bulk import (both previewed as 6 Pokémon, "2 teams found"), library read back after a reload: Garchomp Z (1 gameplan), Salamence, test, Machine, Human. The tab now runs PR #8 (per-record sync), so a later save from another tab merges instead of overwriting — PROVIDED that other tab has been reloaded onto the new code too; the owner was told to reload his. Upstream re-checked at 21:16: head still ffca430 (pushed 2026-10-10 22:17 Phoenix), 0 PRs, 0 open issues.
