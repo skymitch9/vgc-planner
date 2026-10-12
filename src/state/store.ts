@@ -1,7 +1,10 @@
+import { reconcileLibrary, snapshotLibrary } from '../domain/library-sync.ts';
+import type { LibraryBase } from '../domain/library-sync.ts';
 import { findNode, findPlan, findTab, findTeam, sheetOf } from '../domain/model.ts';
 import type { NodeLocation } from '../domain/model.ts';
 import type { Library, Plan, PlanTab, Sheet, Team } from '../domain/types.ts';
 import type { PrefsStore } from '../infra/prefs.ts';
+import { StaleLibraryError } from '../infra/repository.ts';
 import type { LibraryRepository } from '../infra/repository.ts';
 import { config } from '../config.ts';
 
@@ -43,10 +46,15 @@ export class AppStore {
   /** Save progress, for the "Saving… / Saved" hint: `pending` while edits wait to be sent. */
   saveState: 'saved' | 'pending' | 'saving' | 'error' = 'saved';
   onSaveState: (state: AppStore['saveState']) => void = () => {};
+  /** Called after changes saved in another tab were merged into `library` (redraw and tell the user). */
+  onExternalChange: () => void = () => {};
 
   private repo: LibraryRepository;
   private readonly prefs: PrefsStore;
   private timer: ReturnType<typeof setTimeout> | null = null;
+  /** The library as last loaded or saved (or merged from storage): what "changed here since" is measured against. */
+  private base: LibraryBase = snapshotLibrary({ teams: [] });
+  private unwatch: () => void = () => {};
 
   constructor(repo: LibraryRepository, prefs: PrefsStore, persistent = true) {
     this.repo = repo;
@@ -81,6 +89,7 @@ export class AppStore {
   get repository(): LibraryRepository { return this.repo; }
 
   private async loadLibrary(): Promise<void> {
+    this.unwatch();
     this.loadError = null;
     try {
       this.library = await this.repo.load();
@@ -88,6 +97,30 @@ export class AppStore {
       this.library = { teams: [] };
       this.loadError = e instanceof Error ? e.message : String(e);
     }
+    this.base = snapshotLibrary(this.library);
+    this.unwatch = this.repo.watch?.((stored) => { this.receive(stored); }) ?? (() => {});
+  }
+
+  /** Another tab saved: merge its library in, and save again if this tab's own changes aren't in storage yet. */
+  receive(stored: Library): void {
+    if (this.merge(stored) && this.timer === null) this.persist();
+  }
+
+  /**
+   * Merges the stored library into `library` record by record (see domain/library-sync.ts): what was changed here
+   * since the last save stays, everything else takes the stored version. Returns whether this tab still has changes
+   * to save.
+   */
+  private merge(stored: Library): boolean {
+    const result = reconcileLibrary(this.base, this.library, stored);
+    this.library = result.library;
+    this.base = snapshotLibrary(stored);
+    if (result.changed) {
+      this.restoreSelection(this.ui.teamId, this.ui.planId, this.ui.tabId);
+      if (this.ui.selectedNode !== null && !this.currentNode()) this.ui.selectedNode = null;
+      this.onExternalChange();
+    }
+    return result.unsaved;
   }
 
   private restoreSelection(teamId: string | null, planId: string | null, tabId: string | null): void {
@@ -129,12 +162,27 @@ export class AppStore {
     this.prefs.save({ teamId: this.ui.teamId, planId: this.ui.planId, tabId: this.ui.tabId, open: this.ui.open, zoom: this.ui.zoom, navCollapsed: this.ui.navCollapsed, teamFeedUrl: this.ui.teamFeedUrl, importUrl: this.ui.importUrl });
     this.setSaveState('saving');
     try {
-      await this.repo.save(this.library);
+      await this.save();
       // A newer edit may have been scheduled while this save was in flight.
       if (this.timer === null) this.setSaveState('saved');
     } catch (e) {
       this.setSaveState('error');
       this.onError(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  /** Saves the library; when another tab saved first, merges that in and saves the result instead. */
+  private async save(): Promise<void> {
+    for (let attempt = 1; ; attempt++) {
+      const saving = snapshotLibrary(this.library);
+      try {
+        await this.repo.save(this.library);
+        this.base = saving;
+        return;
+      } catch (e) {
+        if (!(e instanceof StaleLibraryError) || attempt >= 5) throw e;
+        if (!this.merge(e.stored)) return; // storage already holds everything this tab has
+      }
     }
   }
 }

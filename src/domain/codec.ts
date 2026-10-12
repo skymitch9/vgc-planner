@@ -257,8 +257,15 @@ export const readPlanRecord = (raw: unknown, id: string): Plan => readPlan({ ...
 
 export interface StoredLibrary {
   schemaVersion: number;
+  /** Goes up by one on every save, so a tab can tell that another tab saved since it last read (absent in older data: 0). */
+  revision?: number;
+  /** When that save happened (ISO time; absent in older data). */
+  savedAt?: string;
   teams: Team[];
 }
+
+/** Which save a stored library came from: its revision and time. */
+export interface LibraryStamp { revision: number; savedAt: string | null }
 
 /** Reads what the repository saved. Also accepts the pre-1.0 shape `{ teams, ui }` (no schemaVersion). */
 export function readLibrary(raw: unknown): Library {
@@ -269,7 +276,22 @@ export function readLibrary(raw: unknown): Library {
   return { teams: asArr(o.teams, 'teams', LIMITS.teams).map((t, i) => readTeam(t, `teams[${i}]`, true, 'plans', 'children')) };
 }
 
-export const writeLibrary = (library: Library): StoredLibrary => ({ schemaVersion: LIBRARY_SCHEMA_VERSION, teams: library.teams });
+/**
+ * The revision and time of a stored library. Older data without them reads as revision 0 with no time. Only the stamp
+ * is checked here, so a library whose teams can't be read still has one.
+ */
+export function readLibraryStamp(raw: unknown): LibraryStamp {
+  const o = isObj(raw) ? raw : {};
+  const revision = typeof o.revision === 'number' && Number.isSafeInteger(o.revision) && o.revision > 0 ? o.revision : 0;
+  const savedAt = typeof o.savedAt === 'string' && o.savedAt.length <= 40 ? o.savedAt : null;
+  return { revision, savedAt };
+}
+
+export const writeLibrary = (library: Library, stamp?: LibraryStamp): StoredLibrary => ({
+  schemaVersion: LIBRARY_SCHEMA_VERSION,
+  ...(stamp ? { revision: stamp.revision, ...(stamp.savedAt ? { savedAt: stamp.savedAt } : {}) } : {}),
+  teams: library.teams,
+});
 
 /* ----------------------------- export file ------------------------------ */
 
