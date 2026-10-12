@@ -2,9 +2,11 @@
  * The Import dialog, with two tabs over one text box:
  * - "Teams from pastes": many teams at once, from Showdown pastes, teambuilder backups and pokepast.es / vrpastes.com
  *   links (see domain/bulk-import.ts). Preview lists what was found; nothing is created before Import is pressed.
- * - "Backup file (JSON)": this app's own export file, merged into the library by team name.
+ * - "Backup file (JSON)": this app's own export file (chosen, pasted, or fetched from a URL), merged into the library
+ *   by team name.
  * Text that is a backup file switches to the second tab by itself.
  */
+import { config } from '../config.ts';
 import { BULK_MAX_ITEMS, capBulk, looksLikeBackup, nameFor, splitBulk, teamKey } from '../domain/bulk-import.ts';
 import type { BulkPaste } from '../domain/bulk-import.ts';
 import { DataError, LIMITS } from '../domain/codec.ts';
@@ -16,6 +18,7 @@ import { REGULATION } from '../domain/regulation.ts';
 import { parseShowdown, teamWarnings } from '../domain/showdown.ts';
 import { fillSpreads } from '../domain/team-feed.ts';
 import type { PokemonSet } from '../domain/types.ts';
+import { checkBackupUrl, fetchBackup } from '../infra/backup-url.ts';
 import { loadDex } from '../infra/dex-loader.ts';
 import { fetchPasteLink } from '../infra/paste-links.ts';
 import { store } from '../state/instance.ts';
@@ -30,13 +33,13 @@ export type ImportTab = 'pastes' | 'backup';
 const TABS: ReadonlyArray<[ImportTab, string]> = [['pastes', 'Teams from pastes'], ['backup', 'Backup file (JSON)']];
 const DESC: Readonly<Record<ImportTab, string>> = {
   pastes: 'Add several teams at once. Press Preview to see what was found; nothing is added before you press Import.',
-  backup: 'Choose a file or paste the JSON. Teams with the same name are merged, so gameplans land in the right folder.',
+  backup: 'Choose a file, paste the JSON or fetch it from a URL. Teams with the same name are merged, so gameplans land in the right folder.',
 };
 const PLACEHOLDER: Readonly<Record<ImportTab, string>> = {
   pastes: 'Showdown pastes, with a line of --- between teams\npokepast.es / vrpastes.com links, one per line\nor a Showdown teambuilder backup (=== [format] Team name ===)',
   backup: 'Paste JSON here',
 };
-const MAX_FILE_BYTES = 2_000_000;
+const MAX_FILE_BYTES = config.backupUrl.maxBytes;
 
 /** One line of the preview: a team that can be imported, or something that could not be read (with why, in words). */
 type Row =
@@ -64,12 +67,16 @@ function rowHTML(row: Row, index: number): string {
     <span class="tt-badges">${badges}</span>${problems}</div>`;
 }
 
-/** Opens the dialog on `tab`. */
-export function openImport(tab: ImportTab = 'pastes'): void {
+/** Opens the dialog on `tab`; with `url`, on the Backup tab with that address filled in and its fetch started. */
+export function openImport(tab: ImportTab = 'pastes', { url }: { url?: string } = {}): void {
+  if (url) tab = 'backup';
   let rows: Row[] = [];
   let dex: Dex | null = null;
   let busy = false;
   let previewToken = 0;
+  let fetchToken = 0;
+  /** The address the box's text was fetched from (remembered once it is imported); null once the text changes. */
+  let fetchedFrom: string | null = null;
   /** Teams already downloaded in this dialog, so pressing Preview again doesn't fetch them twice. */
   const fetched = new Map<string, ReturnType<typeof fetchPasteLink>>();
 
@@ -87,6 +94,10 @@ export function openImport(tab: ImportTab = 'pastes'): void {
         <label class="tt-check" id="imp-fill-wrap"><input type="checkbox" id="imp-fill" checked> Fill missing spreads from usage (marked Estimated)</label>
         <button type="button" class="btn sm" id="imp-preview" title="Ctrl+Enter">Preview</button>
       </div>
+      <div class="imp-url" id="imp-url-wrap">
+        <label class="lbl" for="imp-url">…or fetch from a URL</label>
+        <div class="imp-url-row"><input type="url" class="field" id="imp-url" placeholder="https://example.com/backup.json" spellcheck="false" autocomplete="url"><button type="button" class="btn sm" id="imp-fetch">Fetch</button></div>
+      </div>
       <div class="hint" id="imp-status" role="status"></div>
       <div class="hint err-text" id="imp-err" role="alert"></div>
       <div class="imp-rows" id="imp-rows"></div>
@@ -97,6 +108,8 @@ export function openImport(tab: ImportTab = 'pastes'): void {
   const file = $<HTMLInputElement>('#imp-file');
   const fill = $<HTMLInputElement>('#imp-fill');
   const previewBtn = $<HTMLButtonElement>('#imp-preview');
+  const urlField = $<HTMLInputElement>('#imp-url');
+  const fetchBtn = $<HTMLButtonElement>('#imp-fetch');
   const go = $<HTMLButtonElement>('#imp-go');
   const status = $('#imp-status');
   const error = $('#imp-err');
@@ -130,6 +143,7 @@ export function openImport(tab: ImportTab = 'pastes'): void {
     file.setAttribute('aria-label', tab === 'pastes' ? 'Text file with teams' : 'JSON file');
     $('#imp-fill-wrap').hidden = tab !== 'pastes';
     previewBtn.hidden = tab !== 'pastes';
+    $('#imp-url-wrap').hidden = tab !== 'backup';
     status.textContent = '';
     error.textContent = '';
     drawRows();
@@ -138,6 +152,7 @@ export function openImport(tab: ImportTab = 'pastes'): void {
   /** The text changed (typed, pasted or loaded from a file): a preview of the old text no longer stands. */
   const textChanged = (): void => {
     previewToken++;
+    fetchedFrom = null;
     error.textContent = '';
     const hadPreview = rows.length > 0;
     rows = [];
@@ -153,6 +168,7 @@ export function openImport(tab: ImportTab = 'pastes'): void {
   const setBusy = (on: boolean): void => {
     busy = on;
     previewBtn.disabled = on;
+    fetchBtn.disabled = on;
     drawFoot();
   };
 
@@ -293,6 +309,7 @@ export function openImport(tab: ImportTab = 'pastes'): void {
     let message: string;
     try { message = importText(text); }
     catch (e) { error.textContent = e instanceof DataError ? e.message : 'Import failed.'; return; }
+    if (fetchedFrom) { store.ui.importUrl = fetchedFrom; store.persist(); }
     close();
     requestRender();
     toast(message);
@@ -304,17 +321,47 @@ export function openImport(tab: ImportTab = 'pastes'): void {
     let text: string;
     try { text = await chosenFile.text(); } catch { error.textContent = 'That file could not be read.'; return; }
     if (!overlay.isConnected) return;
-    // A backup replaces the box; a text file of teams is added after what is already there, as teams of its own.
+    useText(text);
+    if (tab === 'pastes') status.textContent = `Added the text of ${chosenFile.name}. Press Preview.`;
+  };
+
+  /** Text from a file or a URL: a backup replaces the box; a text file of teams is added after what is already there, as teams of its own. */
+  const useText = (text: string): void => {
     const append = tab === 'pastes' && !looksLikeBackup(text) && box.value.trim() !== '';
     box.value = append ? `${box.value.trimEnd()}\n\n---\n\n${text}` : text;
     textChanged();
-    if (tab === 'pastes') status.textContent = `Added the text of ${chosenFile.name}. Press Preview.`;
+  };
+
+  /** Fetches the backup at the URL field's address into the box, then on exactly as if that file had been chosen. */
+  const fetchUrl = async (): Promise<void> => {
+    if (tab !== 'backup' || busy) return;
+    error.textContent = '';
+    status.textContent = '';
+    let href: string;
+    try { href = checkBackupUrl(urlField.value); } catch (e) { error.textContent = e instanceof Error ? e.message : String(e); urlField.focus(); return; }
+    const token = ++fetchToken;
+    const stale = (): boolean => token !== fetchToken || !overlay.isConnected;
+    setBusy(true);
+    status.textContent = `Fetching the backup from ${new URL(href).host}…`;
+    try {
+      const text = await fetchBackup(href);
+      if (stale()) return;
+      useText(text);
+      fetchedFrom = href;
+    } catch (e) {
+      if (stale()) return;
+      status.textContent = '';
+      error.textContent = e instanceof Error ? e.message : String(e);
+    } finally {
+      if (overlay.isConnected) setBusy(false);
+    }
   };
 
   // Capture on window, so Escape closes only this dialog.
   const onKey = (e: KeyboardEvent): void => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
   const close = (): void => {
     previewToken++;
+    fetchToken++;
     overlay.remove();
     window.removeEventListener('keydown', onKey, true);
     previouslyFocused?.focus();
@@ -332,6 +379,8 @@ export function openImport(tab: ImportTab = 'pastes'): void {
   });
   file.addEventListener('change', () => { const f = file.files?.[0]; if (f) void loadFile(f); });
   previewBtn.addEventListener('click', () => void preview());
+  fetchBtn.addEventListener('click', () => void fetchUrl());
+  urlField.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); void fetchUrl(); } });
   go.addEventListener('click', () => { if (tab === 'backup') importBackup(); else importTeams(); });
 
   const rowOf = (target: EventTarget | null): TeamRow | null => {
@@ -353,5 +402,13 @@ export function openImport(tab: ImportTab = 'pastes'): void {
 
   must('#layer').appendChild(overlay);
   setTab(tab);
-  box.focus();
+  urlField.value = url ?? store.ui.importUrl ?? '';
+  if (url) void fetchUrl();
+  else box.focus();
+}
+
+/** A `?import=<url>` link (see readImportLink): opens the Backup tab and starts the fetch; nothing is imported until the user presses Import. */
+export function openImportLink(url: string | null): void {
+  if (url) openImport('backup', { url });
+  else toast('The import link was ignored: its address must start with https:// (or http://).', true);
 }

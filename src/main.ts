@@ -1,7 +1,9 @@
 import './styles/index.css';
+import { readImportLink } from './infra/backup-url.ts';
 import { store } from './state/instance.ts';
 import { connectAccount, greetAccount, renderSaveState } from './ui/account.ts';
 import { render } from './ui/app.ts';
+import { openImportLink } from './ui/bulk-import.ts';
 import { openSharedLink } from './ui/share.ts';
 import { installEvents, reportError } from './ui/events.ts';
 import { installIconFallbacks } from './ui/icons.ts';
@@ -18,6 +20,9 @@ async function main(): Promise<void> {
   installSavedTeamPicker();
   window.addEventListener('error', (e) => reportError(e.error ?? e.message));
   window.addEventListener('unhandledrejection', (e) => reportError(e.reason));
+  // `?import=<url>` is read once and taken out of the address bar, so a reload doesn't fetch it again.
+  const importLink = readImportLink(window.location.href);
+  if (importLink) history.replaceState(history.state, '', importLink.cleaned);
 
   store.onError = (message) => toast(message, true);
   store.onSaveState = () => renderSaveState();
@@ -27,8 +32,8 @@ async function main(): Promise<void> {
   // in, the account's library replaces this device's before anything is drawn.
   await connectAccount();
   render();
-  // First the welcome (first sign-in), then any share link the page was opened with.
-  void greetAccount().then(() => openSharedLink());
+  // First the welcome (first sign-in), then any share link the page was opened with, then any import link.
+  void greetAccount().then(() => openSharedLink()).finally(() => { if (importLink) openImportLink(importLink.url); });
 
   // Make sure the last edits are written when the tab is hidden or closed.
   const flush = (): void => { void store.flush(); };

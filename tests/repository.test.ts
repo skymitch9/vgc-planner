@@ -67,6 +67,10 @@ test('store restores the last open plan from preferences and reports save errors
   store.ui.teamFeedUrl = '';
   await store.flush();
   assert.equal(prefs.load().teamFeedUrl, '', 'clearing the feed is remembered too');
+  assert.equal(store.ui.importUrl, null, 'no backup address until one is used');
+  store.ui.importUrl = 'https://files.example/backup.json';
+  await store.flush();
+  assert.equal(prefs.load().importUrl, 'https://files.example/backup.json', 'the last backup address is remembered');
 
   const errors: string[] = [];
   store.onError = (m) => errors.push(m);
