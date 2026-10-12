@@ -2,6 +2,10 @@
 
 > Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-11 ~18:00 Phoenix — the newest block was moved from TODO.md verbatim in this session after reading each entry's body against the repos (`git log`, `gh pr list`, the running processes, the feed); the older entries below it were not re-verified (archive: never edited). APPEND ONLY, newest first.
 
+## 2026-10-11 22:00 — the three imports done for the owner ("Do those imports for me")
+
+From a fresh tab on the PR #8 code, through the new `?import=<url>` link against the coach server: (1) the recorded game → a new team "skymitch — Rillaboom / Sneasler / Dragonite / Delphox / Kingambit / Basculegion" with the gameplan "vs FallenJedi97 — 2026-10-11 (replay …)" as played; (2) the Machine pack → merged by team name into **Machine: 12 gameplans**; (3) the Human pack → **Human: 12 gameplans**. Read back after a reload. GOTCHA (browser automation, not the app): inside this dialog a click sent by accessibility reference does nothing (Import and Cancel alike); a click by screen coordinates works. Three ref-clicks were silently lost before this was noticed; the imports were redone by coordinates. The owner must reload his own tab (PR #8 merges, but only tabs on the new code).
+
 ## 2026-10-11 21:40 — the matchup pack built (vgc-meta PR #17, cloud session)
 
 Moved whole from TODO.md:
