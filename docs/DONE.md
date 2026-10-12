@@ -2,6 +2,15 @@
 
 > Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-11 ~18:00 Phoenix — the newest block was moved from TODO.md verbatim in this session after reading each entry's body against the repos (`git log`, `gh pr list`, the running processes, the feed); the older entries below it were not re-verified (archive: never edited). APPEND ONLY, newest first.
 
+## 2026-10-11 21:40 — the matchup pack built (vgc-meta PR #17, cloud session)
+
+Moved whole from TODO.md:
+
+- 2026-10-11 20:56 — In flight: (C) matchup pack — continued in cloud session A https://claude.ai/code/session_01S9q8Z95SvPwrh7BPNDrvs7 (new branch feature/matchup-pack; brief on branch brief/matchup-pack); (D) library sync across tabs (KI-4 fix, upstream candidate H) — cloud session on vgc-planner (brief on branch brief/storage-sync); (E) 0-turn replay export fix — LOCAL Opus agent in its own worktree (branch fix/replay-export-turns). vgc-meta PR #15 (Windows fixture paths) merged by the conductor; vgc-meta main 615d5ab, 386/386 locally; coach restarted on it. Cloud credit $219 of $250 at 20:54.
+- 2026-10-11 21:2x — CORRECTION: the matchup pack had NOT started. Cloud session A archived itself after PR #14 and the 20:50 follow-up never ran (its page showed "This session is archived"; no feature/matchup-pack branch on GitHub). Lesson: a finished cloud session cannot be reused for the next task — start a NEW session per feature. Restarted as a fresh cloud session on vgc-meta at 21:2x (brief branch brief/matchup-pack unchanged).
+
+Resolution: PR #17 https://github.com/skymitch9/vgc-meta/pull/17 (merge b3a9cf5), built in https://claude.ai/code/session_01V5C81Z7aTZfAQ6djrmFTrE in 20 minutes on the cloud credit. `src/planner/pack.mjs` `buildPack`: one team → a planner backup with one gameplan per common opponent (the 12 heaviest compositions of the top 100 from the team builder's meta model); selection from a cached deep sim row under the current tag (`+mone`) else the calc plan; exactly one Mega per four, named in the first note; turn 1 = my plan verbs + their likeliest real turn-1 move; turn 2 when the plan names one; notes with leads, bring rates, threats, worst calc line, sources and the "for this player" caveat; written by the existing writer, validated by the codec copy. CLI `npm run planner -- pack --team <paste> [--top 12] [--tier]`; `GET /api/planner/pack?team=<file under data/planner/teams/>&top=12` (bare names only). 397 tests (388 before). Run for the owner at 21:45 on the live database: Machine (12 gameplans; 3 from deep sim rows at 66.7–79.9%, 9 from calcs) and Human (12; 2 from deep rows, 10 from calcs); import links given. NOT verified: a pack opened in the running planner (the owner imports it); the deep-row best back is the best back of that lead only.
+
 ## 2026-10-11 21:30 — FIRST REAL-SITE COACH TEST: it works (owner played on play.pokemonshowdown.com)
 
 6. First real-site test of the coach extension (only he can).
