@@ -2,6 +2,15 @@
 
 > Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-11 ~18:00 Phoenix — the newest block was moved from TODO.md verbatim in this session after reading each entry's body against the repos (`git log`, `gh pr list`, the running processes, the feed); the older entries below it were not re-verified (archive: never edited). APPEND ONLY, newest first.
 
+## 2026-10-11 18:2x — stale dev server stopped (owner: "Yes")
+
+Moved whole from TODO.md "Waiting on the owner":
+
+11. NEW (docs pass): a stale Vite server (PID 61596, since 2026-10-10 17:57) still runs from the deleted worktree `.claude/worktrees/agent-a408f7c610631b9f1` and keeps that empty folder busy (KI-3); stop it?
+
+Resolution: the process was confirmed first (Win32_Process 61596 = node … `.claudeworktreesagent-a408f7c610631b9f1
+ode_modules…ite.js`, started 2026-10-10 17:57), then stopped with Stop-Process; the live dev server on :5173 still answered 200 afterwards. `git worktree list` shows only the main tree. See KNOWN_ISSUES KI-3 for the folder.
+
 ## 2026-10-11 18:2x — upstream bug fixes taken (owner: "Yes take your suggestion for 1")
 
 Moved whole from TODO.md "Waiting on the owner":
