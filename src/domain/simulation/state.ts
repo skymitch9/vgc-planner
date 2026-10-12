@@ -145,6 +145,8 @@ export interface TurnScratch {
   damaged: Record<string, { amount: number; category: string; by: string }>;
   /** Switches forced by Eject Button, Eject Pack, Red Card or Emergency Exit, carried out after the current action. */
   forced: { side: Side; name: string; reason: string }[];
+  /** Pokémon heating up for Beak Blast (from the start of the turn until it fires): contact burns the attacker. */
+  beak: Record<string, true>;
   /** After You / Quash: Pokémon made to act next, or last. */
   next: Record<string, boolean>;
   last: Record<string, boolean>;
@@ -210,7 +212,7 @@ export function fieldEffects(f: FieldState): FieldEffect[] {
 
 export const newScratch = (): TurnScratch => ({
   protect: {}, redirect: { me: null, opp: null }, entered: {}, wide: { me: false, opp: false }, quick: { me: false, opp: false }, helped: {}, flinched: {}, acted: {}, hitBy: {}, charged: {},
-  damaged: {}, forced: [], next: {}, last: {},
+  damaged: {}, forced: [], beak: {}, next: {}, last: {},
 });
 
 /** The item that counts right now: none under Magic Room (the item is still held, and comes back when it ends). */
@@ -233,6 +235,12 @@ export function bestStat(mon: MonState): BoostKey {
   }
   return best;
 }
+
+/**
+ * The form a species starts the battle in, when the calculator names it differently from a team paste (by id):
+ * Aegislash starts in Shield Forme (Stance Change switches it, see turn.ts).
+ */
+const START_FORMS: Readonly<Record<string, string>> = { aegislash: 'Aegislash-Shield' };
 
 /** Mon that must have stats; throws a plain Error (shown as a calculator problem) otherwise. */
 export function statsOf(mon: MonState): StatTable {
@@ -398,7 +406,7 @@ export function initState(engine: CalcEngine, plan: Pick<PlanTab, 'selection'>, 
     for (const set of list) {
       // A paste may name the Mega form ("Aerodactyl-Mega", with the Mega's ability): the battle still starts in base form.
       const pastedMega = isMega(set.species);
-      const base = pastedMega ? baseSpecies(set.species) : set.species;
+      const base = START_FORMS[toID(pastedMega ? baseSpecies(set.species) : set.species)] ?? (pastedMega ? baseSpecies(set.species) : set.species);
       const megaForm = engine.megaOf(base, set.item) ?? (pastedMega ? set.species : null);
       // A Mega has a single ability, so the calculator's data decides it (Charizard-Mega-Y: Drought), whatever the
       // paste says. On a paste that names the Mega, a different ability line is the base form's (e.g. Blaze).
