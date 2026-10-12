@@ -2,6 +2,14 @@
 
 > Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-11 ~18:00 Phoenix — the newest block was moved from TODO.md verbatim in this session after reading each entry's body against the repos (`git log`, `gh pr list`, the running processes, the feed); the older entries below it were not re-verified (archive: never edited). APPEND ONLY, newest first.
 
+## 2026-10-11 20:31 — import a backup from a URL built (planner PR #7, cloud session B)
+
+Moved whole from TODO.md:
+
+- 2026-10-11 20:30 — Import a backup from a URL BUILT: planner PR #7 (https://github.com/skymitch9/vgc-planner/pull/7, merged on opening) — Import dialog → "Backup file (JSON)" tab → "…or fetch from a URL" field + Fetch, same validation/merge/confirm path as a chosen file, worded errors; `?import=<url>` opens that tab with the fetch started, never auto-imports; 254 → 262 tests; upstream candidate J; production CSP note (KI-2): on the deployed site it works only for origins listed in `connect-src`.
+
+Resolution: PR #7 https://github.com/skymitch9/vgc-planner/pull/7 (merge f7ff6a5), built in cloud session https://claude.ai/code/session_016SbEC6whkhbMVPxpL2FhPj on the cloud credit. Import dialog → Backup file (JSON) → "…or fetch from a URL" + Fetch (no cookies, no referrer, 15 s timeout, 2 MB cap, http(s) only, the codec's own validation, then the exact file path: into the box, Import to confirm); worded errors; `?import=<url>` opens the dialog and fetches but never imports by itself, parameter removed from the address bar; last address remembered in prefs. 262 tests (254 before); build clean, no inline handlers. Independence check by the conductor: the code diff contains no host, port or product name of any other app. NOT verified: production CSP (KI-2) — a URL import on the deployed site works only for origins listed in the headers; real HTTPS servers, redirects, servers without CORS; Firefox/Safari; mobile layout; e2e (KI-1). Upstream candidate J.
+
 ## 2026-10-11 20:10 — Showdown paste export built (planner PR #6)
 
 Moved whole from TODO.md:
