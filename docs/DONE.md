@@ -2,6 +2,14 @@
 
 > Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-11 ~18:00 Phoenix — the newest block was moved from TODO.md verbatim in this session after reading each entry's body against the repos (`git log`, `gh pr list`, the running processes, the feed); the older entries below it were not re-verified (archive: never edited). APPEND ONLY, newest first.
 
+## 2026-10-11 19:0x — the two environment-dependent tests fixed (vgc-meta PR #13)
+
+Moved whole from TODO.md:
+
+- 2026-10-11 18:5x — FINDING after merging vgc-meta PR #12 on this machine: 2 of 339 tests fail here because they assume no `data/sim-features.json` exists (this machine enables the sixteen, so the engine tag carries `+fa712d486`). Tests, not code. DISPATCHED (Opus, own worktree, own PR): make those tests independent of the local default file.
+
+Resolution: vgc-meta PR #13 (merge df7d60b): three tests now pass `features: "none"` explicitly (calibrate-score, tiers-report, calibrate-agree), so they measure the v1 player whatever the machine's `data/sim-features.json` says; no source change; `npm run check` 339/339 with the file present and absent. Cause recorded: `engineTag()` never reads the default file, the command entrypoints do (`resolveFeatures(undefined)`).
+
 ## 2026-10-11 18:2x — stale dev server stopped (owner: "Yes")
 
 Moved whole from TODO.md "Waiting on the owner":
