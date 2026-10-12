@@ -11,10 +11,11 @@ const storage = usableLocalStorage();
 
 /**
  * The library on this device (browser storage, or memory when storage is blocked). Used while signed out; the
- * store switches to the account's library on sign-in and back to this one on sign-out.
+ * store switches to the account's library on sign-in and back to this one on sign-out. Other tabs' saves reach it
+ * through the window's `storage` events.
  */
 export const device: { repo: LibraryRepository; persistent: boolean } = storage
-  ? { repo: new LocalStorageRepository(storage, config.storage.libraryKey, config.storage.legacyKey), persistent: true }
+  ? { repo: new LocalStorageRepository(storage, config.storage.libraryKey, config.storage.legacyKey, window), persistent: true }
   : { repo: new MemoryRepository(), persistent: false };
 
 export const store = new AppStore(

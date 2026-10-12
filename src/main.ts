@@ -26,6 +26,8 @@ async function main(): Promise<void> {
 
   store.onError = (message) => toast(message, true);
   store.onSaveState = () => renderSaveState();
+  // The planner may be open in several tabs: what another tab saves is merged in here and shown.
+  store.onExternalChange = () => { render(); toast('Library updated from another tab'); };
   await store.init();
   if (store.loadError) toast(store.loadError, true);
   // Accounts are optional: without the API (or signed out) the app keeps working on this device only. When signed

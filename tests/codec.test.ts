@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { DataError, EXPORT_FORMAT, LIMITS, buildExport, mergeImport, readExport, readLibrary, readTeamFields, writeLibrary } from '../src/domain/codec.ts';
+import { DataError, EXPORT_FORMAT, LIMITS, buildExport, mergeImport, readExport, readLibrary, readLibraryStamp, readTeamFields, writeLibrary } from '../src/domain/codec.ts';
 import type { ExportFile } from '../src/domain/codec.ts';
 import { clearEstimated, clonePlan, cloneTab, countNodes, newNode, newPlan, newTab, newTeam } from '../src/domain/model.ts';
 import type { Library } from '../src/domain/types.ts';
@@ -252,4 +252,15 @@ test('clearEstimated drops edited species, species no longer on the team, or eve
   team.estimatedSpreads = ['Rillaboom'];
   clearEstimated(team);
   assert.ok(!('estimatedSpreads' in team));
+});
+
+test('the stored library carries a revision and save time; older data reads as revision 0', () => {
+  const lib = sampleLibrary();
+  const raw = JSON.parse(JSON.stringify(writeLibrary(lib, { revision: 7, savedAt: '2026-10-11T20:00:00.000Z' }))) as unknown;
+  assert.deepEqual(readLibraryStamp(raw), { revision: 7, savedAt: '2026-10-11T20:00:00.000Z' });
+  assert.equal(readLibrary(raw).teams[0]!.name, 'Rain', 'the stamp does not change what is read');
+  assert.deepEqual(readLibraryStamp(JSON.parse(JSON.stringify(writeLibrary(lib))) as unknown), { revision: 0, savedAt: null });
+  assert.deepEqual(readLibraryStamp({ teams: [] }), { revision: 0, savedAt: null }, 'pre-1.0 shape');
+  assert.deepEqual(readLibraryStamp({ schemaVersion: 2, revision: -3, savedAt: 42, teams: [] }), { revision: 0, savedAt: null }, 'nonsense is ignored');
+  assert.deepEqual(readLibraryStamp(null), { revision: 0, savedAt: null });
 });
