@@ -3,9 +3,9 @@ import type { ExportScope } from '../domain/codec.ts';
 import { cleanSelections, setEstimated, clonePlan, cloneTab, cloneTeam, countNodes, findNode, findPlan, findTeam, monsFor, newNode, newPlan, newTab, newTeam, nextTabName, seedActions } from '../domain/model.ts';
 import { copyNameFor } from '../domain/bulk-import.ts';
 import { parseShowdown, teamWarnings } from '../domain/showdown.ts';
-import { slug } from '../domain/strings.ts';
+import { fileName, slug } from '../domain/strings.ts';
 import { nextActions } from '../domain/simulation/state.ts';
-import { writeTeam } from '../domain/dex.ts';
+import { showdownPaste, writeTeam } from '../domain/dex.ts';
 import type { Side, SlotKind, Team } from '../domain/types.ts';
 import { loadDex } from '../infra/dex-loader.ts';
 import { store } from '../state/instance.ts';
@@ -329,6 +329,10 @@ export async function showExport(scope: ExportScope): Promise<void> {
     body: `<textarea class="paste medium" readonly id="exp" aria-label="Exported JSON">${esc(json)}</textarea>`,
     actions: [
       { label: 'Close', value: null },
+      ...(scope.type === 'team' ? [{
+        label: 'Showdown paste',
+        run: () => { setTimeout(() => void showShowdownExport(scope.teamId), 0); return null; },
+      }] : []),
       {
         label: 'Copy',
         run: () => {
@@ -340,17 +344,75 @@ export async function showExport(scope: ExportScope): Promise<void> {
       {
         label: 'Download .json', cls: 'primary',
         run: () => {
-          const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
-          const link = document.createElement('a');
-          link.href = url; link.download = `${filename}.json`;
-          document.body.appendChild(link); link.click(); link.remove();
-          setTimeout(() => URL.revokeObjectURL(url), 1000);
-          toast(`Downloaded ${filename}.json`);
+          downloadText(json, `${filename}.json`, 'application/json');
           return false;
         },
       },
     ],
   });
+}
+
+/** Saves text as a file through a temporary link (no inline handlers, so the CSP stays strict). */
+function downloadText(text: string, name: string, type: string): void {
+  const url = URL.createObjectURL(new Blob([text], { type }));
+  const link = document.createElement('a');
+  link.href = url; link.download = name;
+  document.body.appendChild(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast(`Downloaded ${name}`);
+}
+
+/** The team as Showdown export text, or null (with a toast) when the team has no Pokémon yet. */
+function teamShowdown(teamId: string): { team: Team; text: string } | null {
+  const team = findTeam(store.library, teamId);
+  if (!team) return null;
+  const text = showdownPaste(team.paste);
+  if (!text) { toast('This team has no Pokémon yet', true); return null; }
+  return { team, text };
+}
+
+/** Copies the team as a Showdown paste; if the clipboard refuses, opens the dialog with the text selected. */
+export function copyShowdownPaste(teamId: string): void {
+  const found = teamShowdown(teamId);
+  if (!found) return;
+  const fallback = (): void => { void showShowdownExport(teamId, 'Copy failed. The text is selected: press Ctrl+C (Cmd+C) to copy it.'); };
+  if (!navigator.clipboard) { fallback(); return; }
+  navigator.clipboard.writeText(found.text).then(() => toast('Showdown paste copied'), fallback);
+}
+
+/** Downloads the team as a Showdown paste, named after the team. */
+export function downloadShowdownPaste(teamId: string): void {
+  const found = teamShowdown(teamId);
+  if (found) downloadText(found.text, `${fileName(found.team.name)}.txt`, 'text/plain');
+}
+
+/** The team as Showdown paste text in a dialog, ready to copy into Showdown's teambuilder (Import from text). */
+export async function showShowdownExport(teamId: string, problem?: string): Promise<void> {
+  const found = teamShowdown(teamId);
+  if (!found) return;
+  const { team, text } = found;
+  const opened = modal<null>({
+    title: 'Showdown paste',
+    desc: problem ?? "Paste this into Showdown's teambuilder (New team, then Import from text).",
+    body: `<textarea class="paste medium" readonly id="exp-sd" aria-label="Showdown paste">${esc(text)}</textarea>`,
+    actions: [
+      { label: 'Close', value: null },
+      {
+        label: 'Copy',
+        run: () => {
+          must<HTMLTextAreaElement>('#exp-sd').select();
+          void navigator.clipboard.writeText(text).then(() => toast('Showdown paste copied'), () => toast('Copy failed. Select the text and copy it manually.', true));
+          return false;
+        },
+      },
+      {
+        label: 'Download .txt', cls: 'primary',
+        run: () => { downloadText(text, `${fileName(team.name)}.txt`, 'text/plain'); return false; },
+      },
+    ],
+  });
+  must<HTMLTextAreaElement>('#exp-sd').select();
+  await opened;
 }
 
 /** Merges this app's export file (as JSON text) into the library and returns the summary line; throws DataError on a bad file. The Import dialog (bulk-import.ts) calls it. */

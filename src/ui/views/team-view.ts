@@ -256,6 +256,8 @@ export function renderTeamView(main: HTMLElement, team: Team): void {
     <span class="chip">${esc(REGULATION.label)}</span><span class="spacer"></span>
     <button class="btn" data-act="duplicate-team" data-team="${esc(team.id)}">Duplicate</button>
     <button class="btn" data-act="export-team" data-team="${esc(team.id)}">Export team</button>
+    <button class="btn" data-act="copy-showdown" data-team="${esc(team.id)}" title="Copy this team as Showdown paste text, ready for Showdown's teambuilder">Copy Showdown paste</button>
+    <button class="btn" data-act="download-showdown" data-team="${esc(team.id)}" title="Save this team as a Showdown paste (.txt)">Download .txt</button>
     <button class="btn danger" data-act="delete-team" data-team="${esc(team.id)}">Delete</button>${extLinksHTML()}</div>
   <div class="page"><div class="page-inner">
     <div class="section"><div class="section-head"><h3>Team</h3>
