@@ -10,6 +10,8 @@ export interface UiPrefs {
   navCollapsed: boolean;
   /** The team feed the "★ Top teams" picker loads; null (or absent) until the user picks one, meaning the default. */
   teamFeedUrl?: string | null;
+  /** The last address a backup was fetched from in the Import dialog. */
+  importUrl?: string | null;
 }
 
 export const defaultPrefs = (): UiPrefs => ({ teamId: null, planId: null, tabId: null, open: {}, zoom: 1, navCollapsed: false });
@@ -45,6 +47,7 @@ export class LocalStoragePrefs implements PrefsStore {
       if (typeof p.zoom === 'number' && Number.isFinite(p.zoom)) prefs.zoom = p.zoom;
       if (p.navCollapsed === true) prefs.navCollapsed = true;
       if (typeof p.teamFeedUrl === 'string' && p.teamFeedUrl.length <= 500) prefs.teamFeedUrl = p.teamFeedUrl;
+      if (typeof p.importUrl === 'string' && p.importUrl.length <= 2000) prefs.importUrl = p.importUrl;
       if (typeof p.open === 'object' && p.open !== null) {
         for (const [k, v] of Object.entries(p.open)) if (v === true) prefs.open[k] = true;
       }

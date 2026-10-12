@@ -159,6 +159,8 @@ select.input { padding-right: 4px; }
 .imp-modal [hidden] { display: none; }
 .imp-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
 .imp-controls #imp-file { flex: 1 1 220px; min-width: 0; font-size: 12.5px; }
+.imp-url-row { display: flex; gap: 8px; align-items: center; }
+.imp-url-row .field { flex: 1 1 auto; min-width: 0; }
 .imp-rows { display: grid; gap: 6px; }
 .imp-row { display: grid; grid-template-columns: auto minmax(150px, 1fr) auto minmax(0, auto); align-items: center; gap: 4px 10px; padding: 6px 10px; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--bg); }
 .imp-row.off .imp-mons { opacity: .45; }

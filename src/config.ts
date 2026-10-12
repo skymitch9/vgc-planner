@@ -34,4 +34,10 @@ export const config = {
     maxFeedChars: 3_000_000,
     maxPasteChars: 20_000,
   },
+  backupUrl: {
+    /** Fetching a backup file from a web address (Import dialog, `?import=` links). */
+    timeoutMs: 15_000,
+    /** The same cap as a chosen backup file. */
+    maxBytes: 2_000_000,
+  },
 } as const;
