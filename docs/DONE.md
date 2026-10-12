@@ -2,6 +2,10 @@
 
 > Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-11 ~18:00 Phoenix — the newest block was moved from TODO.md verbatim in this session after reading each entry's body against the repos (`git log`, `gh pr list`, the running processes, the feed); the older entries below it were not re-verified (archive: never edited). APPEND ONLY, newest first.
 
+## 2026-10-11 21:0x — "0-turn replay export" RETRACTED: a conductor misreading (vgc-meta PR #16 adds the regression test)
+
+The conductor's 20:5x end-to-end check read `tabs[0].turns` and saw nothing; the planner's format stores a gameplan's turns as a nested `flow` chain (each turn the child of the one before), so `turns` does not exist. Measured by the fix agent on 615d5ab: replay 2691536717 → 12 `|turn|` lines, 12 turns from the live coach server, from the planner's own reader and from the CLI; 2695579965 and 2696467495 → 13 and 13 (their logs have 13 turns; `replay_turns` holds 12); the live 2696463631 → 8. Every turn has 4 actions except a last turn with 3 when one side is down to its last Pokémon. No code changed; PR #16 (merge 784afae) adds an untrimmed real-replay fixture (names anonymised) with its golden export and a 12-in/12-out test; 388 tests. Lesson for the next end-to-end check: count the `flow` chain, not a `turns` array.
+
 ## 2026-10-11 20:44 — the API that feeds the planner recorded data: built (vgc-meta PR #14, cloud session A)
 
 Moved whole from TODO.md:
