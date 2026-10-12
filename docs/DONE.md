@@ -2,6 +2,10 @@
 
 > Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-11 ~18:00 Phoenix — the newest block was moved from TODO.md verbatim in this session after reading each entry's body against the repos (`git log`, `gh pr list`, the running processes, the feed); the older entries below it were not re-verified (archive: never edited). APPEND ONLY, newest first.
 
+## 2026-10-11 20:05 — the two teams renamed in the planner (owner: "Add those teams into the site and label them human and machine")
+
+They were already in the library as "Computer's choice" / "Human's choice" (imported 19:58); renamed through the team page's name field from a fresh tab to **Machine** and **Human**, read back after a reload. Library: Garchomp Z (1 gameplan), Salamence, test, Machine, Human.
+
 ## 2026-10-11 20:0x — two teams delivered (computer's choice / human's choice) and added to the planner
 
 Moved whole from TODO.md:
