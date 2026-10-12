@@ -2,6 +2,16 @@
 
 > Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-11 ~18:00 Phoenix — the newest block was moved from TODO.md verbatim in this session after reading each entry's body against the repos (`git log`, `gh pr list`, the running processes, the feed); the older entries below it were not re-verified (archive: never edited). APPEND ONLY, newest first.
 
+## 2026-10-11 20:10 — Showdown paste export built (planner PR #6)
+
+Moved whole from TODO.md:
+
+- 2026-10-11 20:0x — Owner ask (App 1): "Make sure we also have a team export that way if I make a team in app I can get it into showdown." → a team made in the planner must come OUT as Showdown paste text (copy to clipboard + download .txt), not only as the app's JSON backup. Checking what "Export team" does today first.
+
+- 2026-10-11 20:10 — Showdown paste export BUILT: planner PR #6 (branch feature/showdown-export): the team page header now has "Copy Showdown paste" and "Download .txt" next to "Export team", the single-team Export dialog has a "Showdown paste" choice, and the sidebar team menu has "Copy Showdown paste", all reusing writeTeam (dex.ts showdownPaste); upstream candidate (UPSTREAM-PLAN)
+
+Resolution: PR #6 https://github.com/skymitch9/vgc-planner/pull/6 (merge 6677f4f): `showdownPaste()` in `src/domain/dex.ts` reuses the existing `writeTeam` serializer (one canonical implementation); buttons "Copy Showdown paste" and "Download .txt" on the team page header next to "Export team", a "Showdown paste" option in the Export dialog, and "Copy Showdown paste" in the sidebar team menu; 254 tests (249 before). Verified in a worktree browser: the copied text re-imports as the same team ("duplicate of" in the preview). NOT verified: importing into Pokémon Showdown itself; the clipboard-failure fallback; narrow screens; e2e (KI-1). Upstream candidate I in UPSTREAM-PLAN.
+
 ## 2026-10-11 20:05 — the two teams renamed in the planner (owner: "Add those teams into the site and label them human and machine")
 
 They were already in the library as "Computer's choice" / "Human's choice" (imported 19:58); renamed through the team page's name field from a fresh tab to **Machine** and **Human**, read back after a reload. Library: Garchomp Z (1 gameplan), Salamence, test, Machine, Human.
