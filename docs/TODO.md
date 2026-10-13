@@ -362,3 +362,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 15:55** — They led Staraptor + Ceruledge. Call: Fake Out Staraptor, Psyshock Ceruledge (Ghost, Fake Out immune, 2x into Delphox); turn 2 Dire Claw Ceruledge + Psyshock Staraptor.
 
 - **2026-10-13 16:18** — Vs Cereza (Charizard / Garchomp / Incineroar / Water-Psychic mon / Sneasler / Normal-Fairy mon, sun). Call: Sun group bring, Sneasler + Delphox lead, Rillaboom + Basculegion back; turn-1 branches given (double Garchomp / Fake Out Incineroar / Fake Out + Psyshock the mirror Sneasler).
+
+- **2026-10-13 16:47** — Vs K11 (Whimsicott / Normal-Psychic mon / Froslass / Staraptor / Cinderace / Sneasler, snow). No Snow group in the Dragonite list. Call: lead Kingambit + Delphox, back Sneasler + Basculegion; Dragonite home (Blizzard 4x). Turn 1: Kowtow Cleave Froslass + Heat Wave.
