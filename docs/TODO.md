@@ -310,3 +310,4 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - 2026-10-13 13:26 — Owner: "How's the ongoing stuff" → status given.
 - 2026-10-13 13:27 — Live vs Rufus (Arcanine-H / Mega Garchomp / Mega Salamence / Sylveon / Sneasler / Incineroar): Salamence-mirror group plan given: Salamence + Sneasler, back Gholdengo + Incineroar; Protect + Fake Out if Arcanine-H leads.
 - 2026-10-13 13:28 — Live turn 1 vs Sneasler + Garchomp: Protect Salamence + Fake Out Garchomp; turn 2 Draco Meteor Garchomp.
+- 2026-10-13 13:30 — Live: Scarf Garchomp dead, Salamence low at −2, their Incineroar in → Salamence out to Gholdengo, Close Combat Incineroar.
