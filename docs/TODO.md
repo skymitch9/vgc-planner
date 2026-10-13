@@ -346,3 +346,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 15:45** — Vs Grogovich (Arcanine-H / Whimsicott / Tyranitar / Basculegion / Staraptor / Sneasler, sand). Call: lead Rillaboom + Sneasler, back Dragonite + Kingambit; Basculegion home (sand breaks Sash). Turn 1: Fake Out Whimsicott, Close Combat Tyranitar.
 
 - **2026-10-13 15:46** — They led Whimsicott + Staraptor. Call: Fake Out Whimsicott + Dire Claw Whimsicott (2x), accept Brave Bird on Sneasler; alt: Sneasler -> Kingambit which resists Brave Bird.
+
+- **2026-10-13 15:47** — Owner: MEGA Staraptor. Dex: Staraptor-Mega Fighting/Flying 85/140/100/60/90/110 Contrary; zero feed sets. Told him: no Close Combat (resisted + Contrary), keep Kingambit away (CC 4x), Dragonite-Mega (91/124/115/145/125/100 Multiscale) is the answer; Rillaboom cannot hit it.
