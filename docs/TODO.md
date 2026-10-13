@@ -368,3 +368,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 16:48** — They led Whimsicott + Sneasler. Call: Kingambit -> Basculegion (Ghost blanks Close Combat), Delphox Psyshock Sneasler.
 
 - **2026-10-13 16:49** — Their Sneasler dead, Whimsicott Tailwind, Staraptor in with Intimidate. Call: Heat Wave + Liquidation Staraptor; Protect Delphox if low.
+
+- **2026-10-13 16:55** — Vs Neon Black (Empoleon / Kingambit / Blastoise / Normal-Fairy mon / Grass mon / Fire mon; photo upside down). Call: lead Rillaboom + Sneasler, back Dragonite + Kingambit; Fake Out Blastoise, Close Combat Kingambit or Empoleon.
