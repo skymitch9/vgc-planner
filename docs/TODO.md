@@ -342,3 +342,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 15:35** — Vs Quan (Sneasler / Sableye / Archaludon / Charizard / Normal-Fairy mon / Mawile). Call: lead Dragonite + Kingambit, back Sneasler + Delphox (list says Basculegion back for other-Megas; swapped for Fire coverage on Mawile + Archaludon). Turn 1: Tailwind, Kowtow Cleave Sableye; Archaludon Body Press is 4x on Kingambit.
 
 - **2026-10-13 15:36** — Owner: "Delphox is a mega" (two Mega holders in my call). Corrected: back Sneasler + Rillaboom, Dragonite the Mega. Rule for me: never put Dragonite and Delphox in the same four.
+
+- **2026-10-13 15:45** — Vs Grogovich (Arcanine-H / Whimsicott / Tyranitar / Basculegion / Staraptor / Sneasler, sand). Call: lead Rillaboom + Sneasler, back Dragonite + Kingambit; Basculegion home (sand breaks Sash). Turn 1: Fake Out Whimsicott, Close Combat Tyranitar.
