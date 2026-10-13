@@ -301,3 +301,4 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - 2026-10-13 13:08 — Live: "What if gengar megas" → Tailwind anyway, Draco Meteor Gengar turn 2; Sneasler trapped works on the partner; Gholdengo ignores Shadow Tag.
 - 2026-10-13 13:09 — Correction: the "Rain" team's fourth is KOMMO-O (Dragon/Fighting), not Urshifu; advice updated (Fake Out it turn 1, Draco Meteor not Hyper Voice — Soundproof, Protect Salamence when it is boosted).
 - 2026-10-13 13:10 — Live turn 2 (Incineroar + Kingambit led, Tailwind up, Kingambit +2): Salamence Protect, Sneasler Close Combat Kingambit.
+- 2026-10-13 13:11 — Live turn 3 (Incineroar → Rillaboom, Kingambit Protected): Hyper Voice + Close Combat Kingambit; no second Protect, no Incineroar switch into Defiant.
