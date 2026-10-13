@@ -334,3 +334,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 15:17** — Owner: "Mega floette speed vs basc". Answered: Mega Floette base 102 (154 Modest max / 169 Timid / 144 at 22 pts) beats his Adamant 32-Spe Basculegion (130) unless Floette runs no speed (122); feed: 151 Modest / 50 Timid, only 4 of 201 under 19 Spe pts. Caveat: 8 EVs per Champions point assumed.
 
 - **2026-10-13 15:22** — Switched to the Dragonite team on the Switch. Vs J (Incineroar / Lucario / Water mon / Kleavor / Farigiraf / Garchomp); he brought Rillaboom + Dragonite lead, Sneasler + Basculegion back; they lead Farigiraf + Kleavor. Call: Rillaboom High Horsepower Kleavor, Dragonite Protect (Armor Tail kills Fake Out / Grassy Glide / Aqua Jet; scout Trick Room and Stone Axe); Tailwind turn 2 if no room.
+
+- **2026-10-13 15:28** — Vs El Gamberone = Salerno Recife six (Toxapex / Incineroar / Sylveon / Garchomp / Charizard-Y / Venusaur). Call from dragonite-leads.md Sun group: lead Sneasler + Delphox, back Rillaboom + Kingambit (81.3% own best). Turn 1: Fake Out Venusaur, Delphox into Venusaur.
