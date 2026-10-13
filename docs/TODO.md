@@ -358,3 +358,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 15:53** — Vs JohnyBanana (Charizard / Ceruledge / Archaludon / Grass-Ghost mon / Staraptor / Venusaur, sun). Call: lead Sneasler + Delphox, back Rillaboom + Basculegion (Sun group). Turn 1: Fake Out Venusaur, Heat Wave; Psyshock a Mega Staraptor.
 
 - **2026-10-13 15:54** — Owner: "Where is my lead report" — my phrase "I need only your lead report" read as a report I owed. Clarified (meant: tell me their lead) and re-sent dragonite-leads.md. Lesson: say "tell me their lead" plainly.
+
+- **2026-10-13 15:55** — They led Staraptor + Ceruledge. Call: Fake Out Staraptor, Psyshock Ceruledge (Ghost, Fake Out immune, 2x into Delphox); turn 2 Dire Claw Ceruledge + Psyshock Staraptor.
