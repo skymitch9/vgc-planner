@@ -312,3 +312,4 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - 2026-10-13 13:28 — Live turn 1 vs Sneasler + Garchomp: Protect Salamence + Fake Out Garchomp; turn 2 Draco Meteor Garchomp.
 - 2026-10-13 13:30 — Live: Scarf Garchomp dead, Salamence low at −2, their Incineroar in → Salamence out to Gholdengo, Close Combat Incineroar.
 - 2026-10-13 13:36 — Owner asks: "How do I find out what rating the master ball 3 and 4 change happens at" → searching for the Champions ranked tier thresholds.
+- 2026-10-13 13:36 — Live vs Ant (Ugarte's Louisville sun six): the matchup's own best bring given: Gholdengo + Sneasler, back Salamence + Incineroar (46.9% vs 28% group plan); Armor Tail blocks Fake Out while Farigiraf is out.
