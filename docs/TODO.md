@@ -352,3 +352,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 15:47** — Turn 1 result: Whimsicott down, Staraptor Protected, Arcanine-H in. Turn 2 call: Grassy Glide + Close Combat into Arcanine (Sash break then 2x), Dragonite in for whoever Brave Bird takes.
 
 - **2026-10-13 15:48** — Arcanine-H brought Intimidate (not Rock Head): his leads at -2. Kept the double into Arcanine (Glide first, CC ~90%); alt swap Rillaboom -> Dragonite.
+
+- **2026-10-13 15:49** — Staraptor set Tailwind; their last is Basculegion-M. Call: Grassy Glide Basculegion (priority beats Tailwind), Sneasler -> Dragonite; then Glide + Dragon Pulse Staraptor.
