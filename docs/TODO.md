@@ -304,3 +304,4 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - 2026-10-13 13:11 — Live turn 3 (Incineroar → Rillaboom, Kingambit Protected): Hyper Voice + Close Combat Kingambit; no second Protect, no Incineroar switch into Defiant.
 - 2026-10-13 13:18 — Live vs Elewiel (Mega Altaria / Mega Blastoise / Rillaboom / Kingambit / Sneasler / Basculegion): DEVIATED from the 'other Megas' group plan (Salamence + Gholdengo lead) because Pixilate Hyper Voice counters a Salamence lead → Gholdengo + Rillaboom, back Salamence + Sneasler.
 - 2026-10-13 13:19 — Live turn 1 vs Blastoise + Sneasler: Fake Out Blastoise, Nasty Plot Gholdengo (their Sneasler cannot touch it); turn 2 Grassy Glide Blastoise + Make It Rain.
+- 2026-10-13 13:20 — Live: Blastoise Mega'd → same line, Grassy Glide + Make It Rain before Dark Pulse.
