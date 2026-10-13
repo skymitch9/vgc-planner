@@ -306,3 +306,4 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - 2026-10-13 13:19 — Live turn 1 vs Blastoise + Sneasler: Fake Out Blastoise, Nasty Plot Gholdengo (their Sneasler cannot touch it); turn 2 Grassy Glide Blastoise + Make It Rain.
 - 2026-10-13 13:20 — Live: Blastoise Mega'd → same line, Grassy Glide + Make It Rain before Dark Pulse.
 - 2026-10-13 13:21 — Owner: "Fake out poisoned me?" → their Sneasler is Poison Touch (30% on contact); Rillaboom poisoned, terrain offsets half.
+- 2026-10-13 13:21 — Live: Gholdengo KOed by Mega Blastoise's Shadow Ball → Sneasler in (Fake Out Blastoise + Grassy Glide), Salamence last.
