@@ -338,3 +338,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 15:28** — Vs El Gamberone = Salerno Recife six (Toxapex / Incineroar / Sylveon / Garchomp / Charizard-Y / Venusaur). Call from dragonite-leads.md Sun group: lead Sneasler + Delphox, back Rillaboom + Kingambit (81.3% own best). Turn 1: Fake Out Venusaur, Delphox into Venusaur.
 
 - **2026-10-13 15:29** — They led Garchomp + Charizard. Call: double Garchomp (Close Combat + Psyshock), both his leads outspeed both foes; no Fake Out.
+
+- **2026-10-13 15:35** — Vs Quan (Sneasler / Sableye / Archaludon / Charizard / Normal-Fairy mon / Mawile). Call: lead Dragonite + Kingambit, back Sneasler + Delphox (list says Basculegion back for other-Megas; swapped for Fire coverage on Mawile + Archaludon). Turn 1: Tailwind, Kowtow Cleave Sableye; Archaludon Body Press is 4x on Kingambit.
