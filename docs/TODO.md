@@ -344,3 +344,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 15:36** — Owner: "Delphox is a mega" (two Mega holders in my call). Corrected: back Sneasler + Rillaboom, Dragonite the Mega. Rule for me: never put Dragonite and Delphox in the same four.
 
 - **2026-10-13 15:45** — Vs Grogovich (Arcanine-H / Whimsicott / Tyranitar / Basculegion / Staraptor / Sneasler, sand). Call: lead Rillaboom + Sneasler, back Dragonite + Kingambit; Basculegion home (sand breaks Sash). Turn 1: Fake Out Whimsicott, Close Combat Tyranitar.
+
+- **2026-10-13 15:46** — They led Whimsicott + Staraptor. Call: Fake Out Whimsicott + Dire Claw Whimsicott (2x), accept Brave Bird on Sneasler; alt: Sneasler -> Kingambit which resists Brave Bird.
