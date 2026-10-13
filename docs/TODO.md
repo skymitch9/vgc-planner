@@ -374,3 +374,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 16:56** — They led Blastoise + Farigiraf (Armor Tail: no Fake Out / Glide). Call: double Farigiraf (CC + Wood Hammer) before Trick Room; turn 2 Wood Hammer Blastoise; Kingambit if room goes up.
 
 - **2026-10-13 16:57** — Correction: Golisopod, not Empoleon. CC resisted; Dire Claw / Wood Hammer / HH neutral; First Impression 2x on Rillaboom.
+
+- **2026-10-13 16:58** — Turn 1: Sneasler one-shot by Farigiraf Psychic (4x, my miss), Blastoise one-shot by Wood Hammer. Call: Kingambit in (Psychic-immune), Kowtow Cleave + Wood Hammer Farigiraf.
