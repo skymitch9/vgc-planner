@@ -366,3 +366,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 16:47** — Vs K11 (Whimsicott / Normal-Psychic mon / Froslass / Staraptor / Cinderace / Sneasler, snow). No Snow group in the Dragonite list. Call: lead Kingambit + Delphox, back Sneasler + Basculegion; Dragonite home (Blizzard 4x). Turn 1: Kowtow Cleave Froslass + Heat Wave.
 
 - **2026-10-13 16:48** — They led Whimsicott + Sneasler. Call: Kingambit -> Basculegion (Ghost blanks Close Combat), Delphox Psyshock Sneasler.
+
+- **2026-10-13 16:49** — Their Sneasler dead, Whimsicott Tailwind, Staraptor in with Intimidate. Call: Heat Wave + Liquidation Staraptor; Protect Delphox if low.
