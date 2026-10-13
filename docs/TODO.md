@@ -328,3 +328,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 15:07** — Owner: it was MEGA Froslass. No Sash, same call (Dire Claw + Shadow Ball). Gap: Mega Froslass stats/ability not known to me and unverified in the sim data — check the Showdown engine dex for Froslass-Mega after the game.
 
 - **2026-10-13 15:08** — Dex check done: Froslass-Mega 70/80/70/140/100/120 Ice/Ghost, Snow Warning; 83 feed pastes, all Blizzard / Shadow Ball / Protect, 75 Aurora Veil. Told him: Blizzard 4x on Salamence, keep it back until Froslass is gone; hit before Veil.
+
+- **2026-10-13 15:10** — Owner: "Give me the leads and backups for the team we have been playing on showdown with dragonite and Delphox" (= vgc-meta data/sim-input/skymitch.txt: Rillaboom / Sneasler White Herb / Dragonite / Delphox / Kingambit / Basculegion). No CPU while he plays, so built it from the existing 2026-10-11T19-11-13 top-30 deep report (74.7% best-lead / 60.3% any) with leads-list.mjs -> vgc-meta/data/planner/dragonite-leads.md (25 sixes, 8 groups), sent to him. Queued: fresh top-100 deep sim for this team once he stops playing, then re-run the list.
