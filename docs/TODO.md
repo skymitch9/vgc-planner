@@ -299,3 +299,4 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - 2026-10-13 12:58 — Live vs ユナカ turn 1 (they lead Dragonite + Sneasler): Mega + Protect Salamence, Fake Out Dragonite; turn 2 Tailwind + Dire Claw Dragonite.
 - 2026-10-13 13:07 — Live vs "Rain" (Mega Gengar / Rillaboom / Incineroar / Urshifu-R / Sneasler / Kingambit): Gengar group plan given: Salamence + Sneasler, back Gholdengo + Incineroar; Gholdengo ignores Shadow Tag.
 - 2026-10-13 13:08 — Live: "What if gengar megas" → Tailwind anyway, Draco Meteor Gengar turn 2; Sneasler trapped works on the partner; Gholdengo ignores Shadow Tag.
+- 2026-10-13 13:09 — Correction: the "Rain" team's fourth is KOMMO-O (Dragon/Fighting), not Urshifu; advice updated (Fake Out it turn 1, Draco Meteor not Hyper Voice — Soundproof, Protect Salamence when it is boosted).
