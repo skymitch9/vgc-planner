@@ -354,3 +354,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 15:48** — Arcanine-H brought Intimidate (not Rock Head): his leads at -2. Kept the double into Arcanine (Glide first, CC ~90%); alt swap Rillaboom -> Dragonite.
 
 - **2026-10-13 15:49** — Staraptor set Tailwind; their last is Basculegion-M. Call: Grassy Glide Basculegion (priority beats Tailwind), Sneasler -> Dragonite; then Glide + Dragon Pulse Staraptor.
+
+- **2026-10-13 15:53** — Vs JohnyBanana (Charizard / Ceruledge / Archaludon / Grass-Ghost mon / Staraptor / Venusaur, sun). Call: lead Sneasler + Delphox, back Rillaboom + Basculegion (Sun group). Turn 1: Fake Out Venusaur, Heat Wave; Psyshock a Mega Staraptor.
