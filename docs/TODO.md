@@ -380,3 +380,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 16:59** — Appletun in for Blastoise (Grass/Dragon TR partner). Call held: double Farigiraf; Dragonite Dragon Pulse for Appletun later.
 
 - **2026-10-13 17:02** — Vs ミヤ (Houndoom / Gardevoir / Torkoal / Normal-Fairy mon / Annihilape / Grass mon, sun). Call: lead Sneasler + Delphox, back Kingambit + Basculegion (Kingambit over Rillaboom for Gardevoir); turn-1 branches given; Dire Claw 2x on Gardevoir, its Psychic 4x on Sneasler.
+
+- **2026-10-13 17:04** — They led Gardevoir + Annihilape. Turn 2 call: Dire Claw Gardevoir (2x, you outspeed), Psyshock Annihilape.
