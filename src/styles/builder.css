@@ -174,3 +174,19 @@ select.input { padding-right: 4px; }
   .imp-row .imp-mons, .imp-row .tt-badges { grid-column: 2; justify-content: flex-start; }
   .imp-row.err { grid-template-columns: 1fr; }
 }
+
+/* ---------- Optimize SPs dialog ---------- */
+.spo [hidden] { display: none; }
+.spo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px 12px; }
+.spo-checks { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; }
+.spo-paste { min-height: 110px; }
+.spo-result:empty { display: none; }
+.spo-result { display: grid; gap: 10px; }
+.spo-ok { background: var(--ok-soft); color: var(--ok); border-radius: 9px; padding: 8px 12px; font-size: 13px; font-weight: 500; }
+.spo-result .warn { margin-top: 0; }
+.spo-out { display: grid; gap: 8px; font-size: 13px; }
+.spo-out .lbl { display: block; font-size: 12px; font-weight: 600; color: var(--ink-2); margin-bottom: 2px; }
+.spo-line { font-size: 13px; user-select: all; }
+.spo-chg { display: inline-block; padding: 1px 7px; border-radius: 6px; background: var(--line-soft); font-weight: 600; font-variant-numeric: tabular-nums; }
+.spo-chg.up { background: var(--ok-soft); color: var(--ok); }
+.spo-chg.down { background: var(--bad-soft); color: var(--danger); }

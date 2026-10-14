@@ -13,6 +13,17 @@ const NATURES: Readonly<Record<string, readonly [BoostKey, BoostKey]>> = {
   Calm: ['spd', 'atk'], Gentle: ['spd', 'def'], Sassy: ['spd', 'spe'], Careful: ['spd', 'spa'],
 };
 
+/** The stat a nature raises and the one it lowers; null for neutral or unknown natures. */
+export function natureStats(nature: string | null | undefined): readonly [BoostKey, BoostKey] | null {
+  const key = Object.keys(NATURES).find((n) => n.toLowerCase() === String(nature ?? '').trim().toLowerCase());
+  return key ? NATURES[key]! : null;
+}
+
+/** The nature that raises `up` and lowers `down` ("Adamant" for atk/spa); null when they are the same stat. */
+export function natureWith(up: BoostKey, down: BoostKey): string | null {
+  return Object.entries(NATURES).find(([, [u, d]]) => u === up && d === down)?.[0] ?? null;
+}
+
 const SPREAD_ALIASES: Readonly<Record<string, StatKey>> = {
   hp: 'hp', atk: 'atk', attack: 'atk', def: 'def', defense: 'def', spa: 'spa', spatk: 'spa', satk: 'spa',
   spd: 'spd', spdef: 'spd', sdef: 'spd', spe: 'spe', speed: 'spe',

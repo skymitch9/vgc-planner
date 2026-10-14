@@ -17,6 +17,7 @@ import { openMenu, toast } from '../overlays.ts';
 import { PASTE_LINK_HINT } from '../paste-links.ts';
 import { attachPicker } from '../picker.ts';
 import { createPlanFrom } from '../actions.ts';
+import { openSpOptimizer } from '../sp-optimizer.ts';
 import { openTopBuilds } from '../top-builds.ts';
 import { boxEstimates, estimatedToast, openTopTeams, topTeamsButton } from '../top-teams.ts';
 import { renderNav } from './sidebar.ts';
@@ -121,6 +122,7 @@ function editorHTML(set: PokemonSet, dex: Dex): string {
       </div>
       <div class="ed-actions">
         ${usage.length ? '<button class="btn sm" id="ed-top-set">Load top set ▾</button>' : '<span class="hint">No usage data for this Pokémon</span>'}
+        <button class="btn sm" id="ed-optimize" title="Find the fewest Stat Points to KO a target or survive its attack">Optimize SPs</button>
         <button class="btn sm ghost danger" id="ed-remove">Remove</button>
       </div>
     </div>
@@ -206,6 +208,7 @@ function wireEditor(main: HTMLElement, team: Team, sets: PokemonSet[], dex: Dex)
       commit();
     });
   });
+  qs('#ed-optimize', main)?.addEventListener('click', () => openSpOptimizer(dex, team, i));
   qs('#ed-remove', main)?.addEventListener('click', () => {
     sets.splice(i, 1);
     view.slot = Math.max(0, Math.min(i, sets.length - 1));

@@ -395,6 +395,35 @@ export function entryOrder<T extends { side: Side; name: string }>(st: BattleSta
 /** `entryTies`: speed ties between the leads' entry abilities (see {@link entryOrder}). */
 export interface InitialState { st: BattleState; entry: LogEntry[]; entryTies: SpeedTie[] }
 
+/**
+ * One Pokémon as it enters the battle: base form, full HP, no boosts or status. Shared by {@link initState} and the
+ * Stat Point optimizer, so both see the same forms, abilities and stats.
+ */
+export function newMonState(engine: CalcEngine, set: PokemonSet): MonState {
+  // A paste may name the Mega form ("Aerodactyl-Mega", with the Mega's ability): the battle still starts in base form.
+  const pastedMega = isMega(set.species);
+  const base = START_FORMS[toID(pastedMega ? baseSpecies(set.species) : set.species)] ?? (pastedMega ? baseSpecies(set.species) : set.species);
+  const megaForm = engine.megaOf(base, set.item) ?? (pastedMega ? set.species : null);
+  // A Mega has a single ability, so the calculator's data decides it (Charizard-Mega-Y: Drought), whatever the
+  // paste says. On a paste that names the Mega, a different ability line is the base form's (e.g. Blaze).
+  const megaAbility = megaForm ? engine.defaultAbility(megaForm) || (pastedMega ? set.ability : '') : '';
+  const baseAbility = pastedMega
+    ? (set.ability && toID(set.ability) !== toID(megaAbility) ? set.ability : engine.defaultAbility(base))
+    : set.ability;
+  const mon: MonState = {
+    name: set.species, set, species: base,
+    ability: baseAbility,
+    mega: false, megaForm, megaAbility,
+    sp: (statPoints(set) ?? { sp: emptyStatTable() }).sp, stats: null, boosts: zeroBoosts(), hp: 0, hpLo: 0, hpHi: 0, fainted: false,
+    status: null, toxic: 0, slept: 0, frozen: 0, item: set.item, unburden: false, entryBoosted: false,
+    charging: null, recharging: null, activeTurns: 0, moveActions: 0, timesHit: 0, lastFailed: false, protectStreak: false,
+    lastMove: '', lastTarget: '', choiceLock: null, encore: null, disable: null, taunt: 0, imprison: false, sub: 0, yawn: 0, perish: null,
+    seeded: null, saltCure: false, destinyBond: false, boosted: null, flashFire: false, charge: false, disguiseBroken: false, transformedFrom: null, confused: 0,
+  };
+  refreshStats(engine, mon);
+  return mon;
+}
+
 /** Battle start: everyone at full HP, leads on the field, entry abilities resolved (fastest first, so the slowest weather wins). */
 /** `tieOrder`: the first turn's picks for speed ties between the leads' entry abilities. */
 export function initState(engine: CalcEngine, plan: Pick<PlanTab, 'selection'>, myMons: readonly PokemonSet[], oppMons: readonly PokemonSet[], tieOrder: readonly string[] = []): InitialState {
@@ -403,30 +432,7 @@ export function initState(engine: CalcEngine, plan: Pick<PlanTab, 'selection'>, 
     field: newField(), turn: newScratch(),
   };
   const add = (side: Side, list: readonly PokemonSet[]): void => {
-    for (const set of list) {
-      // A paste may name the Mega form ("Aerodactyl-Mega", with the Mega's ability): the battle still starts in base form.
-      const pastedMega = isMega(set.species);
-      const base = START_FORMS[toID(pastedMega ? baseSpecies(set.species) : set.species)] ?? (pastedMega ? baseSpecies(set.species) : set.species);
-      const megaForm = engine.megaOf(base, set.item) ?? (pastedMega ? set.species : null);
-      // A Mega has a single ability, so the calculator's data decides it (Charizard-Mega-Y: Drought), whatever the
-      // paste says. On a paste that names the Mega, a different ability line is the base form's (e.g. Blaze).
-      const megaAbility = megaForm ? engine.defaultAbility(megaForm) || (pastedMega ? set.ability : '') : '';
-      const baseAbility = pastedMega
-        ? (set.ability && toID(set.ability) !== toID(megaAbility) ? set.ability : engine.defaultAbility(base))
-        : set.ability;
-      const mon: MonState = {
-        name: set.species, set, species: base,
-        ability: baseAbility,
-        mega: false, megaForm, megaAbility,
-        sp: (statPoints(set) ?? { sp: emptyStatTable() }).sp, stats: null, boosts: zeroBoosts(), hp: 0, hpLo: 0, hpHi: 0, fainted: false,
-        status: null, toxic: 0, slept: 0, frozen: 0, item: set.item, unburden: false, entryBoosted: false,
-        charging: null, recharging: null, activeTurns: 0, moveActions: 0, timesHit: 0, lastFailed: false, protectStreak: false,
-        lastMove: '', lastTarget: '', choiceLock: null, encore: null, disable: null, taunt: 0, imprison: false, sub: 0, yawn: 0, perish: null,
-        seeded: null, saltCure: false, destinyBond: false, boosted: null, flashFire: false, charge: false, disguiseBroken: false, transformedFrom: null, confused: 0,
-      };
-      refreshStats(engine, mon);
-      st.mons[side][set.species] = mon;
-    }
+    for (const set of list) st.mons[side][set.species] = newMonState(engine, set);
   };
   add('me', myMons);
   add('opp', oppMons);
