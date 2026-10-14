@@ -382,3 +382,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 17:02** — Vs ミヤ (Houndoom / Gardevoir / Torkoal / Normal-Fairy mon / Annihilape / Grass mon, sun). Call: lead Sneasler + Delphox, back Kingambit + Basculegion (Kingambit over Rillaboom for Gardevoir); turn-1 branches given; Dire Claw 2x on Gardevoir, its Psychic 4x on Sneasler.
 
 - **2026-10-13 17:04** — They led Gardevoir + Annihilape. Turn 2 call: Dire Claw Gardevoir (2x, you outspeed), Psyshock Annihilape.
+
+- **2026-10-13 17:05** — Annihilape dead, Gardevoir Protected, Delphox at 3 HP. Call: Delphox Protect, Dire Claw Gardevoir; then Delphox out to Kingambit (non-Fire) or Basculegion (Fire).
