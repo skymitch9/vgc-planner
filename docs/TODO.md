@@ -406,3 +406,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 17:15** — Turn 2: Talonflame Tailwind, Froslass swapped to their Rillaboom which died to Dire Claw + Heat Wave. Turn 3 call: Quick Guard (blocks Gale Wings Brave Bird) + Psyshock Talonflame; Dire Claw Froslass instead if it returned.
 
 - **2026-10-13 17:15** — Froslass back beside Talonflame (Gale Wings off). Call: Dire Claw Froslass + Heat Wave. PASTE ERROR: his Sneasler has no Quick Guard (vgc-meta data/sim-input/skymitch.txt lists Close Combat / Fake Out / Quick Guard / Dire Claw); ask for the real fourth move and fix with the Incineroar pastes.
+
+- **2026-10-13 17:16** — Owner: does it have Quick Guard on Showdown? Yes: all 3 recorded games (data/planner/gen9championsvgc2026regmc-*.json, Oct 12) show Sneasler White Herb Jolly 16/25/7/18 with CC / Fake Out / Quick Guard / Dire Claw. Switch team differs. Also: skymitch.txt spreads are simplified vs the Showdown team (Rillaboom 20/25/1/6/14 Showdown vs 32/32/2 sim; Dragonite Modest 7/25/2/32 vs sim). Decision needed after the game: Switch or Showdown is the source of truth; then rewrite skymitch.txt.
