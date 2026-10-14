@@ -386,3 +386,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 17:05** — Annihilape dead, Gardevoir Protected, Delphox at 3 HP. Call: Delphox Protect, Dire Claw Gardevoir; then Delphox out to Kingambit (non-Fire) or Basculegion (Fire).
 
 - **2026-10-13 17:06** — Indeedee-F in with Follow Me (so the Normal-Fairy mon was Indeedee, Psychic/Normal; Psychic Terrain kills priority). Call: Sneasler -> Kingambit (Psychic-immune), Delphox Heat Wave; then Kowtow Indeedee, Iron Head Gardevoir.
+
+- **2026-10-13 17:07** — Owner: Delphox probably dies. Confirmed, Basculegion next; Kowtow + Liquidation Indeedee, Iron Head Gardevoir after.
