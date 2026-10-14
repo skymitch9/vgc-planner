@@ -384,3 +384,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 17:04** — They led Gardevoir + Annihilape. Turn 2 call: Dire Claw Gardevoir (2x, you outspeed), Psyshock Annihilape.
 
 - **2026-10-13 17:05** — Annihilape dead, Gardevoir Protected, Delphox at 3 HP. Call: Delphox Protect, Dire Claw Gardevoir; then Delphox out to Kingambit (non-Fire) or Basculegion (Fire).
+
+- **2026-10-13 17:06** — Indeedee-F in with Follow Me (so the Normal-Fairy mon was Indeedee, Psychic/Normal; Psychic Terrain kills priority). Call: Sneasler -> Kingambit (Psychic-immune), Delphox Heat Wave; then Kowtow Indeedee, Iron Head Gardevoir.
