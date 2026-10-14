@@ -396,3 +396,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 17:10** — Owner correction: Hyper Voice is NOT resisted on Kingambit (Fairy 2x Dark x 0.5 Steel = neutral). I said "resists Fairy" twice; wrong. Psychic immunity is its only safety vs Gardevoir.
 
 - **2026-10-13 17:11** — Vs Zhe (Froslass / Garchomp / Charizard / Normal mon / Rillaboom / Kingambit). Call: lead Sneasler + Delphox, back Rillaboom + Basculegion; Dragonite home. Turn-1 branches: Fake Out Froslass or Rillaboom + Heat Wave; double Garchomp; CC Kingambit.
+
+- **2026-10-13 17:11** — Owner correction: Froslass is Ghost, Fake Out immune. Fixed call: Fake Out the partner, Heat Wave / Dire Claw Froslass. Second Ghost-vs-Fake-Out slip today; check Ghost typing before every Fake Out call.
