@@ -400,3 +400,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 17:11** — Owner correction: Froslass is Ghost, Fake Out immune. Fixed call: Fake Out the partner, Heat Wave / Dire Claw Froslass. Second Ghost-vs-Fake-Out slip today; check Ghost typing before every Fake Out call.
 
 - **2026-10-13 17:13** — They led Talonflame (not Charizard) + Froslass. Call: Fake Out Talonflame (kills Gale Wings), Heat Wave; then Dire Claw Froslass / Psyshock Talonflame.
+
+- **2026-10-13 17:13** — Turn 1 double Protect. Turn 2 call: Dire Claw Froslass + Heat Wave (trade Sneasler for the Mega); alt Quick Guard vs Gale Wings Brave Bird.
