@@ -518,3 +518,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - [2026-10-14 02:28] slimvali-floette re-run (Flower Veil) done: 55.1% best lead per matchup; best single lead Floette-Eternal + Incineroar 52.7% (run 2026-10-14T02-28-21). All six shared-team sims complete; no sims running.
 
 - [2026-10-14 08:13] Owner asked "is everything finished?" + "what are my computer specs?" → yes, all sims/builds done, only the four local servers running. Specs: Ryzen 9 7950X3D (16C/32T), 64 GB RAM, RTX 4080 SUPER, 2× 2 TB SSD, MSI MS-7E12 board.
+
+- [2026-10-14 15:19] Owner asked: "Can we expand our sim data to more than 100" → yes, no code change: `sim --top N` takes up to 1571 feed teams with full sets (503 regional, 550 online, 480 creator, 38 ranked; sorted best first). Cost scales with N: top 100 took ~65 min at 31 workers, so top 300 ≈ 3.3 h, all 503 regional ≈ 5.5 h, all 1571 ≈ 17 h. Waiting on owner: how many teams + run now or after he stops playing. Also open: Kingambit Low Kick vs Iron Head sim (offered). Correction logged: live calls wrongly credited Kingambit with Steel moves; the paste has Low Kick and the sims used it.
