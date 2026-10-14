@@ -19,6 +19,14 @@ ui  ──►  state  ──►  infra  ──►  domain
 - **state**: `AppStore` owns the library and view state and saves through the repository (debounced, errors surfaced). `SimService` owns the calculator's lifecycle and caches results per plan state.
 - **ui**: string-template views, one module per screen area, a single delegated event listener (`data-act` attributes), and a render bus so views don't import each other.
 
+## Stat Point optimizer
+
+- **Where:** `src/domain/sp-optimizer.ts` (pure, no DOM) and its dialog `src/ui/sp-optimizer.ts`, opened by the "Optimize SPs" button in the team builder's editor. Off unless opened; nothing is written until Apply, and Apply offers Undo.
+- **How it calls the calculator:** through the same `CalcEngine` as the turn simulation (`simService.ready()` in the browser, `createEngine(@smogon/calc)` in tests), so forms, items, abilities and the Champions stat formula match turn results. Pokémon are built with `newMonState` (`simulation/state.ts`), the function `initState` uses.
+- **Search:** `minSpToKO` binary-searches the attacking stat (0–32; damage never drops as the stat rises), and past 32 counts on to say how many points a KO would need. `minSpToSurvive` searches HP and the hit defence together: HP walks up while the defence walks down, so a query costs tens of calculator calls instead of 33 × 33. Both respect 32 per stat and 66 in total (points over 66 come out of other stats, least useful first, Speed last) and can try a nature that raises the searched stat.
+- **Writing back:** `rewriteSpread` replaces only that Pokémon's `EVs:` (and, on a nature change, `Nature`) line in the paste; every other line stays byte-for-byte.
+- **Not modelled:** Intimidate and other entry effects, Multiscale / Focus Sash / Sturdy on the second of two hits, crits, stat stages.
+
 ## Rendering and safety
 
 - Views build HTML strings. **Every dynamic value goes through `esc()`**; there is no other way text reaches `innerHTML`.
