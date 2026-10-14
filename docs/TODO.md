@@ -398,3 +398,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 17:11** — Vs Zhe (Froslass / Garchomp / Charizard / Normal mon / Rillaboom / Kingambit). Call: lead Sneasler + Delphox, back Rillaboom + Basculegion; Dragonite home. Turn-1 branches: Fake Out Froslass or Rillaboom + Heat Wave; double Garchomp; CC Kingambit.
 
 - **2026-10-13 17:11** — Owner correction: Froslass is Ghost, Fake Out immune. Fixed call: Fake Out the partner, Heat Wave / Dire Claw Froslass. Second Ghost-vs-Fake-Out slip today; check Ghost typing before every Fake Out call.
+
+- **2026-10-13 17:13** — They led Talonflame (not Charizard) + Froslass. Call: Fake Out Talonflame (kills Gale Wings), Heat Wave; then Dire Claw Froslass / Psyshock Talonflame.
