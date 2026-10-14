@@ -390,3 +390,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 - **2026-10-13 17:07** — Owner: Delphox probably dies. Confirmed, Basculegion next; Kowtow + Liquidation Indeedee, Iron Head Gardevoir after.
 
 - **2026-10-13 17:09** — Owner: does Kingambit outspeed Gardevoir? No: Kingambit 84 vs Mega Gardevoir 120 (zero speed) / Indeedee-F 105.
+
+- **2026-10-13 17:10** — LOSS vs ミヤ: Mega Gardevoir Hyper Voice swept Kingambit + Basculegion. My miss: underrated Pixilate Hyper Voice (165 SpA) + Follow Me cover; Kingambit over Rillaboom was fine, Basculegion in the back and the Delphox sac were not. Queue when CPU is free: sim skymitch.txt vs a Miya-style six (Houndoom / Gardevoir-Mega / Torkoal / Indeedee-F / Annihilape / Grass mon) and add a Gardevoir-sun entry to the leads list. Candidate bring: Sneasler + Kingambit lead, Dragonite + Rillaboom back.
