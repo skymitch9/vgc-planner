@@ -106,6 +106,17 @@ select.input { padding-right: 4px; }
 .share-bar { background: var(--line-soft); border-radius: 4px; height: 7px; overflow: hidden; }
 .share-pct { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
 .tb-foot { margin-right: auto; align-self: center; }
+/* ---------- speed tiers ---------- */
+.st-toggles { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; }
+.st-toggles label { display: inline-flex; align-items: center; gap: 5px; }
+.st-list { gap: 4px; }
+.st-row { display: grid; grid-template-columns: 64px auto minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 4px 10px; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--bg); font-size: 13px; }
+.st-row.mine { border-color: var(--me); cursor: pointer; }
+.st-row.picked { box-shadow: 0 0 0 2px var(--me); }
+.st-spe { font-weight: 700; font-variant-numeric: tabular-nums; }
+.st-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.st-spread { font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.st-tag { font-size: 10.5px; padding: 0 6px; }
 .menu-sub { padding-left: 12px; font-size: 12px; }
 @media (max-width: 820px) {
   .tb-summary { grid-template-columns: 30px auto 1fr auto; }

@@ -18,6 +18,7 @@ import { PASTE_LINK_HINT } from '../paste-links.ts';
 import { attachPicker } from '../picker.ts';
 import { createPlanFrom } from '../actions.ts';
 import { openSpOptimizer } from '../sp-optimizer.ts';
+import { openSpeedTiers } from '../speed-tiers.ts';
 import { openTopBuilds } from '../top-builds.ts';
 import { boxEstimates, estimatedToast, openTopTeams, topTeamsButton } from '../top-teams.ts';
 import { renderNav } from './sidebar.ts';
@@ -267,6 +268,7 @@ export function renderTeamView(main: HTMLElement, team: Team): void {
       <div class="btn-row">
         ${dex?.usage ? '<button class="btn sm" id="top-builds">★ Top builds</button>' : ''}
         ${dex ? '<button class="btn sm" id="top-teams">★ Top teams</button>' : ''}
+        ${dex ? '<button class="btn sm" id="speed-tiers">Speed tiers</button>' : ''}
         <div class="seg" role="tablist">
           <button class="seg-btn${mode === 'builder' ? ' on' : ''}" data-mode="builder" role="tab" ${dex ? '' : 'disabled title="Loading…"'}>Builder</button>
           <button class="seg-btn${mode === 'paste' ? ' on' : ''}" data-mode="paste" role="tab">Paste</button>
@@ -314,6 +316,7 @@ export function renderTeamView(main: HTMLElement, team: Team): void {
       toast(replace !== null ? `${built.species} replaced slot ${replace + 1}` : `${built.species} added`);
     });
   });
+  qs('#speed-tiers', main)?.addEventListener('click', () => { if (dex) openSpeedTiers(dex, sets); });
   qs('#top-teams', main)?.addEventListener('click', () => {
     if (!dex) return;
     openTopTeams(dex, [
