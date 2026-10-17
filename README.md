@@ -32,6 +32,8 @@ Plan VGC matchups as flowchart gameplans for Pokémon Champions (Regulation M-C)
 
 **Top builds.** The format's Pokémon ranked by Smogon usage, each with its most used moves, items, abilities, Stat Point spreads and teammates. One click adds the most common build (or a chosen spread) to your team, respecting Species Clause and Item Clause.
 
+**Speed tiers.** Your team at its real Level 50 Speed (and each Mega's), in one list with the format's 40 most used Pokémon (their most common spread and the max-Speed benchmark). Toggles for Tailwind, Trick Room, Choice Scarf and a −1 / +1 Speed stage; ties are marked, and clicking one of your Pokémon counts the threats it outspeeds, ties and is slower than.
+
 **Top teams.** Load a published team from a [team feed](#team-feed) into any paste box, make it your team, or start a gameplan against it. Spreads the player didn't publish are filled in from usage and labelled *Estimated*.
 
 **Saved teams as opponents.** In **New gameplan** and when editing the opponent, **Use a saved team…** copies one of your own teams into the opponent box (your current team too, for a mirror match). It is a copy: later changes to that team don't change the gameplan.

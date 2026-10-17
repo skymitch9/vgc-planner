@@ -1,17 +1,22 @@
 /**
- * "Speed tiers": the team being edited in turn order, at each member's real Level 50 Speed (and its Mega's), with
+ * "Speed tiers": the team being edited in turn order, at each member's real Level 50 Speed (and its Mega's), mixed
+ * with the format's most used Pokémon from the usage data (most common spread, plus the max-Speed benchmark), with
  * toggles for Tailwind, Trick Room, Choice Scarf and one Speed stage. Click a member to see how it fares.
  */
 import type { Dex } from '../domain/dex.ts';
 import { REGULATION } from '../domain/regulation.ts';
 import type { SpeedEntry, SpeedToggles } from '../domain/speed-tiers.ts';
-import { NO_TOGGLES, matchup, speedTiers, teamEntries } from '../domain/speed-tiers.ts';
+import { NO_TOGGLES, matchup, speedTiers, teamEntries, threatEntries } from '../domain/speed-tiers.ts';
 import type { PokemonSet } from '../domain/types.ts';
 import { esc } from './dom.ts';
 import { monIcon } from './icons.ts';
 
+/** How many of the most used Pokémon to list. */
+const THREATS = 40;
+
 export function openSpeedTiers(dex: Dex, team: readonly PokemonSet[]): void {
-  const entries: SpeedEntry[] = teamEntries(team, dex);
+  const entries: SpeedEntry[] = [...teamEntries(team, dex), ...threatEntries(dex, THREATS)];
+  const usage = dex.usage;
   const t: SpeedToggles = { ...NO_TOGGLES };
   let picked: string | null = null;
 
@@ -19,7 +24,7 @@ export function openSpeedTiers(dex: Dex, team: readonly PokemonSet[]): void {
   overlay.className = 'overlay';
   overlay.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-label="Speed tiers">
     <div class="modal-head"><h2>Speed tiers · ${esc(REGULATION.label)}</h2>
-      <p>Level 50 Speed from each paste's nature and Stat Points, fastest first. Click one of your Pokémon to compare it.</p>
+      <p>Level 50 Speed from each paste's nature and Stat Points, fastest first${usage ? `, against the ${THREATS} most used Pokémon (Smogon usage for ${esc(usage.month)}): their most common spread and the max-Speed benchmark` : ''}. Click one of your Pokémon to compare it.</p>
       <div class="st-toggles mt-s">
         <label><input type="checkbox" data-t="tailwind"> Tailwind <span class="hint">(my team ×2)</span></label>
         <label><input type="checkbox" data-t="trickRoom"> Trick Room</label>

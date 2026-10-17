@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { Dex, type DexData, type UsageData } from '../src/domain/dex.ts';
 import { parseShowdown } from '../src/domain/showdown.ts';
-import { NO_TOGGLES, applyStage, matchup, speedTiers, teamEntries, type SpeedEntry } from '../src/domain/speed-tiers.ts';
+import { NO_TOGGLES, applyStage, matchup, speedTiers, teamEntries, threatEntries, type SpeedEntry } from '../src/domain/speed-tiers.ts';
 
 const read = <T>(file: string): T => JSON.parse(readFileSync(new URL(`../src/data/${file}`, import.meta.url), 'utf8')) as T;
 const dex = new Dex(read<DexData>('champions-mc.json'), read<UsageData>('usage-mc.json'));
@@ -77,4 +77,19 @@ Adamant Nature
     ['Sneasler', 172, true],
   ]);
   assert.equal(rows[2]!.spread, 'Jolly · 18 Spe');
+});
+
+test('threats come from the usage data: most common spread, max-Speed benchmark, Mega base stats, Scarf flag', () => {
+  const rows = threatEntries(dex, 40);
+  const top = dex.usage!.mons.slice(0, 40);
+  assert.ok(rows.length >= top.length && rows.every((r) => !r.mine));
+  const sneasler = rows.filter((r) => r.name === 'Sneasler').map((r) => r.speed);
+  assert.deepEqual(sneasler, [172, 189]); // Adamant 32 Spe is the most common; Jolly 32 Spe is the max.
+  // A Mega entry uses the Mega forme's base Speed; when its common spread is already max Speed there is one row.
+  const megaUsage = top.find((m) => m.mega && m.spreads[0]?.[1].endsWith('/32') && dex.nature(m.spreads[0][0])?.plus === 'spe')!;
+  const mega = dex.megaFor(dex.species(megaUsage.species)!, megaUsage.mega!)!;
+  const megaRows = rows.filter((r) => r.name === megaUsage.name);
+  assert.deepEqual(megaRows.map((r) => r.speed), [Math.floor(((mega.baseStats.spe + 52) * 11) / 10)]);
+  const scarfers = top.filter((m) => m.items[0]?.[0] === 'Choice Scarf').map((m) => m.name);
+  assert.deepEqual([...new Set(rows.filter((r) => r.scarf).map((r) => r.name))], scarfers);
 });

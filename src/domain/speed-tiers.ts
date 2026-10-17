@@ -2,8 +2,9 @@
  * Speed tiers: the team's real Level 50 Speed next to the format's common threats, with the field effects that
  * change turn order (Tailwind, Trick Room, Choice Scarf, one stage up or down). Pure data in, rows out; no DOM.
  */
-import type { Dex } from './dex.ts';
-import { calcStats, emptyStatTable, natureStats, statPoints } from './stats.ts';
+import type { Dex, UsageMon } from './dex.ts';
+import { spFromSlashes, toID } from './dex.ts';
+import { calcStats, emptyStatTable, natureStats, natureWith, statPoints } from './stats.ts';
 import type { PokemonSet, StatTable } from './types.ts';
 
 export interface SpeedEntry {
@@ -105,3 +106,34 @@ export function teamEntries(team: readonly PokemonSet[], dex: Dex): SpeedEntry[]
 
 /** calcStats wants the nature's canonical capitalisation ("jolly" -> "Jolly"). */
 const cap = (n: string): string => (n ? n[0]!.toUpperCase() + n.slice(1).toLowerCase() : '');
+
+/**
+ * The format's common threats from the usage data: for each of the `limit` most used entries (Megas are their own
+ * entries), the Speed of its most common spread, plus the max-Speed benchmark (+Spe nature, 32 Spe) if different.
+ */
+export function threatEntries(dex: Dex, limit = 40): SpeedEntry[] {
+  const out: SpeedEntry[] = [];
+  for (const mon of (dex.usage?.mons ?? []).slice(0, limit)) {
+    const base = baseFor(mon, dex);
+    if (!base) continue;
+    const scarf = toID(mon.items[0]?.[0]) === 'choicescarf';
+    const top = mon.spreads[0];
+    let common = -1;
+    if (top) {
+      const sp = spFromSlashes(top[1]);
+      common = speOf(base, sp, top[0]);
+      out.push({ key: `threat-${mon.name}`, speed: common, name: mon.name, spread: `${spreadLabel(top[0], sp.spe)} (most common)`, mine: false, scarf });
+    }
+    const max = speOf(base, { ...emptyStatTable(), spe: 32 }, natureWith('spe', 'atk')!);
+    if (max !== common) out.push({ key: `threat-${mon.name}-max`, speed: max, name: mon.name, spread: '+Spe · 32 Spe (max)', mine: false, scarf });
+  }
+  return out;
+}
+
+/** Base stats for a usage entry: the Mega forme's when the entry is a Mega. */
+function baseFor(mon: UsageMon, dex: Dex): StatTable | null {
+  const species = dex.species(mon.species);
+  if (!species) return null;
+  if (!mon.mega) return species.baseStats;
+  return dex.megaFor(species, mon.mega)?.baseStats ?? null;
+}
