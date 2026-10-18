@@ -672,3 +672,15 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
     - Agent's top-30 DragonFox: 60.9% → 72.1% with prep. 20 opponents went up, 10 went down (Walker 77→59, Henry 81→68).
     - Accepted limit: the prep table is not conditioned on their bring, so the cache needs a schema change for (my bring × their bring) cells.
     - Prep Bo3 is now running on all five teams (`data/sim/bo3prep-2026-10-17/`).
+  - 22:19: **Prep Bo3 results** (top 30, 256 series; `data/sim/bo3prep-2026-10-17/`):
+
+    | Team | Series | Avg vs the 8 rain / sun+rain teams |
+    |---|---|---|
+    | sun+rain | 78.0 | 78.0 |
+    | rain2 | 75.5 | 69.5 |
+    | DragonFox Thunderbolt | 74.2 | 77.9 |
+    | DragonFox Heat Wave | 72.1 | 74.5 |
+    | sun2 | 66.5 | 80.3 |
+
+    - Thunderbolt's weak spot is Sutherland-Smith (Archaludon + Pelipper): 44.1, against 71.5 for Heat Wave.
+    - Caveat: prep favors my side, because the opponent does not prep, so the absolute numbers are inflated. Compare teams to each other only.
