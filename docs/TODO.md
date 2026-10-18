@@ -613,3 +613,5 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
   1. `feat/bo3`: a `--bo3` series mode for `npm run sim` and `improve`. Both AIs adapt their brings between games using only what a human would see. The loser counters the bring that beat them; the winner anticipates the counter.
   2. `feat/teambuild-weather-bo3`: two teambuild toggles. `--weather-teams` calcs threats in their own team's weather. `--bo3` scores lead depth.
   After review and merge, the conductor runs the full Bo3 sim on DragonFox (dragonfox-real.txt).
+
+- **2026-10-17 18:0x, owner:** "Also give me a pokepaste of my team with sneasler protect." I tried uploading to pokepast.es, but the sandbox blocks the network (curl exit 43; the unsandboxed retry was denied). I gave him the paste text (scratchpad `dragonfox-real.txt`) in chat instead.
