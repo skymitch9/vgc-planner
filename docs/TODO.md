@@ -684,4 +684,4 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 
     - Thunderbolt's weak spot is Sutherland-Smith (Archaludon + Pelipper): 44.1, against 71.5 for Heat Wave.
     - Caveat: prep favors my side, because the opponent does not prep, so the absolute numbers are inflated. Compare teams to each other only.
-  - 22:3x: imported four matchup packs into the planner (localhost:5173), one tab at a time via `?import=` and the coach's `/api/planner/pack`: Sun-Rain-Bo3, Rain-v2, Sun-v2 and DragonFox-Thunderbolt, each with 12 opponents. Team files are in vgc-meta `data/planner/teams/*-2026-10-17.txt`. I confirmed in the sidebar after a reload.
+  - 22:28: imported four matchup packs into the planner (localhost:5173), one tab at a time via `?import=` and the coach's `/api/planner/pack`: Sun-Rain-Bo3, Rain-v2, Sun-v2 and DragonFox-Thunderbolt, each with 12 opponents. Team files are in vgc-meta `data/planner/teams/*-2026-10-17.txt`. I confirmed in the sidebar after a reload.
