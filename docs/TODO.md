@@ -658,3 +658,13 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
   - So the Bo3 drops (Begot −54, Webb −21) come from the Bo3 policy's calc-picked brings (the flaw logged at 18:30), not from Thunderbolt.
   - Calcs, Mega Delphox vs Mega Golisopod (Bug/Steel, Adamant 32 Atk): Heat Wave 126-150% (58-73% in rain). Golisopod Sucker Punch does 90-107% to Delphox. Delphox is faster (204 vs 72).
   - Revised verdict: Thunderbolt is about even; the normal sim's best lead is 75.0 vs 76.7. Fixing the Bo3 policy is needed before Bo3 can judge set changes.
+
+- **2026-10-17 21:45, owner:** "merge as you see fit, run the new bo3 sim."
+  - **Merged:** vgc-meta #48, #50 (retargeted to main), and #49. #49 had a DONE.md conflict; both entries were kept, newest first, and 708/708 tests pass. Main is at bcb6976. Both worktrees were removed after their node_modules junctions were rmdir'd; the main node_modules is intact.
+  - **Bo3 runs (current calc policy, 256 series, top 30, `data/sim/bo3-2026-10-17/`):**
+    - sun+rain 58.3%
+    - rain2 52.0%
+    - sun2 53.6%
+    - DragonFox Heat Wave 60.9%
+    - DragonFox Thunderbolt 58.8%
+  - **Dispatched 21:47:** an Opus agent for `--bo3-prep`, where my side's brings come from the sim's per-opponent lead table (worktree `../vgc-meta-prep`, PR to open, not merge). After it lands, re-run Bo3 with prep on all five.
