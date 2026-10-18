@@ -624,7 +624,7 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
 
 - **2026-10-17 18:27:** vgc-meta PR #49 (`feat/teambuild-weather-bo3`) landed. The agent reports 698 tests passing, the off state byte-identical, and the flags `--weather-teams` and `--bo3`. The conductor reviewed the plan/calc diff. The merge, and a re-run of the tests, were both denied by the auto-mode classifier ("Merge Without Review"), so they wait on the owner's explicit OK. His team on both flags: series 0.337. Worst matchup is the sun+rain Garchomp/Archaludon/Pelipper/Charizard-Y six at 0.185, with G3 at 20%. Worktree `../vgc-meta-weather`: its node_modules is a JUNCTION, so `rmdir` it before `git worktree remove`.
 
-- **2026-10-17 18:3x:** the Bo3 sim landed as vgc-meta PR #48 (`sim --bo3`) and PR #50 (`improve --bo3`, stacked on #48). Neither is merged; both wait on the owner's OK, like #49.
+- **2026-10-17 18:30:** the Bo3 sim landed as vgc-meta PR #48 (`sim --bo3`) and PR #50 (`improve --bo3`, stacked on #48). Neither is merged; both wait on the owner's OK, like #49.
   - **DragonFox top 30, 256 series:** 60.9% series, G1 57.6 / G2 57.4 / G3 58.8, G3 reached 43.6%. Report: scratchpad `time256/2026-10-17T18-12-30/report.md`.
   - **Weak spots, rain / sun+rain:**
     - Subramanian (Charizard+Politoed): 27.0%
