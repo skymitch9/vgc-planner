@@ -690,3 +690,9 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
   - **Bo1 metric:** single-game best-lead win rate. Current leaders are DragonFox Heat Wave 76.7, DragonFox Thunderbolt 75.0, sun+rain 71.6 and rain2 70.7.
   - **Running:** `npm run improve --goal overall --budget-minutes 30` on DragonFox (Heat Wave) and then on sun+rain, one after the other. Logs are `data/sim/improve-bo1-*.log`.
   - **Then:** run a full sim on any improved team to verify it.
+
+- **2026-10-17 22:35, owner:** "make a new team that can beat my dragonfox."
+  - **Setup:** a one-team feed with DragonFox (Heat Wave) as the only opponent, at vgc-meta `data/sim/vsdf/feed.json`.
+  - **Candidates (14), each sim'd head-to-head vs DragonFox at 16 workers:** DragonFox's 8 hardest real opponents by best-lead rate (Ugarte Louisville 60, Arce 65, Sutherland-Smith 66, Liu Li 69, and others), plus tonight's six builds.
+  - **Next:** take the best one, run `improve` on it against the vsdf feed, then check it vs the top 30 so it isn't a one-trick counter.
+  - **Runs alongside:** the Bo1 improve runs.
