@@ -6,8 +6,9 @@
 
 ## STATE at 10:00, 2026-10-18 — start here
 
-- **Running (local CPU only, no Claude usage):** vgc-meta sims of four tiers finalists (Acker, Conway, Cheng, Ugarte) vs the top 30, one after another, ~09:45 → ~11:30. Logs `vgc-meta/data/sim/verify-meta-*-2026-10-18.log`. Start nothing CPU-heavy until it ends.
-- **Servers:** planner http://localhost:5173, feed :4400, coach :4410 (the Showdown extension's backend; its suggestions switch is manual, default OFF), capture :4420.
+- **Running:** nothing (checked 13:05). The finalist chain stopped after Acker (45.9 / 31.5, estimated spreads); Conway, Cheng and Ugarte never started, and the owner dropped them at 13:1x as unneeded. The PC rebooted at 11:23.
+- **Servers:** DOWN since the 11:23 reboot, not restarted — planner http://localhost:5173, feed :4400, coach :4410 (the Showdown extension's backend; its suggestions switch is manual, default OFF), capture :4420.
+- **Owner workflow (2026-10-18 13:1x):** a team he sends is a leaderboard / regional team to ADD TO THE DATABASE as a comparison opponent — not something to sim. vgc-meta has no command for that yet (`paste add` files sets only): `../vgc-meta/docs/TODO.md` → "Next" → "A team the owner submits goes into the database".
 - **Code:** vgc-meta `main` 73a9503, PRs through #51 merged (Bo3 series sim, `--bo3-prep`, teambuild `--weather-teams` / `--bo3`, `improve --bo3`). Planner `main` unchanged in code since #10 (speed tiers, 2026-10-16).
 - **The owner's current team question** (open entries at the bottom, 22:30 onward): the Bo1 pick is the improved DragonFox, 79.6 best-lead / 65.9 any-bring vs the top 30 (original 76.7 / 59.6). He doubts it ("basically my same team… not bringing speed control?"). Measured since: Tailwind on Dragonite costs ~3 points; Icy Wind on Milotic is about even (79.1 / 64.7). Meta tiers: three of the top six finalists run his core. Next: compare the four finalists when their sims land; improve and import any that beat 79.6 / 65.9.
 - **Planner teams imported 2026-10-17** (matchup packs, 12 opponents each): Sun-Rain-Bo3, Rain-v2, Sun-v2, DragonFox-Thunderbolt, DragonFox-Improved. Reload any open planner tab before an import.
