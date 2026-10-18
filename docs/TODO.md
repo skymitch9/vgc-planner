@@ -653,7 +653,7 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
     - Thunderbolt loses: Begot −54 and Webb −21 (Golisopod teams), Sutherland-Smith −9, Singh −8.
     - Verdict: keep Heat Wave as the default.
 
-- **2026-10-17 21:4x, owner:** "Can we not bring Delphox for Golisopod." Yes. The normal sim, which enumerates every bring, confirms it.
+- **2026-10-17 21:42, owner:** "Can we not bring Delphox for Golisopod." Yes. The normal sim, which enumerates every bring, confirms it.
   - With Thunderbolt Dragonite: Begot best lead is 73 (Delphox+Kingambit 66, up from 52 with Heat Wave); Webb best lead is Rillaboom+Delphox 69 (was 70).
   - So the Bo3 drops (Begot −54, Webb −21) come from the Bo3 policy's calc-picked brings (the flaw logged at 18:30), not from Thunderbolt.
   - Calcs, Mega Delphox vs Mega Golisopod (Bug/Steel, Adamant 32 Atk): Heat Wave 126-150% (58-73% in rain). Golisopod Sucker Punch does 90-107% to Delphox. Delphox is faster (204 vs 72).
