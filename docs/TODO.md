@@ -647,3 +647,4 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
     - Then a Bo3 run (256 series) of both variants, from the unmerged `../vgc-meta-bo3` worktree. Output: `data/sim/bo3-2026-10-17`, logs `data/sim/bo3-*.log`.
   - 20:15: the **Psychic Terrain** build simmed at 57.1 / 41.2 and is dropped. rain2 started 20:15.
   - 20:42: **rain2** simmed at 70.7 / 54.9 (vgc-meta `data/sim/2026-10-17T20-42-46`). Its best bring was Archaludon + Pelipper → Rillaboom + Garchomp, at 68.2%. It's a keeper. sun2 started 20:42.
+  - 21:09: **sun2** simmed at 67.7 / 55.2 (`data/sim/2026-10-17T21-09-43`). Its best bring was Charizard + Venusaur → Sylveon + Garchomp, at 66.7%. It beats sun1 on any-bring (55.2 vs 51.0) and takes the 4th slot. The Thunderbolt DragonFox sim started 21:09.
