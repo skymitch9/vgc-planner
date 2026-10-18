@@ -696,3 +696,10 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
   - **Candidates (14), each sim'd head-to-head vs DragonFox at 16 workers:** DragonFox's 8 hardest real opponents by best-lead rate (Ugarte Louisville 60, Arce 65, Sutherland-Smith 66, Liu Li 69, and others), plus tonight's six builds.
   - **Next:** take the best one, run `improve` on it against the vsdf feed, then check it vs the top 30 so it isn't a one-trick counter.
   - **Runs alongside:** the Bo1 improve runs.
+  - 22:44, owner, correcting the ask: "Best it's score not specifically to beat it as a match up. I want a team with a higher aim rating if possible. Explore the current meta."
+    - Goal: beat DragonFox's overall score (76.7 best-lead / 59.6 any-bring vs top 30), not the head-to-head matchup.
+    - The head-to-head vsdf sims are stopped.
+    - Plan:
+      1. The running improve (DragonFox, then sun+rain, goal overall) continues.
+      2. Then `npm run tiers --tier official --keep1 40 --keep2 10 --opponents 24` over all 492 official teams. ETA ~2 h with the features on; log at `data/sim/tiers-2026-10-17.log`.
+      3. Then the top tiered teams and the improved teams get sim'd vs top 30 for a like-for-like comparison.
