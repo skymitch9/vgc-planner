@@ -631,3 +631,4 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
     - Sutherland-Smith (Archaludon+Pelipper): 41.4%
     - JJ Miller (Pelipper+Staraptor): 49.2%, G3 33.6%
   - ⚠️ **Policy flaw found in review:** the calc-based bring policy over-picks Dragonite+Basculegion for my side, a lead the normal sim rates poorly (e.g. Ugarte Louisville G1 3.1%). So the Bo3 numbers likely understate a player who preps from the sim's lead table. Proposed fix: my side's G1 and adaptation candidates come from the sim's per-opponent lead table ("prep"). Not built.
+  - 18:41: the **sun+rain** build simmed at 71.6% best lead / 55.8% any bring (vgc-meta `data/sim/2026-10-17T18-41-34`). DragonFox is at 76.7 / 59.6. Best bring: Farigiraf + Charizard → Archaludon + Politoed, 68.3%. Rain started 18:41.
