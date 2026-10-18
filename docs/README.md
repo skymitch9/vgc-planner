@@ -2,7 +2,7 @@
 
 > ⚠️ **Scope of docs/ (owner rule, 2026-10-10):** docs/ is tracked in THIS repo (skymitch9/vgc-planner) only. When a PR is sent back to the main/upstream project, **exclude docs/ from that PR** and say so in the PR description. See [access/CONTRIBUTING-UPSTREAM.md](access/CONTRIBUTING-UPSTREAM.md).
 
-> Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-11 ~18:00 Phoenix — every link below resolves to a file or folder in this tree (`ls docs docs/access docs/info`); the seven pieces of the docs standard are present. NOT checked: the content of `info/ARCHITECTURE.md` against today's code (it is upstream's document, carried over unchanged).
+> Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-18 ~10:00 Phoenix — every link below resolves to a file or folder in this tree (`ls docs docs/access docs/info`); the seven pieces of the docs standard are present. NOT checked: the content of `info/ARCHITECTURE.md` against today's code (it is upstream's document, carried over unchanged).
 
 | File | Answers |
 |---|---|

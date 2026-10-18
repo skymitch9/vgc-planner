@@ -1,6 +1,96 @@
 # DONE — dated archive, newest first, append only
 
-> Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-11 ~18:00 Phoenix — the newest block was moved from TODO.md verbatim in this session after reading each entry's body against the repos (`git log`, `gh pr list`, the running processes, the feed); the older entries below it were not re-verified (archive: never edited). APPEND ONLY, newest first.
+> Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-18 ~10:00 Phoenix (the newest block, moved verbatim). Before that, 2026-10-11 ~18:00 Phoenix — the next block was moved from TODO.md verbatim in this session after reading each entry's body against the repos (`git log`, `gh pr list`, the running processes, the feed); the older entries below it were not re-verified (archive: never edited). APPEND ONLY, newest first.
+
+## 2026-10-18 10:00 — Bo3 series sim, double-weather teambuild, four new teams, Thunderbolt and Golisopod questions (2026-10-17 evening)
+
+Moved whole from TODO.md in the 2026-10-18 docs pass: each was answered or built, merged where it was code, and reported to the owner during the night. The open asks (Bo1 team, "higher score than DragonFox", the speed-control doubt) stay in TODO.
+
+- **2026-10-17 17:41, owner:** "I've been struggling a lot in rain or rain sun best of 3s. I'm usually losing at game 3." Answered from the Psyshock sim (`vgc-meta/data/sim/2026-10-16T22-58-42`). For G3, use the lead with the best WORST case, not the best average. Rain: Sneasler + Dragonite (avg 68, worst 58). Sun + Rain: Rillaboom + Delphox (avg 75, worst 72). The sim AI does not adapt between games, so the Bo3 rotation is a judgement, not a measurement. Asked him what beats him in G3. Possible later item: a rain-only re-sim, once he's off the clock (no CPU-heavy work while he plays).
+
+- **2026-10-17 17:5x, owner:** "I'm also struggling to kill Archaludon with Delphox as a mega with stamina." Answered with damage calcs (@smogon/calc gen 0 via vgc-meta; his real sets vs Calm and Bold 32 HP / 32 SpD Leftovers Stamina Archaludon). Mega Delphox Heat Wave does 29-39%, and only 14-19% in rain. Psyshock does 13-17%. Stamina only raises Def, so it is not what stops Delphox. Sneasler Close Combat does 73-95%, then Kingambit Low Kick does 36-42% into +1 Def, which is a KO. Fake Out or Grassy Glide into it first feeds Stamina. Scripts are in the session scratchpad: archa-calc.mjs, archa-calc2.mjs.
+
+- **2026-10-17 17:55, owner:** "Let's try and adjust our team creation sim for best of 3 and beating double weather." The work is in vgc-meta (`npm run teambuild` = `src/teambuild/`, `npm run improve` = `sim/improve/`). Proposal sent, waiting on his go:
+  - **Bo3:** score each matchup as a series, not one game. G1 is played with the best lead. G2 and G3 assume the opponent has countered it, so the next-best lead plays. This rewards teams with 2-3 strong leads.
+  - **Double weather:** calc rain and sun teams in their own team's weather, not only the attacker's. Weight sun + rain compositions up.
+  - **Constraint:** build only. No CPU-heavy runs while he plays.
+
+- **2026-10-17 17:56, owner:** "Make sure we have the ai actually make lead adjustments and stuff for a bo3. Go ahead and run it now. I'm at an in person tournament." He gave the go, and the PC is free for heavy runs. Two Opus agents were dispatched at 17:57 (usage before: 0% / 41% / 66% / $186.83). Each works in its own vgc-meta worktree and opens its own PR:
+  1. `feat/bo3`: a `--bo3` series mode for `npm run sim` and `improve`. Both AIs adapt their brings between games using only what a human would see. The loser counters the bring that beat them; the winner anticipates the counter.
+  2. `feat/teambuild-weather-bo3`: two teambuild toggles. `--weather-teams` calcs threats in their own team's weather. `--bo3` scores lead depth.
+  After review and merge, the conductor runs the full Bo3 sim on DragonFox (dragonfox-real.txt).
+
+- **2026-10-17 18:0x, owner:** "Also give me a pokepaste of my team with sneasler protect." I tried uploading to pokepast.es, but the sandbox blocks the network (curl exit 43; the unsandboxed retry was denied). I gave him the paste text (scratchpad `dragonfox-real.txt`) in chat instead.
+
+- **2026-10-17 18:13, owner:** "Also make me a sun rain team, a sun team, a rain team. And maybe a terrain or trick room team but only if it sims super well. I want 4 team or more to test in leaderboard and showdown including the running sim."
+  - Built with `npm run teambuild` (main tree, calc-based), output in vgc-meta `data/teambuild/2026-10-17-{rain,sun,sunrain,tr,psyterrain}/`.
+  - Staged as `data/sim-input/built-2026-10-17-*.txt` and sim'd one after another vs the top 30 with the standard command (queue `data/sim/queue-2026-10-17.sh`, logs `data/sim/built-2026-10-17-*.log`, started 18:15).
+  - The sun + rain team is `--style sun --around Politoed`. There is no native sun + rain style yet; the weather agent is adding weather-team calcs.
+  - Rule for TR and terrain: they ship only if they sim near or above DragonFox's 76.7 best-lead / 59.6 any-bring.
+
+- **2026-10-17 18:27:** vgc-meta PR #49 (`feat/teambuild-weather-bo3`) landed. The agent reports 698 tests passing, the off state byte-identical, and the flags `--weather-teams` and `--bo3`. The conductor reviewed the plan/calc diff. The merge, and a re-run of the tests, were both denied by the auto-mode classifier ("Merge Without Review"), so they wait on the owner's explicit OK. His team on both flags: series 0.337. Worst matchup is the sun+rain Garchomp/Archaludon/Pelipper/Charizard-Y six at 0.185, with G3 at 20%. Worktree `../vgc-meta-weather`: its node_modules is a JUNCTION, so `rmdir` it before `git worktree remove`.
+
+- **2026-10-17 18:30:** the Bo3 sim landed as vgc-meta PR #48 (`sim --bo3`) and PR #50 (`improve --bo3`, stacked on #48). Neither is merged; both wait on the owner's OK, like #49.
+  - **DragonFox top 30, 256 series:** 60.9% series, G1 57.6 / G2 57.4 / G3 58.8, G3 reached 43.6%. Report: scratchpad `time256/2026-10-17T18-12-30/report.md`.
+  - **Weak spots, rain / sun+rain:**
+    - Subramanian (Charizard+Politoed): 27.0%
+    - Sutherland-Smith (Archaludon+Pelipper): 41.4%
+    - JJ Miller (Pelipper+Staraptor): 49.2%, G3 33.6%
+  - ⚠️ **Policy flaw found in review:** the calc-based bring policy over-picks Dragonite+Basculegion for my side, a lead the normal sim rates poorly (e.g. Ugarte Louisville G1 3.1%). So the Bo3 numbers likely understate a player who preps from the sim's lead table. Proposed fix: my side's G1 and adaptation candidates come from the sim's per-opponent lead table ("prep"). Not built.
+  - 18:41: the **sun+rain** build simmed at 71.6% best lead / 55.8% any bring (vgc-meta `data/sim/2026-10-17T18-41-34`). DragonFox is at 76.7 / 59.6. Best bring: Farigiraf + Charizard → Archaludon + Politoed, 68.3%. Rain started 18:41.
+  - 19:06: the **rain** build (Politoed / Mega Salamence / Mega Floette / Rillaboom / Sneasler / Incineroar) simmed at only 64.1 / 48.3. That's too weak to recommend. At 19:10 I built **rain2** with `--style rain --around "Archaludon, Pelipper"`: Rillaboom / Incineroar / Scarf Basculegion / Archaludon / Pelipper / Mega Garchomp-Z. It is queued to sim after psyterrain (`data/sim/built-2026-10-17-rain2.log`).
+  - 19:29: the **sun** build simmed at 67.0 / 51.0 (vgc-meta `data/sim/2026-10-17T19-29-28`). Its best bring was Sneasler + Charizard → Kingambit + Basculegion, at 60.0%.
+  - 19:33: built **sun2** with `--style sun --around "Charizard-Mega-Y, Venusaur"`: Incineroar / Farigiraf / Mega Charizard Y / Sylveon / Garchomp / Venusaur. It is queued after rain2.
+  - 19:51: the **Trick Room** build simmed at 65.8 / 47.2. It is dropped, because it does not sim super well (the owner's bar). Psyterrain started 19:51.
+
+- **2026-10-17 19:55, owner:** "Let's also consider swapped dragonite heat wave to thunderbolt. I feel like that could help in rain."
+  - **Calcs** (Mega Dragonite, Modest 25 SpA; scratchpad `tbolt-calc.mjs`):
+    - Thunderbolt does 231-272% to Pelipper, 60-72% to Politoed, 75-89% to Basculegion, 63-75% to Charizard-Y, 74-88% to Staraptor-Mega.
+    - Heat Wave in rain does 6-16% to the rain core.
+    - What Thunderbolt loses: Heat Wave's spread damage vs Golisopod-Mega (91-110%), Gholdengo, Kingambit, Rillaboom and Venusaur (57-70%, ~90-100% in sun).
+    - Archaludon is poor to either; Dragon Pulse 48-57% is still its best.
+  - **Sims:** the variant is at `data/sim-input/dragonfox-tbolt-2026-10-17.txt`, sim'd vs top 30 after sun2.
+    - Then a Bo3 run (256 series) of both variants, from the unmerged `../vgc-meta-bo3` worktree. Output: `data/sim/bo3-2026-10-17`, logs `data/sim/bo3-*.log`.
+  - 20:15: the **Psychic Terrain** build simmed at 57.1 / 41.2 and is dropped. rain2 started 20:15.
+  - 20:42: **rain2** simmed at 70.7 / 54.9 (vgc-meta `data/sim/2026-10-17T20-42-46`). Its best bring was Archaludon + Pelipper → Rillaboom + Garchomp, at 68.2%. It's a keeper. sun2 started 20:42.
+  - 21:09: **sun2** simmed at 67.7 / 55.2 (`data/sim/2026-10-17T21-09-43`). Its best bring was Charizard + Venusaur → Sylveon + Garchomp, at 66.7%. It beats sun1 on any-bring (55.2 vs 51.0) and takes the 4th slot. The Thunderbolt DragonFox sim started 21:09.
+  - 21:42: **Thunderbolt vs Heat Wave result.** Normal sim: Thunderbolt 75.0 / 59.0 (`data/sim/2026-10-17T21-35-04`) vs Heat Wave 76.7 / 59.6. Bo3 at 256 series: Thunderbolt 58.8% vs Heat Wave 60.9% (`data/sim/bo3-2026-10-17/`, run from the unmerged `../vgc-meta-bo3` worktree with `--feed` from main).
+    - Thunderbolt gains: Nascimento +33, Kang +12, JJ Miller +10, Walker +9, Subramanian +7.
+    - Thunderbolt loses: Begot −54 and Webb −21 (Golisopod teams), Sutherland-Smith −9, Singh −8.
+    - Verdict: keep Heat Wave as the default.
+
+- **2026-10-17 21:42, owner:** "Can we not bring Delphox for Golisopod." Yes. The normal sim, which enumerates every bring, confirms it.
+  - With Thunderbolt Dragonite: Begot best lead is 73 (Delphox+Kingambit 66, up from 52 with Heat Wave); Webb best lead is Rillaboom+Delphox 69 (was 70).
+  - So the Bo3 drops (Begot −54, Webb −21) come from the Bo3 policy's calc-picked brings (the flaw logged at 18:30), not from Thunderbolt.
+  - Calcs, Mega Delphox vs Mega Golisopod (Bug/Steel, Adamant 32 Atk): Heat Wave 126-150% (58-73% in rain). Golisopod Sucker Punch does 90-107% to Delphox. Delphox is faster (204 vs 72).
+  - Revised verdict: Thunderbolt is about even; the normal sim's best lead is 75.0 vs 76.7. Fixing the Bo3 policy is needed before Bo3 can judge set changes.
+
+- **2026-10-17 21:45, owner:** "merge as you see fit, run the new bo3 sim."
+  - **Merged:** vgc-meta #48, #50 (retargeted to main), and #49. #49 had a DONE.md conflict; both entries were kept, newest first, and 708/708 tests pass. Main is at bcb6976. Both worktrees were removed after their node_modules junctions were rmdir'd; the main node_modules is intact.
+  - **Bo3 runs (current calc policy, 256 series, top 30, `data/sim/bo3-2026-10-17/`):**
+    - sun+rain 58.3%
+    - rain2 52.0%
+    - sun2 53.6%
+    - DragonFox Heat Wave 60.9%
+    - DragonFox Thunderbolt 58.8%
+  - **Dispatched 21:47:** an Opus agent for `--bo3-prep`, where my side's brings come from the sim's per-opponent lead table (worktree `../vgc-meta-prep`, PR to open, not merge). After it lands, re-run Bo3 with prep on all five.
+  - 22:06: **#51 `--bo3-prep` merged.** It passed 714/714 tests, and with the flag off the output is byte-identical to main. Main is at 1eb8f69 and the prep worktree has been removed.
+    - Agent's top-30 DragonFox: 60.9% → 72.1% with prep. 20 opponents went up, 10 went down (Walker 77→59, Henry 81→68).
+    - Accepted limit: the prep table is not conditioned on their bring, so the cache needs a schema change for (my bring × their bring) cells.
+    - Prep Bo3 is now running on all five teams (`data/sim/bo3prep-2026-10-17/`).
+  - 22:19: **Prep Bo3 results** (top 30, 256 series; `data/sim/bo3prep-2026-10-17/`):
+
+    | Team | Series | Avg vs the 8 rain / sun+rain teams |
+    |---|---|---|
+    | sun+rain | 78.0 | 78.0 |
+    | rain2 | 75.5 | 69.5 |
+    | DragonFox Thunderbolt | 74.2 | 77.9 |
+    | DragonFox Heat Wave | 72.1 | 74.5 |
+    | sun2 | 66.5 | 80.3 |
+
+    - Thunderbolt's weak spot is Sutherland-Smith (Archaludon + Pelipper): 44.1, against 71.5 for Heat Wave.
+    - Caveat: prep favors my side, because the opponent does not prep, so the absolute numbers are inflated. Compare teams to each other only.
+  - 22:28: imported four matchup packs into the planner (localhost:5173), one tab at a time via `?import=` and the coach's `/api/planner/pack`: Sun-Rain-Bo3, Rain-v2, Sun-v2 and DragonFox-Thunderbolt, each with 12 opponents. Team files are in vgc-meta `data/planner/teams/*-2026-10-17.txt`. I confirmed in the sidebar after a reload.
 
 ## 2026-10-11 22:19 — team-preview advice fixed (vgc-meta PR #18) — both real-game failures explained
 
