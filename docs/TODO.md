@@ -615,3 +615,9 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
   After review and merge, the conductor runs the full Bo3 sim on DragonFox (dragonfox-real.txt).
 
 - **2026-10-17 18:0x, owner:** "Also give me a pokepaste of my team with sneasler protect." I tried uploading to pokepast.es, but the sandbox blocks the network (curl exit 43; the unsandboxed retry was denied). I gave him the paste text (scratchpad `dragonfox-real.txt`) in chat instead.
+
+- **2026-10-17 18:13, owner:** "Also make me a sun rain team, a sun team, a rain team. And maybe a terrain or trick room team but only if it sims super well. I want 4 team or more to test in leaderboard and showdown including the running sim."
+  - Built with `npm run teambuild` (main tree, calc-based), output in vgc-meta `data/teambuild/2026-10-17-{rain,sun,sunrain,tr,psyterrain}/`.
+  - Staged as `data/sim-input/built-2026-10-17-*.txt` and sim'd one after another vs the top 30 with the standard command (queue `data/sim/queue-2026-10-17.sh`, logs `data/sim/built-2026-10-17-*.log`, started 18:15).
+  - The sun + rain team is `--style sun --around Politoed`. There is no native sun + rain style yet; the weather agent is adding weather-team calcs.
+  - Rule for TR and terrain: they ship only if they sim near or above DragonFox's 76.7 best-lead / 59.6 any-bring.
