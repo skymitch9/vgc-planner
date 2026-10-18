@@ -609,7 +609,7 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
   - **Double weather:** calc rain and sun teams in their own team's weather, not only the attacker's. Weight sun + rain compositions up.
   - **Constraint:** build only. No CPU-heavy runs while he plays.
 
-- **2026-10-17 18:0x, owner:** "Make sure we have the ai actually make lead adjustments and stuff for a bo3. Go ahead and run it now. I'm at an in person tournament." He gave the go, and the PC is free for heavy runs. Two Opus agents were dispatched at 18:02 (usage before: 0% / 41% / 66% / $186.83). Each works in its own vgc-meta worktree and opens its own PR:
+- **2026-10-17 17:56, owner:** "Make sure we have the ai actually make lead adjustments and stuff for a bo3. Go ahead and run it now. I'm at an in person tournament." He gave the go, and the PC is free for heavy runs. Two Opus agents were dispatched at 17:57 (usage before: 0% / 41% / 66% / $186.83). Each works in its own vgc-meta worktree and opens its own PR:
   1. `feat/bo3`: a `--bo3` series mode for `npm run sim` and `improve`. Both AIs adapt their brings between games using only what a human would see. The loser counters the bring that beat them; the winner anticipates the counter.
   2. `feat/teambuild-weather-bo3`: two teambuild toggles. `--weather-teams` calcs threats in their own team's weather. `--bo3` scores lead depth.
   After review and merge, the conductor runs the full Bo3 sim on DragonFox (dragonfox-real.txt).
