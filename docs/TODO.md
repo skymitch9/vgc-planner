@@ -668,7 +668,7 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
     - DragonFox Heat Wave 60.9%
     - DragonFox Thunderbolt 58.8%
   - **Dispatched 21:47:** an Opus agent for `--bo3-prep`, where my side's brings come from the sim's per-opponent lead table (worktree `../vgc-meta-prep`, PR to open, not merge). After it lands, re-run Bo3 with prep on all five.
-  - 22:1x: **#51 `--bo3-prep` merged.** It passed 714/714 tests, and with the flag off the output is byte-identical to main. Main is at 1eb8f69 and the prep worktree has been removed.
+  - 22:06: **#51 `--bo3-prep` merged.** It passed 714/714 tests, and with the flag off the output is byte-identical to main. Main is at 1eb8f69 and the prep worktree has been removed.
     - Agent's top-30 DragonFox: 60.9% → 72.1% with prep. 20 opponents went up, 10 went down (Walker 77→59, Henry 81→68).
     - Accepted limit: the prep table is not conditioned on their bring, so the cache needs a schema change for (my bring × their bring) cells.
     - Prep Bo3 is now running on all five teams (`data/sim/bo3prep-2026-10-17/`).
