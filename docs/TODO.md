@@ -636,3 +636,12 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
   - 19:29: the **sun** build simmed at 67.0 / 51.0 (vgc-meta `data/sim/2026-10-17T19-29-28`). Its best bring was Sneasler + Charizard → Kingambit + Basculegion, at 60.0%.
   - 19:33: built **sun2** with `--style sun --around "Charizard-Mega-Y, Venusaur"`: Incineroar / Farigiraf / Mega Charizard Y / Sylveon / Garchomp / Venusaur. It is queued after rain2.
   - 19:51: the **Trick Room** build simmed at 65.8 / 47.2. It is dropped, because it does not sim super well (the owner's bar). Psyterrain started 19:51.
+
+- **2026-10-17 19:55, owner:** "Let's also consider swapped dragonite heat wave to thunderbolt. I feel like that could help in rain."
+  - **Calcs** (Mega Dragonite, Modest 25 SpA; scratchpad `tbolt-calc.mjs`):
+    - Thunderbolt does 231-272% to Pelipper, 60-72% to Politoed, 75-89% to Basculegion, 63-75% to Charizard-Y, 74-88% to Staraptor-Mega.
+    - Heat Wave in rain does 6-16% to the rain core.
+    - What Thunderbolt loses: Heat Wave's spread damage vs Golisopod-Mega (91-110%), Gholdengo, Kingambit, Rillaboom and Venusaur (57-70%, ~90-100% in sun).
+    - Archaludon is poor to either; Dragon Pulse 48-57% is still its best.
+  - **Sims:** the variant is at `data/sim-input/dragonfox-tbolt-2026-10-17.txt`, sim'd vs top 30 after sun2.
+    - Then a Bo3 run (256 series) of both variants, from the unmerged `../vgc-meta-bo3` worktree. Output: `data/sim/bo3-2026-10-17`, logs `data/sim/bo3-*.log`.
