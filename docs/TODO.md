@@ -645,3 +645,4 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
     - Archaludon is poor to either; Dragon Pulse 48-57% is still its best.
   - **Sims:** the variant is at `data/sim-input/dragonfox-tbolt-2026-10-17.txt`, sim'd vs top 30 after sun2.
     - Then a Bo3 run (256 series) of both variants, from the unmerged `../vgc-meta-bo3` worktree. Output: `data/sim/bo3-2026-10-17`, logs `data/sim/bo3-*.log`.
+  - 20:15: the **Psychic Terrain** build simmed at 57.1 / 41.2 and is dropped. rain2 started 20:15.
