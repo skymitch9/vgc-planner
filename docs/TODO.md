@@ -648,3 +648,7 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
   - 20:15: the **Psychic Terrain** build simmed at 57.1 / 41.2 and is dropped. rain2 started 20:15.
   - 20:42: **rain2** simmed at 70.7 / 54.9 (vgc-meta `data/sim/2026-10-17T20-42-46`). Its best bring was Archaludon + Pelipper → Rillaboom + Garchomp, at 68.2%. It's a keeper. sun2 started 20:42.
   - 21:09: **sun2** simmed at 67.7 / 55.2 (`data/sim/2026-10-17T21-09-43`). Its best bring was Charizard + Venusaur → Sylveon + Garchomp, at 66.7%. It beats sun1 on any-bring (55.2 vs 51.0) and takes the 4th slot. The Thunderbolt DragonFox sim started 21:09.
+  - 21:42: **Thunderbolt vs Heat Wave result.** Normal sim: Thunderbolt 75.0 / 59.0 (`data/sim/2026-10-17T21-35-04`) vs Heat Wave 76.7 / 59.6. Bo3 at 256 series: Thunderbolt 58.8% vs Heat Wave 60.9% (`data/sim/bo3-2026-10-17/`, run from the unmerged `../vgc-meta-bo3` worktree with `--feed` from main).
+    - Thunderbolt gains: Nascimento +33, Kang +12, JJ Miller +10, Walker +9, Subramanian +7.
+    - Thunderbolt loses: Begot −54 and Webb −21 (Golisopod teams), Sutherland-Smith −9, Singh −8.
+    - Verdict: keep Heat Wave as the default.
