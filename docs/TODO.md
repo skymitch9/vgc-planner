@@ -711,3 +711,4 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
       - Kingambit Protect → Swords Dance
     - Staged as `data/sim-input/dragonfox-improved-2026-10-17.txt`.
     - Chain re-queued (task bv1di9nu1 replaced): after the sun+rain improve, verify both improved teams with a full top-30 sim, then run tiers.
+  - 23:24: **sun+rain improve** (`data/sim/improve-2026-10-17T23-24-43`): any-bring 57.4 → 62.2. The two changes are Farigiraf → Life Orb Garchomp, and Charizard's Hurricane → Ancient Power. Verification sims of both improved teams are running now, then tiers.
