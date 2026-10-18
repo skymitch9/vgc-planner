@@ -685,3 +685,8 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
     - Thunderbolt's weak spot is Sutherland-Smith (Archaludon + Pelipper): 44.1, against 71.5 for Heat Wave.
     - Caveat: prep favors my side, because the opponent does not prep, so the absolute numbers are inflated. Compare teams to each other only.
   - 22:28: imported four matchup packs into the planner (localhost:5173), one tab at a time via `?import=` and the coach's `/api/planner/pack`: Sun-Rain-Bo3, Rain-v2, Sun-v2 and DragonFox-Thunderbolt, each with 12 opponents. Team files are in vgc-meta `data/planner/teams/*-2026-10-17.txt`. I confirmed in the sidebar after a reload.
+
+- **2026-10-17 22:30, owner:** "i also need a very solid best of 1 team to play in the online tournament, run a sim and make me a high win rate team."
+  - **Bo1 metric:** single-game best-lead win rate. Current leaders are DragonFox Heat Wave 76.7, DragonFox Thunderbolt 75.0, sun+rain 71.6 and rain2 70.7.
+  - **Running:** `npm run improve --goal overall --budget-minutes 30` on DragonFox (Heat Wave) and then on sun+rain, one after the other. Logs are `data/sim/improve-bo1-*.log`.
+  - **Then:** run a full sim on any improved team to verify it.
