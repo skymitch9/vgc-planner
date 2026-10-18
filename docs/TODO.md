@@ -703,3 +703,11 @@ Order for the rest of the night (each feature = its own PR on its repo, merged o
       1. The running improve (DragonFox, then sun+rain, goal overall) continues.
       2. Then `npm run tiers --tier official --keep1 40 --keep2 10 --opponents 24` over all 492 official teams. ETA ~2 h with the features on; log at `data/sim/tiers-2026-10-17.log`.
       3. Then the top tiered teams and the improved teams get sim'd vs top 30 for a like-for-like comparison.
+  - 22:57: **DragonFox improve finished** (`data/sim/improve-2026-10-17T22-57-27`; budget-shrunk, so noisy). Any-bring overall went 59.2 → **66.6**; floor5 went 53.3 → 68.6.
+    - Combined team, 4 changes:
+      - Rillaboom → Milotic (Competitive, Scald / Ice Beam / Muddy Water)
+      - Basculegion → Arcanine-Hisui (Sash, Head Smash / Extreme Speed)
+      - Dragonite Tailwind → **Thunderbolt** (keeps Heat Wave)
+      - Kingambit Protect → Swords Dance
+    - Staged as `data/sim-input/dragonfox-improved-2026-10-17.txt`.
+    - Chain re-queued (task bv1di9nu1 replaced): after the sun+rain improve, verify both improved teams with a full top-30 sim, then run tiers.
