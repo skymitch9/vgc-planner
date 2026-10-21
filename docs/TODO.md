@@ -4,10 +4,15 @@
 
 > **Scope:** this file is the PROJECT-LEVEL log for BOTH apps — the planner (App 1, this repo) and vgc-meta (App 2) — and has served that way since 2026-10-10. App 2's own detailed backlog lives in `../vgc-meta/docs/TODO.md` (private repo skymitch9/vgc-meta). Finished items are never badged here: they move to [DONE.md](DONE.md).
 
-## STATE at 10:00, 2026-10-18 — start here
+## STATE at 18:2x, 2026-10-20 — start here (pre-reboot pass)
 
-- **Running:** nothing (checked 13:05). The finalist chain stopped after Acker (45.9 / 31.5, estimated spreads); Conway, Cheng and Ugarte never started, and the owner dropped them at 13:1x as unneeded. The PC rebooted at 11:23.
-- **Servers:** restarted 13:3x 2026-10-18 after the 11:23 reboot (detached windows; all four answered 200) — planner http://localhost:5173, feed :4400, coach :4410 (the Showdown extension's backend; its suggestions switch is manual, default OFF), capture :4420.
+- **Reboot prep (owner ask 2026-10-20 18:1x: "Update all docs prepare for pc reboot"):** checked 18:18. Both repos are clean and pushed: planner `main` ab5a9d7, vgc-meta `main` fff32f3. Neither has a worktree. vgc-meta's untracked files are local logs and DB backups and are meant to stay that way.
+  - No sim, gated run or agent is running.
+  - The four servers were up, all started 2026-10-18 22:50: planner dev PID 49232, feed serve 53920, coach 55204, capture 46300. The reboot will stop them.
+  - **To start them again:** [access/MORNING-TEST.md](access/MORNING-TEST.md) → "After a PC reboot".
+  - **Next work** is in vgc-meta `docs/TODO.md`: the human-policy BUILD 2, which waits on the owner's go. Optional: finish the Hannes confirm run (Sneasler and Archaludon).
+- **Running:** nothing (checked 2026-10-20 18:18). The finalist chain from 2026-10-18 stopped after Acker; the owner dropped the rest.
+- **Servers:** see the reboot prep line above.
 - **Owner workflow (2026-10-18 13:1x):** a team he sends is a leaderboard / regional team to ADD TO THE DATABASE as a comparison opponent — not something to sim. Built: vgc-meta PR #52 (`npm run team -- add|import|list|remove`, `--format bo1|bo3`, opponent pools `--pool bo1|bo3|submitted`). 13:3x: all 49 teams he has given imported from `vgc-meta/data/submitted/manifest.json` (committed 029a782): 33 bo3 / 16 bo1, 14 new entries + 35 recorded on existing feed teams, 0 refused; published (feed 1,679 entries). DB backup before the import: `vgc-meta/data/vgc-meta.sqlite.before-submitted-2026-10-18` (untracked). Gaps (no full team data): Season 6 winner rental 8WAHH8QK9J, NintendJosh's Floette/Salamence edit, battenko/pam_o M-6 (shorthand spreads), Brian Hough's 4 screenshots, Hyosaku's paywalled spreads.
 - **Code:** vgc-meta `main` 73a9503, PRs through #51 merged (Bo3 series sim, `--bo3-prep`, teambuild `--weather-teams` / `--bo3`, `improve --bo3`). Planner `main` unchanged in code since #10 (speed tiers, 2026-10-16).
 - **The owner's current team question** (open entries at the bottom, 22:30 onward): the Bo1 pick is the improved DragonFox, 79.6 best-lead / 65.9 any-bring vs the top 30 (original 76.7 / 59.6). He doubts it ("basically my same team… not bringing speed control?"). Measured since: Tailwind on Dragonite costs ~3 points; Icy Wind on Milotic is about even (79.1 / 64.7). Meta tiers: three of the top six finalists run his core. Next: compare the four finalists when their sims land; improve and import any that beat 79.6 / 65.9.

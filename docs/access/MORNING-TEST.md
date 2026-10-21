@@ -1,6 +1,6 @@
 # Test guide — how to try each piece of both apps
 
-> Audience: the owner. Status: TRACKED (fork-only docs). Last verified: 2026-10-11 17:47 Phoenix — the three servers below answered a GET at that time (planner 200; feed.json 1,372 entries, generated 09:56 UTC; coach `/health` ok with all sixteen features listed); the `tiers` process was alive (started 13:37); `data/sim-features.json` in vgc-meta read (sixteen features). Rows carry their own "not verified". NOT re-run for this update: any of the commands in the tables (no tests, builds or sims were started). First written for the morning of 2026-10-11; `docs/TODO.md` holds the live state.
+> Audience: the owner. Status: TRACKED (fork-only docs). Last verified: the server table and reboot block on 2026-10-20 18:18 Phoenix, when the four node processes were listed; the start commands were not run. Everything else on 2026-10-11 17:47 Phoenix — the three servers below answered a GET at that time (planner 200; feed.json 1,372 entries, generated 09:56 UTC; coach `/health` ok with all sixteen features listed); the `tiers` process was alive (started 13:37); `data/sim-features.json` in vgc-meta read (sixteen features). Rows carry their own "not verified". NOT re-run for this update: any of the commands in the tables (no tests, builds or sims were started). First written for the morning of 2026-10-11; `docs/TODO.md` holds the live state.
 
 ## What should already be running on this machine
 
@@ -8,8 +8,25 @@
 |---|---|---|
 | Planner (App 1) dev server | http://localhost:5173 | in `vgc-planner`: `npm run dev` |
 | Team feed server (App 2's published output) | http://localhost:4400/feed.json | in `vgc-meta`: `npx serve@14.2.4 public -l 4400 --cors` |
-| Coach server (sixteen-feature player) | http://127.0.0.1:4410/health | in `vgc-meta`: `npm run coach` (restart it after changing `data/sim-features.json`) |
-| ⏳ Tiered sims on the official tier (started 13:37, local CPU only) | — (writes `data/sim/tiers-<time>/tiers.md` when done) | it is resumable: rerun the same command (row 8 below) |
+| Coach server (the features in `data/sim-features.json`) | http://127.0.0.1:4410/health | in `vgc-meta`: `npm run coach` (restart it after changing `data/sim-features.json`) |
+| Capture server (camera page for in-person games) | http://127.0.0.1:4420/version | in `vgc-meta`: `npm run capture` (needs the coach up) |
+
+### After a PC reboot — start all four (added 2026-10-20 18:2x)
+
+None of the four start by themselves. The four commands below each open their own window. Close a window and that server stops. This is the same set the conductor restarted after the 2026-10-18 reboot, but these exact command lines have not been run yet (written 2026-10-20).
+
+```powershell
+$p = "C:\Users\nbasl\OneDrive\Documents\vs-code-repos\vgcplanner"
+Start-Process powershell -ArgumentList '-NoExit','-Command',"cd '$p\vgc-planner'; npm run dev"
+Start-Process powershell -ArgumentList '-NoExit','-Command',"cd '$p\vgc-meta'; npx serve@14.2.4 public -l 4400 --cors"
+Start-Process powershell -ArgumentList '-NoExit','-Command',"cd '$p\vgc-meta'; npm run coach"
+Start-Process powershell -ArgumentList '-NoExit','-Command',"cd '$p\vgc-meta'; npm run capture"
+```
+
+To check them: `curl.exe -s -o NUL -w "%{http_code}\n"` against http://localhost:5173, http://localhost:4400/feed.json, http://127.0.0.1:4410/health and http://127.0.0.1:4420/version. Each should answer 200.
+
+- **Heavy runs are not auto-resumed.** The gated runner (`npm run gated` in vgc-meta) only starts when it is asked to. After a reboot it still respects the Wow.exe and Tue/Wed/Thu 18:30–22:15 stops.
+- **The planner tab:** reload it after the dev server is back (KI-4).
 
 ⚠️ **One planner tab at a time, and reload it before you change anything** (KNOWN_ISSUES KI-4: a stale second tab overwrites your library). Your teams live only in this browser: sidebar **Export all** saves a backup file ([RECOVERY.md](RECOVERY.md)).
 
