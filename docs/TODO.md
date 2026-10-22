@@ -6,6 +6,8 @@
 
 ## STATE at 18:2x, 2026-10-20 — start here (pre-reboot pass)
 
+- **2026-10-21 18:01, owner:** "fire up the apps, i want to play on showdown and refine the bot while we wait". The four servers were started at 18:01 with the MORNING-TEST "After a PC reboot" commands (first real run of those lines: they work) and all answered 200 at 18:02. Coach `/health`: 24 features, mega rule one, 28 battles / 408 decisions recorded so far (348 agreed). Next: the owner plays; refine the coach from what his games show.
+
 - **Reboot prep (owner ask 2026-10-20 18:1x: "Update all docs prepare for pc reboot"):** checked 18:18. Both repos are clean and pushed: planner `main` ab5a9d7, vgc-meta `main` fff32f3. Neither has a worktree. vgc-meta's untracked files are local logs and DB backups and are meant to stay that way.
   - No sim, gated run or agent is running.
   - The four servers were up, all started 2026-10-18 22:50: planner dev PID 49232, feed serve 53920, coach 55204, capture 46300. The reboot will stop them.
