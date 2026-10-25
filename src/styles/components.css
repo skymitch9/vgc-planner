@@ -30,6 +30,8 @@ label.lbl { display: block; font-size: 12px; font-weight: 600; color: var(--ink-
 .side-tag.me { background: var(--me-soft); color: var(--me); }
 .side-tag.opp { background: var(--opp-soft); color: var(--opp); }
 /* A Pokémon already on the field: shown, not chosen. */
+.act-pick { display: flex; align-items: center; gap: 6px; }
+.act-pick .field { flex: 1; min-width: 0; }
 .act-mon { display: flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 2px; font-weight: 600; font-size: 13px; overflow: hidden; white-space: nowrap; }
 .icon-btn { border: 0; background: none; color: var(--ink-3); border-radius: 6px; padding: 4px 7px; font-size: 16px; line-height: 1; }
 .icon-btn:hover { background: var(--line-soft); color: var(--ink); }
@@ -52,12 +54,6 @@ label.lbl { display: block; font-size: 12px; font-weight: 600; color: var(--ink-
 .hint { font-size: 12px; color: var(--ink-3); }
 code.k { background: var(--line-soft); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
 
-@media (max-width: 820px) {
-  .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-  .sidebar { max-height: 38vh; border-right: 0; border-bottom: 1px solid var(--line-soft); }
-  .drawer { width: 100%; }
-  .top { width: 560px; }
-}
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
 /* ---------- utilities (replace inline styles so a strict CSP can be used) ---------- */
@@ -106,7 +102,6 @@ textarea.paste.short { min-height: 160px; }
 /* The step's picture: real app components on the canvas background, scaled down and inert. */
 .welcome-preview { width: 100%; height: 200px; border-radius: 12px; border: 1px solid var(--line-soft); overflow: hidden; display: flex; align-items: center; justify-content: center; pointer-events: none; user-select: none;
   background: radial-gradient(circle, var(--line) 1px, transparent 1px) 0 0 / 18px 18px, var(--bg); }
-/* Scaled to fit by welcome.ts (fitPreview); this zoom is only the starting point. */
 /* welcome.ts (fitPreview) scales each picture to fit its frame; this zoom is only the starting point. */
 .pv-stage { zoom: .72; text-align: left; padding: 12px; }
 .pv-row { display: flex; align-items: center; gap: 14px; }
@@ -120,6 +115,73 @@ textarea.paste.short { min-height: 160px; }
 .pv-side { width: 210px; background: var(--panel); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 8px; font-size: 14px; }
 .pv-tabs { width: 300px; border: 1.5px solid var(--line); border-radius: 10px; }
 .pv-tabs .tab-add { font-size: 18px; font-weight: 600; }
+
+/* ---------- "What's new" (news.ts): same box as the welcome, each picture loops a short animation ---------- */
+.welcome-heading { align-self: stretch; margin: -4px 0 14px; padding-bottom: 12px; border-bottom: 1px solid var(--line-soft); font-size: 16px; font-weight: 700; }
+.welcome-badge { margin-top: 14px; font-size: 11px; font-weight: 700; letter-spacing: .02em; padding: 2px 9px; border-radius: 999px; background: var(--me-soft); color: var(--me); }
+.welcome-badge + h2 { margin-top: 8px; }
+/* Copy a turn: the pointer goes to the copy button and presses it, then the copy slides in beside the card. */
+.pv-copy .pv-copy-btn { position: relative; animation: pv-copy-press 5s ease infinite; }
+.pv-cursor { position: absolute; left: 55%; top: 55%; line-height: 0; animation: pv-copy-cursor 5s ease infinite; }
+.pv-copy-new { animation: pv-copy-appear 5s ease infinite; }
+.pv-cursor svg { width: 28px; height: 28px; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .35)); }
+@keyframes pv-copy-cursor {
+  0% { transform: translate(-150px, 150px); opacity: 0; }
+  8% { opacity: 1; }
+  30% { transform: translate(0, 0) scale(1); }
+  34% { transform: translate(0, 0) scale(.82); }
+  38% { transform: translate(0, 0) scale(1); }
+  85% { transform: translate(0, 0); opacity: 1; }
+  95%, 100% { transform: translate(0, 0); opacity: 0; }
+}
+@keyframes pv-copy-press { 0%, 32% { background: transparent; } 35% { background: var(--me-soft); color: var(--me); } 46%, 100% { background: transparent; } }
+@keyframes pv-copy-appear {
+  0%, 36% { opacity: 0; transform: translateX(-60px) scale(.96); }
+  48% { opacity: 1; transform: none; }
+  88% { opacity: 1; transform: none; }
+  98%, 100% { opacity: 0; transform: none; }
+}
+/* Plan on your phone: the top of a phone screen in the Path view; tapping the second alternative swaps the turn below. */
+.pv-phone { width: 330px; height: 250px; overflow: hidden; border: 6px solid var(--ink-3); border-bottom: 0; border-radius: 30px 30px 0 0; background: var(--bg); padding: 10px 12px 0; display: grid; align-content: start; gap: 8px; }
+.pv-ph-bar { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.pv-ph-bar b { flex: 1; }
+.pv-ph-menu { width: 22px; height: 18px; border-radius: 5px; border: 1px solid var(--line); background: linear-gradient(var(--ink-2), var(--ink-2)) center 4px / 10px 1.5px no-repeat, linear-gradient(var(--ink-2), var(--ink-2)) center 8px / 10px 1.5px no-repeat, linear-gradient(var(--ink-2), var(--ink-2)) center 12px / 10px 1.5px no-repeat; }
+.pv-ph-btn { font-size: 11px; font-weight: 600; border: 1px solid var(--line); border-radius: 7px; padding: 2px 8px; background: var(--panel); }
+.pv-ph-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.pv-ph-seg span { text-align: center; font-size: 11.5px; font-weight: 600; padding: 4px 0; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); color: var(--ink-2); }
+.pv-ph-seg span.on { background: var(--me-soft); border-color: var(--me); color: var(--me); }
+.pv-ph-fork { font-size: 10.5px; color: var(--ink-3); }
+.pv-ph-chips { display: flex; gap: 6px; margin-top: -4px; }
+.pv-chip { position: relative; font-size: 11.5px; font-weight: 600; padding: 4px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--ink-2); }
+.pv-chip-a { animation: pv-mob-chip-a 5s ease infinite; }
+.pv-chip-b { animation: pv-mob-chip-b 5s ease infinite; }
+.pv-ph-cards { display: grid; }
+.pv-ph-cards > .turn { grid-area: 1 / 1; }
+.welcome-preview .pv-ph-cards .turn { width: 100%; }
+.pv-card-a { animation: pv-mob-card-a 5s ease infinite; }
+.pv-card-b { animation: pv-mob-card-b 5s ease infinite; }
+.pv-phone .pv-cursor { left: 60%; top: 60%; animation-name: pv-mob-cursor; }
+@keyframes pv-mob-cursor {
+  0% { transform: translate(-70px, 120px); opacity: 0; }
+  8% { opacity: 1; }
+  30% { transform: translate(0, 0) scale(1); }
+  34% { transform: translate(0, 0) scale(.82); }
+  38% { transform: translate(0, 0) scale(1); }
+  80% { transform: translate(0, 0); opacity: 1; }
+  90%, 100% { transform: translate(0, 0); opacity: 0; }
+}
+@keyframes pv-mob-chip-a { 0%, 33% { background: var(--me); border-color: var(--me); color: var(--on-me); } 37%, 92% { background: var(--panel); border-color: var(--line); color: var(--ink-2); } 98%, 100% { background: var(--me); border-color: var(--me); color: var(--on-me); } }
+@keyframes pv-mob-chip-b { 0%, 33% { background: var(--panel); border-color: var(--line); color: var(--ink-2); } 37%, 92% { background: var(--me); border-color: var(--me); color: var(--on-me); } 98%, 100% { background: var(--panel); border-color: var(--line); color: var(--ink-2); } }
+@keyframes pv-mob-card-a { 0%, 35% { opacity: 1; transform: none; } 45%, 90% { opacity: 0; transform: translateY(6px); } 98%, 100% { opacity: 1; transform: none; } }
+@keyframes pv-mob-card-b { 0%, 35% { opacity: 0; transform: translateY(6px); } 45%, 90% { opacity: 1; transform: none; } 98%, 100% { opacity: 0; transform: translateY(6px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pv-copy .pv-copy-btn, .pv-copy-new { animation: none; }
+  .pv-cursor { display: none; }
+  .pv-chip-a, .pv-chip-b, .pv-card-a, .pv-card-b { animation: none; }
+  .pv-chip-b { background: var(--me); border-color: var(--me); color: var(--on-me); }
+  .pv-card-a { opacity: 0; }
+}
 
 /* ---------- share links ---------- */
 .share-link .field { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; }

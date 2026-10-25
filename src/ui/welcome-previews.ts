@@ -6,7 +6,7 @@
 import { esc } from './dom.ts';
 import { itemIcon, monIcon } from './icons.ts';
 import { moveLabel } from './move-type.ts';
-import { ICON_CHEVRON } from './views/result-card.ts';
+import { ICON_CHEVRON, ICON_COPY } from './views/result-card.ts';
 
 const MY_TEAM = [
   ['Rillaboom', 'Miracle Seed'], ['Aerodactyl-Mega', 'Aerodactylite'], ['Sneasler', 'Grassy Seed'],
@@ -77,4 +77,30 @@ export const PREVIEWS = {
     <div class="turn-result"><ol class="res-log">
       <li class="me">${monIcon('Rillaboom', 'xs')}<div class="txt"><b>${mv('Wood Hammer')}</b><div class="tgt">→ ${monIcon('Raichu-Mega-Y', 'xs')} Raichu-Mega-Y <span class="dmg">147.9–174.9%</span> <span class="ko-tag">KO</span></div></div></li>
     </ol></div>`, 'open', `<span class="card-btn expand open">${ICON_CHEVRON}</span>`),
+} as const;
+
+const ICON_CURSOR = '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 8-6 1.5L10 19Z" fill="#fff" stroke="#181b2b" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+
+/** Pictures for the "What's new" box (news.ts); each one loops a short animation of the feature. */
+export const NEWS_PREVIEWS = {
+  /** The pointer presses a turn card's copy button and the copy slides in right beside it. */
+  copyTurn: `<div class="pv-row pv-top pv-copy">
+    ${turnCard('Turn 1', TURN_1_ME, TURN_1_OPP, '', '', `<span class="card-btn pv-copy-btn">${ICON_COPY}<span class="pv-cursor">${ICON_CURSOR}</span></span><span class="card-btn">${ICON_CHEVRON}</span>`)}
+    ${turnCard('Turn 1', TURN_1_ME, TURN_1_OPP, '', 'selected pv-copy-new', `<span class="card-btn">${ICON_COPY}</span><span class="card-btn">${ICON_CHEVRON}</span>`)}
+  </div>`,
+
+  /**
+   * The top of a phone showing the Path view: the pointer taps the fork's second alternative, which lights up, and
+   * the turn below changes to that line.
+   */
+  mobile: `<div class="pv-phone">
+    <div class="pv-ph-bar"><span class="pv-ph-menu" aria-hidden="true"></span><b>vs Golisopod Rain</b><span class="pv-ph-btn">Share</span></div>
+    <div class="pv-ph-seg"><span class="on">Path</span><span>Overview</span></div>
+    <div class="pv-ph-fork">Turn 2: 2 alternatives</div>
+    <div class="pv-ph-chips"><span class="pv-chip pv-chip-a">If Drill Run</span><span class="pv-chip pv-chip-b">If Leech Life<span class="pv-cursor">${ICON_CURSOR}</span></span></div>
+    <div class="pv-ph-cards">
+      ${turnCard('Turn 2', [act('me', 'Kingambit', 'Kowtow Cleave', 'Golisopod'), act('me', 'Kommo-o', 'Flamethrower', 'Golisopod')], [act('opp', 'Golisopod-Mega', 'Drill Run', 'Kingambit'), act('opp', 'Politoed', 'Ice Beam', 'Kommo-o')], '', 'pv-card-a')}
+      ${turnCard('Turn 2', [act('me', 'Kingambit', 'Kowtow Cleave', 'Golisopod'), act('me', 'Kommo-o', 'Flamethrower', 'Golisopod')], [act('opp', 'Golisopod-Mega', 'Leech Life', 'Kingambit'), act('opp', 'Politoed', 'Ice Beam', 'Kommo-o')], '', 'pv-card-b')}
+    </div>
+  </div>`,
 } as const;

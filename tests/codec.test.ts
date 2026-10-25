@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { DataError, EXPORT_FORMAT, LIMITS, buildExport, mergeImport, readExport, readLibrary, readLibraryStamp, readTeamFields, writeLibrary } from '../src/domain/codec.ts';
 import type { ExportFile } from '../src/domain/codec.ts';
-import { clearEstimated, clonePlan, cloneTab, countNodes, newNode, newPlan, newTab, newTeam } from '../src/domain/model.ts';
+import { clearEstimated, clonePlan, cloneTab, copyTurn, countNodes, newNode, newPlan, newTab, newTeam } from '../src/domain/model.ts';
 import type { Library } from '../src/domain/types.ts';
 
 function sampleLibrary(): Library {
@@ -263,4 +263,20 @@ test('the stored library carries a revision and save time; older data reads as r
   assert.deepEqual(readLibraryStamp({ teams: [] }), { revision: 0, savedAt: null }, 'pre-1.0 shape');
   assert.deepEqual(readLibraryStamp({ schemaVersion: 2, revision: -3, savedAt: 42, teams: [] }), { revision: 0, savedAt: null }, 'nonsense is ignored');
   assert.deepEqual(readLibraryStamp(null), { revision: 0, savedAt: null });
+});
+
+test('copying a turn keeps its content with a fresh id, without its follow-up turns, and independent of the original', () => {
+  const turn = newNode({
+    title: 'Turn 2', note: 'TR line', actions: [{ side: 'me', mon: 'A', kind: 'move', move: 'Protect', target: '', outcome: { cant: 'par' } }],
+    children: [newNode({ title: 'follow-up' })], tieOrder: ['me:A', 'opp:B'],
+  });
+  const copy = copyTurn(turn);
+  assert.notEqual(copy.id, turn.id);
+  assert.deepEqual(copy.children, []);
+  assert.equal(copy.title, 'Turn 2');
+  assert.deepEqual(copy.actions, turn.actions);
+  assert.deepEqual(copy.tieOrder, ['me:A', 'opp:B']);
+  copy.actions[0]!.move = 'Fake Out';
+  assert.equal(turn.actions[0]!.move, 'Protect', 'editing the copy leaves the original alone');
+  assert.equal(turn.children.length, 1);
 });

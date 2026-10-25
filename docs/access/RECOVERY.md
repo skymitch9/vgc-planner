@@ -1,6 +1,6 @@
 # Recovery: rebuilding the planner (App 1) from nothing but git
 
-> Audience: anyone rebuilding this checkout cold, including a weaker executor. Status: TRACKED. Last verified: 2026-10-11 ~17:50 Phoenix — measured: remotes (`git remote -v`), `gh repo view skymitch9/vgc-planner --json isFork,parent` (fork of phc4rdoso/vgc-planner, PUBLIC), `gh repo set-default --view` (skymitch9/vgc-planner), script names in `package.json`, `wrangler.toml`, `.dev.vars.example`, which `.dev.vars` NAMES are filled (values not read), `server/migrations/` (0001–0005), `.gitignore`, the absence of `dist/`, `.wrangler/` and `deploys.log`, Node v24.11.1 against `engines` ≥ 22.12. NOT checked: a fresh clone on another machine (never drilled), `npm ci` (this checkout used `npm install`), any wrangler / Cloudflare command (none run), whether the owner's Cloudflare account can deploy at all.
+> Audience: anyone rebuilding this checkout cold, including a weaker executor. Status: TRACKED. Last verified: 2026-10-11 ~17:50 Phoenix — measured: remotes (`git remote -v`), `gh repo view skymitch9/vgc-planner --json isFork,parent` (fork of phc4rdoso/vgc-planner, PUBLIC), `gh repo set-default --view` (skymitch9/vgc-planner), script names in `package.json`, `wrangler.toml`, `.dev.vars.example`, which `.dev.vars` NAMES are filled (values not read), `server/migrations/` (0001–0005; 0006–0007 added 2026-10-24 by the upstream merge, PR #11, listed by `ls server/migrations`), `.gitignore`, the absence of `dist/`, `.wrangler/` and `deploys.log`, Node v24.11.1 against `engines` ≥ 22.12. NOT checked: a fresh clone on another machine (never drilled), `npm ci` (this checkout used `npm install`), any wrangler / Cloudflare command (none run), whether the owner's Cloudflare account can deploy at all.
 
 Each step is marked **DRILLED** (actually done in this checkout) or **INFERRED** (read from the repo, never run here).
 
@@ -57,7 +57,7 @@ From `wrangler.toml` and the top-level README "Deploy to Cloudflare":
 |---|---|
 | Worker name | `vgc-gameplan-planner`, entry `server/src/index.ts`, static assets `./dist` |
 | Route | `vgcplanner.app` (custom domain), `workers_dev = false` |
-| D1 binding / database | `DB` → `vgc-gameplans`, migrations in `server/migrations/` (0001_auth … 0005_custom_name) |
+| D1 binding / database | `DB` → `vgc-gameplans`, migrations in `server/migrations/` (0001_auth … 0005_custom_name, 0006_news_seen, 0007_plan_created_at; the last two came with the upstream merge, PR #11, 2026-10-24; never applied in this checkout) |
 | Deploy | `npx wrangler login` → `npx wrangler d1 migrations apply vgc-gameplans --remote` → `npm run sprites` → `npm run deploy` (checks sprites, builds, `wrangler deploy`) |
 | Secrets | `npx wrangler secret put DISCORD_CLIENT_ID` (and `DISCORD_CLIENT_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`); never `DEV_LOGIN` in production |
 

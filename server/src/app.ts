@@ -11,6 +11,7 @@
  */
 
 import { AVATARS } from '../../src/domain/avatars.ts';
+import { LATEST_NEWS_ID } from '../../src/domain/news.ts';
 import type { LibraryStore } from './library.ts';
 import { handleLibrary } from './library.ts';
 import type { ShareStore } from './shares.ts';
@@ -27,6 +28,8 @@ export interface User {
   name: string;
   createdAt: number;
   onboardedAt: number | null;
+  /** The newest "What's new" item shown to this user (null: none yet). */
+  newsSeen: number | null;
   /** Profile picture: a name from AVATARS (null only for accounts made before profile pictures). */
   avatar: string | null;
 }
@@ -34,8 +37,11 @@ export interface User {
 /** Persistence for users, sessions and libraries (D1 in production, in memory in tests). Times are epoch milliseconds. */
 export interface Store extends LibraryStore, ShareStore {
   /** Returns the user for this provider account, creating it on first sign-in. */
-  /** `avatar` is used only when the account is created. */
-  upsertUser(provider: User['provider'], providerId: string, name: string, now: number, avatar: string): Promise<{ user: User; created: boolean }>;
+  /**
+   * `avatar` and `newsSeen` are used only when the account is created (`newsSeen`: the newest "What's new" item, so
+   * a new account doesn't get the news from before it existed).
+   */
+  upsertUser(provider: User['provider'], providerId: string, name: string, now: number, avatar: string, newsSeen: number): Promise<{ user: User; created: boolean }>;
   setAvatar(userId: string, avatar: string): Promise<void>;
   /** Sets the display name the user chose; sign-ins keep it from then on. */
   setName(userId: string, name: string): Promise<void>;
@@ -44,6 +50,8 @@ export interface Store extends LibraryStore, ShareStore {
   sessionUser(tokenHash: string, now: number): Promise<User | null>;
   deleteSession(tokenHash: string): Promise<void>;
   markOnboarded(userId: string, now: number): Promise<void>;
+  /** Records that news up to `id` was shown; never goes back to an older one. */
+  markNewsSeen(userId: string, id: number): Promise<void>;
 }
 
 export interface OAuthClient { clientId: string; clientSecret: string }
@@ -158,7 +166,7 @@ function redirect(location: string, cookies: string[] = []): Response {
   return new Response(null, { status: 302, headers });
 }
 
-const publicUser = (u: User) => ({ id: u.id, name: u.name, provider: u.provider, onboarded: u.onboardedAt !== null, avatar: u.avatar });
+const publicUser = (u: User) => ({ id: u.id, name: u.name, provider: u.provider, onboarded: u.onboardedAt !== null, newsSeen: u.newsSeen, avatar: u.avatar });
 
 const ALLOWED_AVATARS: ReadonlySet<string> = new Set(AVATARS);
 
@@ -243,7 +251,7 @@ export async function handleApi(req: Request, deps: ApiDeps): Promise<Response> 
       if (!profileRes.ok) return back('error');
       const profile = spec.profile((await profileRes.json()) as Record<string, unknown>);
       if (!profile) return back('error');
-      const { user } = await deps.store.upsertUser(id, profile.id, cleanName(profile.name), deps.now(), randomAvatar());
+      const { user } = await deps.store.upsertUser(id, profile.id, cleanName(profile.name), deps.now(), randomAvatar(), LATEST_NEWS_ID);
       return redirect(`${app.origin}/`, [clearState, await startSession(user)]);
     } catch {
       return back('error');
@@ -254,7 +262,7 @@ export async function handleApi(req: Request, deps: ApiDeps): Promise<Response> 
     if (!deps.config.devLogin) return json({ error: 'not found' }, 404);
     const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
     const name = cleanName(str(body.name));
-    const { user } = await deps.store.upsertUser('dev', name.toLowerCase(), name, deps.now(), randomAvatar());
+    const { user } = await deps.store.upsertUser('dev', name.toLowerCase(), name, deps.now(), randomAvatar(), LATEST_NEWS_ID);
     return json({ user: publicUser(user) }, 200, { 'Set-Cookie': await startSession(user) });
   }
 
@@ -304,6 +312,16 @@ export async function handleApi(req: Request, deps: ApiDeps): Promise<Response> 
     const user = await currentUser();
     if (!user) return json({ error: 'signed out' }, 401);
     await deps.store.markOnboarded(user.id, deps.now());
+    return json({ ok: true });
+  }
+
+  if (req.method === 'POST' && path === '/api/me/news') {
+    const user = await currentUser();
+    if (!user) return json({ error: 'signed out' }, 401);
+    const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+    const seen = body.seen;
+    if (typeof seen !== 'number' || !Number.isInteger(seen) || seen < 0 || seen > 1_000_000) return json({ error: 'bad news id' }, 400);
+    await deps.store.markNewsSeen(user.id, seen);
     return json({ ok: true });
   }
 

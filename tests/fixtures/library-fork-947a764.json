@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 2,
+  "revision": 12,
+  "savedAt": "2026-10-24T21:40:00.000Z",
+  "teams": [
+    {
+      "id": "team-rain",
+      "name": "Fork Team A",
+      "paste": "Rillaboom @ Miracle Seed\nAbility: Grassy Surge\nLevel: 50\nEVs: 32 HP / 32 Atk / 2 Spe\nAdamant Nature\n- Fake Out\n- Grassy Glide\n- Wood Hammer\n- U-turn\n\nIncineroar @ Sitrus Berry\nAbility: Intimidate\nEVs: 32 HP / 16 Def / 18 SpD\nCareful Nature\n- Fake Out\n- Flare Blitz\n- Parting Shot\n- Knock Off",
+      "plans": [
+        {
+          "id": "plan-1",
+          "name": "vs Chomp TR",
+          "opponent": {
+            "name": "Chomp TR",
+            "paste": "Garchomp @ Choice Scarf\nAbility: Rough Skin\nEVs: 32 Atk / 32 Spe\nJolly Nature\n- Earthquake\n- Dragon Claw\n- Rock Slide\n- Protect\n\nSinistcha @ Leftovers\nAbility: Hospitality\nEVs: 32 HP / 32 SpA\nModest Nature\n- Matcha Gotcha\n- Rage Powder\n- Trick Room\n- Protect"
+          },
+          "tabs": [
+            {
+              "id": "tab-1",
+              "name": "Plan 1",
+              "selection": {
+                "me": {
+                  "lead": [
+                    "Rillaboom",
+                    "Incineroar"
+                  ],
+                  "back": [
+                    null,
+                    null
+                  ]
+                },
+                "opp": {
+                  "lead": [
+                    "Garchomp",
+                    "Sinistcha"
+                  ],
+                  "back": [
+                    null,
+                    null
+                  ]
+                }
+              },
+              "children": [
+                {
+                  "id": "n1",
+                  "title": "Turn 1",
+                  "tags": [
+                    "If they Protect"
+                  ],
+                  "note": "Fake Out the setter",
+                  "actions": [
+                    {
+                      "side": "me",
+                      "kind": "move",
+                      "mon": "Rillaboom",
+                      "move": "Fake Out",
+                      "target": "Sinistcha"
+                    },
+                    {
+                      "side": "me",
+                      "kind": "move",
+                      "mon": "Incineroar",
+                      "move": "Parting Shot",
+                      "target": "Garchomp",
+                      "pivot": "Rillaboom"
+                    },
+                    {
+                      "side": "opp",
+                      "kind": "move",
+                      "mon": "Garchomp",
+                      "move": "Earthquake",
+                      "target": "All",
+                      "outcome": {
+                        "targets": {
+                          "Rillaboom": {
+                            "crit": true,
+                            "hp": 40
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "side": "opp",
+                      "kind": "move",
+                      "mon": "Sinistcha",
+                      "move": "Trick Room",
+                      "target": "",
+                      "outcome": {
+                        "cant": "flinch"
+                      }
+                    }
+                  ],
+                  "children": [
+                    {
+                      "id": "n2",
+                      "title": "Turn 2",
+                      "tags": [],
+                      "note": "",
+                      "actions": [
+                        {
+                          "side": "me",
+                          "kind": "move",
+                          "mon": "Rillaboom",
+                          "move": "Grassy Glide",
+                          "target": "Garchomp"
+                        }
+                      ],
+                      "children": [],
+                      "hpEnd": {
+                        "me:Rillaboom": 40
+                      }
+                    }
+                  ],
+                  "tieOrder": [
+                    "me:Rillaboom",
+                    "opp:Garchomp"
+                  ],
+                  "line": {
+                    "name": "Plan A",
+                    "color": "teal"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "tab-2",
+              "name": "Plan 2",
+              "selection": {
+                "me": {
+                  "lead": [
+                    "Rillaboom",
+                    "Incineroar"
+                  ],
+                  "back": [
+                    null,
+                    null
+                  ]
+                },
+                "opp": {
+                  "lead": [
+                    "Garchomp",
+                    "Sinistcha"
+                  ],
+                  "back": [
+                    null,
+                    null
+                  ]
+                }
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "plan-2",
+          "name": "Empty plan",
+          "opponent": {
+            "name": "",
+            "paste": ""
+          },
+          "tabs": [
+            {
+              "id": "tab-3",
+              "name": "Plan 1",
+              "selection": {
+                "me": {
+                  "lead": [
+                    "Rillaboom",
+                    "Incineroar"
+                  ],
+                  "back": [
+                    null,
+                    null
+                  ]
+                },
+                "opp": {
+                  "lead": [
+                    "Garchomp",
+                    "Sinistcha"
+                  ],
+                  "back": [
+                    null,
+                    null
+                  ]
+                }
+              },
+              "children": []
+            }
+          ]
+        }
+      ],
+      "estimatedSpreads": [
+        "Incineroar"
+      ]
+    },
+    {
+      "id": "team-b",
+      "name": "Fork Team B (copy)",
+      "paste": "Rillaboom @ Miracle Seed\nAbility: Grassy Surge\n- Fake Out",
+      "plans": []
+    }
+  ]
+}

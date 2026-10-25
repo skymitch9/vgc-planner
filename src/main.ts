@@ -2,6 +2,7 @@ import './styles/index.css';
 import { readImportLink } from './infra/backup-url.ts';
 import { store } from './state/instance.ts';
 import { connectAccount, greetAccount, renderSaveState } from './ui/account.ts';
+import { showNews } from './ui/news.ts';
 import { render } from './ui/app.ts';
 import { openImportLink } from './ui/bulk-import.ts';
 import { openSharedLink } from './ui/share.ts';
@@ -34,8 +35,12 @@ async function main(): Promise<void> {
   // in, the account's library replaces this device's before anything is drawn.
   await connectAccount();
   render();
-  // First the welcome (first sign-in), then any share link the page was opened with, then any import link.
-  void greetAccount().then(() => openSharedLink()).finally(() => { if (importLink) openImportLink(importLink.url); });
+  // First the welcome (first sign-in) or what's new since the last visit, then any share link the page was opened
+  // with, then any import link.
+  void greetAccount()
+    .then((who) => showNews(who, store.library.teams.length > 0))
+    .then(() => openSharedLink())
+    .finally(() => { if (importLink) openImportLink(importLink.url); });
 
   // Make sure the last edits are written when the tab is hidden or closed.
   const flush = (): void => { void store.flush(); };

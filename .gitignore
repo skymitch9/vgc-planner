@@ -5,3 +5,12 @@ public/sprites/
 .env.*.local
 .dev.vars
 .wrangler/
+
+# Local usage stats for the production database (not shared in the repo)
+scripts/stats.sql
+scripts/stats.mjs
+scripts/dashboard.mjs
+scripts/dashboard.html
+
+# Promo videos (kept locally, not in the repo)
+promo-videos/
