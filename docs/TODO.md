@@ -6,6 +6,8 @@
 
 ## STATE at 18:2x, 2026-10-20 — start here (pre-reboot pass)
 
+- **2026-10-25 12:03 — after the 11:41 PC reboot:** the four servers were restarted with the MORNING-TEST "After a PC reboot" commands; all answered 200 at 12:03 (planner :5173, feed :4400, coach :4410, capture :4420). Reload any open planner tab (KI-4). The only work cut off by the reboot was vgc-meta's deep-player generation 2, which had been waiting since 08:10 and never started (vgc-meta `docs/TODO.md`, the generation 2 item). Its relaunch waits on the owner, because today is the online tournament day.
+
 - **2026-10-24 22:0x — upstream merged into our `main`: planner PR #11** ("Merge upstream (phc4rdoso/vgc-planner) through 44792e8"), a true merge of upstream's 23 commits since `7c75463` (binding/trapping moves, mobile layout, What's new box, server-side gameplan `created_at`, reopen after sign-in, turn copy). The new merge base is `44792e8`. `npm run check`: 314 tests (313 pass, 1 skipped), was 298. A pre-merge library loads unchanged (new `tests/fork-library-compat.test.ts`, plus a browser check on a library saved by main 947a764). Details: DONE 2026-10-24 22:0x and [info/UPSTREAM-PLAN.md](info/UPSTREAM-PLAN.md).
   - **Open (owner):** (1) **reload** any open planner tab on :5173 before editing, so it runs the merged code; (2) look at the mobile layout on a phone (not verified, see [KNOWN_ISSUES.md](KNOWN_ISSUES.md) KI-5); (3) D1 migrations 0006/0007 only matter if the local API or a deploy is ever used: `npm run db:migrate:local`.
 
