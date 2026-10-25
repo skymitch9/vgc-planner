@@ -29,6 +29,16 @@ export interface UiState {
   focusLine?: string | null;
   scrollX: number;
   scrollY: number;
+  /** Phones: Path (one line of play at a time) or Overview (an outline of every turn). */
+  mobileView: 'path' | 'tree';
+  /** Phones: the alternative followed at each fork (key: the parent turn's id, or the tab's id for the first turn). */
+  pathPick: Record<string, string>;
+  /** Phones: turns folded in the Overview. */
+  folded: Record<string, boolean>;
+  /** Phones: the team menu slid open. */
+  navOpen: boolean;
+  /** Phones: the "Teams, leads and backs" section opened or closed by hand (unset: open only while it needs filling). */
+  setupOpen?: boolean;
 }
 
 /**
@@ -37,7 +47,8 @@ export interface UiState {
  */
 export class AppStore {
   library: Library = { teams: [] };
-  ui: UiState = { teamId: null, planId: null, tabId: null, selectedNode: null, open: {}, expanded: {}, zoom: 1, navCollapsed: false, teamFeedUrl: null, importUrl: null, scrollX: 0, scrollY: 0 };
+  ui: UiState = { teamId: null, planId: null, tabId: null, selectedNode: null, open: {}, expanded: {}, zoom: 1, navCollapsed: false, teamFeedUrl: null, importUrl: null, scrollX: 0, scrollY: 0,
+    mobileView: 'path', pathPick: {}, folded: {}, navOpen: false };
   /** False when browser storage is unavailable and data only lives until the tab closes. */
   persistent: boolean;
   /** Set when saved data could not be read on startup. */
@@ -55,6 +66,11 @@ export class AppStore {
   /** The library as last loaded or saved (or merged from storage): what "changed here since" is measured against. */
   private base: LibraryBase = snapshotLibrary({ teams: [] });
   private unwatch: () => void = () => {};
+  /**
+   * The selection saved in the preferences, kept while it isn't open yet: a signed-in user's team only exists once
+   * the account library loads, after startup has loaded the device library.
+   */
+  private wanted: Pick<UiState, 'teamId' | 'planId' | 'tabId'> | null = null;
 
   constructor(repo: LibraryRepository, prefs: PrefsStore, persistent = true) {
     this.repo = repo;
@@ -71,6 +87,7 @@ export class AppStore {
     this.ui.importUrl = p.importUrl ?? null;
     this.ui.zoom = Math.max(config.zoom.min, Math.min(config.zoom.max, p.zoom));
     this.restoreSelection(p.teamId, p.planId, p.tabId);
+    this.wanted = p.teamId !== null && this.ui.teamId === null ? { teamId: p.teamId, planId: p.planId, tabId: p.tabId } : null;
   }
 
   /**
@@ -82,7 +99,9 @@ export class AppStore {
     this.repo = repo;
     this.persistent = persistent;
     await this.loadLibrary();
-    this.restoreSelection(this.ui.teamId, this.ui.planId, this.ui.tabId);
+    const sel = this.ui.teamId !== null ? this.ui : this.wanted ?? this.ui;
+    this.wanted = null;
+    this.restoreSelection(sel.teamId, sel.planId, sel.tabId);
   }
 
   /** Where the library currently lives. */
@@ -159,7 +178,9 @@ export class AppStore {
 
   async flush(): Promise<void> {
     if (this.timer !== null) { clearTimeout(this.timer); this.timer = null; }
-    this.prefs.save({ teamId: this.ui.teamId, planId: this.ui.planId, tabId: this.ui.tabId, open: this.ui.open, zoom: this.ui.zoom, navCollapsed: this.ui.navCollapsed, teamFeedUrl: this.ui.teamFeedUrl, importUrl: this.ui.importUrl });
+    // Until the remembered selection gets its chance, keep it in the preferences rather than an empty one.
+    const sel = this.ui.teamId === null && this.wanted ? this.wanted : this.ui;
+    this.prefs.save({ teamId: sel.teamId, planId: sel.planId, tabId: sel.tabId, open: this.ui.open, zoom: this.ui.zoom, navCollapsed: this.ui.navCollapsed, teamFeedUrl: this.ui.teamFeedUrl, importUrl: this.ui.importUrl });
     this.setSaveState('saving');
     try {
       await this.save();

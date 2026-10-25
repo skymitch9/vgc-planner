@@ -2,10 +2,10 @@ import type { Store, User } from './app.ts';
 import type { PutResult, StoredPlan, StoredTeam } from './library.ts';
 import type { SharedRecord } from './shares.ts';
 
-interface UserRow { id: string; provider: User['provider']; provider_id: string; name: string; created_at: number; onboarded_at: number | null; avatar: string | null }
+interface UserRow { id: string; provider: User['provider']; provider_id: string; name: string; created_at: number; onboarded_at: number | null; news_seen: number | null; avatar: string | null }
 
 const toUser = (r: UserRow): User => ({
-  id: r.id, provider: r.provider, providerId: r.provider_id, name: r.name, createdAt: r.created_at, onboardedAt: r.onboarded_at, avatar: r.avatar ?? null,
+  id: r.id, provider: r.provider, providerId: r.provider_id, name: r.name, createdAt: r.created_at, onboardedAt: r.onboarded_at, newsSeen: r.news_seen ?? null, avatar: r.avatar ?? null,
 });
 
 /** {@link Store} on Cloudflare D1 (SQLite). Every query is parameterised. */
@@ -14,10 +14,10 @@ export class D1Store implements Store {
 
   constructor(db: D1Database) { this.db = db; }
 
-  async upsertUser(provider: User['provider'], providerId: string, name: string, now: number, avatar: string): Promise<{ user: User; created: boolean }> {
+  async upsertUser(provider: User['provider'], providerId: string, name: string, now: number, avatar: string, newsSeen: number): Promise<{ user: User; created: boolean }> {
     const inserted = await this.db
-      .prepare('INSERT INTO users (id, provider, provider_id, name, created_at, avatar) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (provider, provider_id) DO NOTHING')
-      .bind(crypto.randomUUID(), provider, providerId, name, now, avatar)
+      .prepare('INSERT INTO users (id, provider, provider_id, name, created_at, avatar, news_seen) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT (provider, provider_id) DO NOTHING')
+      .bind(crypto.randomUUID(), provider, providerId, name, now, avatar, newsSeen)
       .run();
     const created = (inserted.meta.changes ?? 0) > 0;
     // Returning users keep their account; their display name follows the provider unless they picked their own.
@@ -56,6 +56,10 @@ export class D1Store implements Store {
 
   async markOnboarded(userId: string, now: number): Promise<void> {
     await this.db.prepare('UPDATE users SET onboarded_at = COALESCE(onboarded_at, ?) WHERE id = ?').bind(now, userId).run();
+  }
+
+  async markNewsSeen(userId: string, id: number): Promise<void> {
+    await this.db.prepare('UPDATE users SET news_seen = MAX(COALESCE(news_seen, 0), ?) WHERE id = ?').bind(id, userId).run();
   }
 
   /* ------------------------------- library ------------------------------- */
@@ -108,8 +112,9 @@ export class D1Store implements Store {
     const team = await this.db.prepare('SELECT 1 AS ok FROM teams WHERE user_id = ? AND id = ?').bind(userId, plan.teamId).first();
     if (!team) return null;
     return this.put('plans', userId, plan.id, baseVersion,
-      this.db.prepare('INSERT INTO plans (user_id, id, team_id, position, data, version, updated_at) VALUES (?, ?, ?, ?, ?, 1, ?) ON CONFLICT (user_id, id) DO NOTHING')
-        .bind(userId, plan.id, plan.teamId, plan.position, plan.data, now),
+      // created_at is set here only, never on update: imports always save new gameplans, so it's their import date.
+      this.db.prepare('INSERT INTO plans (user_id, id, team_id, position, data, version, updated_at, created_at) VALUES (?, ?, ?, ?, ?, 1, ?, ?) ON CONFLICT (user_id, id) DO NOTHING')
+        .bind(userId, plan.id, plan.teamId, plan.position, plan.data, now, now),
       this.db.prepare('UPDATE plans SET team_id = ?, position = ?, data = ?, version = version + 1, updated_at = ? WHERE user_id = ? AND id = ? AND version = ?')
         .bind(plan.teamId, plan.position, plan.data, now, userId, plan.id, baseVersion));
   }

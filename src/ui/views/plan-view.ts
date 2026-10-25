@@ -11,13 +11,15 @@ import { currentDex, loadDex } from '../../infra/dex-loader.ts';
 import { requestRender } from '../bus.ts';
 import { moveLabel } from '../move-type.ts';
 import { isPivotMove, refreshDrawerFoot, renderDrawer } from './drawer.ts';
-import { fieldStripHTML, hasDetails, ICON_CHEVRON, noticeHTML, resultHTML, summaryHTML } from './result-card.ts';
+import { fieldStripHTML, hasDetails, ICON_CHEVRON, ICON_COPY, noticeHTML, resultHTML, summaryHTML } from './result-card.ts';
 import { session } from '../../state/account.ts';
 import { ICON_LINK } from '../share.ts';
-import { renderNav } from './sidebar.ts';
+import { NAV_BUTTON, renderNav } from './sidebar.ts';
 import { extLinksHTML } from '../ext-links.ts';
 import { REPLAY_BUTTON } from '../replay-import.ts';
 import { drawForkColors, legendHTML, lineClass, lineFocus } from '../lines.ts';
+import { isMobile } from '../mobile.ts';
+import { mobilePlanHTML } from './mobile-plan.ts';
 
 const PLUS_ICON = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg>';
 
@@ -88,6 +90,7 @@ function nodeHTML(n: FlowNode, depth: number, sim: SimView, start: BattleState |
     <div class="turn-head">
       ${tags}
       <span class="ttl">${esc(title)}${tag}</span><span class="spacer"></span>
+      <button class="card-btn" data-act="copy-node" data-node="${esc(n.id)}" aria-label="Copy ${esc(title)}" title="Copy this turn (the copy goes right beside it)">${ICON_COPY}</button>
       ${toggle}
     </div>
     ${n.actions.length ? `<div class="acts"><div class="col">${column('me')}</div><div class="col">${column('opp')}</div></div>` : '<div class="none">No actions yet</div>'}
@@ -138,7 +141,24 @@ function focusOf(plan: Sheet): Set<string> | null {
   return set.size ? set : null;
 }
 
+/** The battle state a turn starts from: its parent's result, or the start of the battle for a first turn. */
+function startOf(parent: FlowNode | null, sim: SimView): BattleState | null {
+  if (!sim.enabled || sim.status !== 'ready') return null;
+  if (!parent) return sim.start;
+  const r = sim.results.get(parent.id);
+  return r?.status === 'ready' ? r.state : null;
+}
+
 function canvasInner(team: Team, plan: Sheet, sim: SimView): string {
+  if (isMobile()) {
+    const picks = picksOf(plan);
+    return mobilePlanHTML(plan, {
+      setup: `<div class="m-side">${teamBox('me', team.name, monsFor('me', team, plan))}${selectionBox('me', plan)}</div>
+        <div class="m-side">${teamBox('opp', plan.opponent.name || 'Opponent team', monsFor('opp', team, plan))}${selectionBox('opp', plan)}</div>`,
+      card: (n, depth, parent) => nodeHTML(n, depth, sim, startOf(parent, sim), picks),
+      outcome: (n) => outcomeOf(n, sim),
+    });
+  }
   return `<div class="top">
       <div class="col">${teamBox('me', team.name, monsFor('me', team, plan))}<div class="link"></div>${selectionBox('me', plan)}<div class="bracket"></div></div>
       <div class="col">${teamBox('opp', plan.opponent.name || 'Opponent team', monsFor('opp', team, plan))}<div class="link"></div>${selectionBox('opp', plan)}<div class="bracket"></div></div>
@@ -172,22 +192,24 @@ export function renderPlanView(main: HTMLElement, team: Team, plan: Plan): void 
   if (!currentDex()) loadDex().then(() => requestRender()).catch(() => { /* names stay plain; the team view reports the failure */ });
   const sim = simService.compute(team, sheet);
   main.innerHTML = `
-  <div class="topbar">
-    <span class="crumb">${esc(team.name)} /</span>
+  <div class="topbar plan-bar">
+    ${NAV_BUTTON}
+    <span class="crumb d-only">${esc(team.name)} /</span>
     <input class="title-input" id="plan-name" value="${esc(plan.name)}" aria-label="Gameplan name">
     <span class="spacer"></span>
-    <div class="zoom-ctl"><button class="btn sm" data-act="zoom" data-d="-1" aria-label="Zoom out">−</button><span class="lvl" id="zlvl">${Math.round(store.ui.zoom * 100)}%</span><button class="btn sm" data-act="zoom" data-d="1" aria-label="Zoom in">+</button></div>
-    ${REPLAY_BUTTON}
+    <div class="zoom-ctl d-only"><button class="btn sm" data-act="zoom" data-d="-1" aria-label="Zoom out">−</button><span class="lvl" id="zlvl">${Math.round(store.ui.zoom * 100)}%</span><button class="btn sm" data-act="zoom" data-d="1" aria-label="Zoom in">+</button></div>
+    <span class="d-only">${REPLAY_BUTTON}</span>
     ${session.shared.has(plan.id)
       ? `<button class="btn shared" data-act="share-plan" data-plan="${esc(plan.id)}" title="Shared by link: copy the link or stop sharing">${ICON_LINK}Shared</button>`
       : `<button class="btn" data-act="share-plan" data-plan="${esc(plan.id)}">Share</button>`}
-    <button class="btn" data-act="export-plan" data-team="${esc(team.id)}" data-plan="${esc(plan.id)}">Export</button>
-    ${extLinksHTML()}
+    <button class="btn d-only" data-act="export-plan" data-team="${esc(team.id)}" data-plan="${esc(plan.id)}">Export</button>
+    <button class="btn m-only more-btn" data-act="plan-more" data-team="${esc(team.id)}" data-plan="${esc(plan.id)}" aria-label="More actions" title="More actions">⋯</button>
+    <div class="d-only">${extLinksHTML()}</div>
   </div>
   <div id="notice">${noticeHTML(sim)}</div>
   <div class="line-legend" id="line-legend">${legendHTML(sheet.children, store.ui.focusLine)}</div>
   <div class="workspace">
-    <div class="canvas" id="canvas"><div class="canvas-inner" id="cinner">${canvasInner(team, sheet, sim)}</div></div>
+    <div class="canvas" id="canvas"><div class="canvas-inner ${isMobile() ? 'mobile' : ''}" id="cinner">${canvasInner(team, sheet, sim)}</div></div>
     <aside class="drawer hidden" id="drawer" aria-label="Turn editor"></aside>
   </div>
   <div class="tabbar" id="tabbar">${tabBarHTML(plan, sheet.id)}</div>`;
@@ -203,6 +225,34 @@ export function renderPlanView(main: HTMLElement, team: Team, plan: Plan): void 
   setupPan();
   if (store.ui.selectedNode && findNode(sheet.children, store.ui.selectedNode)) renderDrawer();
   else store.ui.selectedNode = null;
+}
+
+/**
+ * Scrolls the canvas just enough for a turn card to be fully visible, keeping clear of the turn editor wherever it
+ * covers the canvas. Nothing moves when the card is already in view.
+ */
+export function revealTurn(nodeId: string): void {
+  const canvas = qs('#canvas');
+  const card = canvas?.querySelector<HTMLElement>(`.turn[data-node="${CSS.escape(nodeId)}"]`);
+  if (!canvas || !card) return;
+  const margin = 24;
+  const view = canvas.getBoundingClientRect();
+  const drawer = qs('#drawer');
+  // On wide screens the canvas already makes room for the editor; elsewhere the editor lies over it.
+  const covered = drawer && !drawer.classList.contains('hidden') ? Math.max(0, view.right - drawer.getBoundingClientRect().left) : 0;
+  const box = card.getBoundingClientRect();
+  const left = view.left + margin;
+  const right = view.right - covered - margin;
+  let dx = 0;
+  // Only when there's room for the card beside the editor (on a phone the editor covers everything).
+  if (right - left >= box.width) {
+    if (box.right > right) dx = box.right - right;
+    else if (box.left < left) dx = box.left - left;
+  }
+  let dy = 0;
+  if (box.bottom > view.bottom - margin) dy = Math.min(box.bottom - (view.bottom - margin), box.top - (view.top + margin));
+  else if (box.top < view.top + margin) dy = box.top - (view.top + margin);
+  if (dx || dy) canvas.scrollBy({ left: dx, top: dy, behavior: 'smooth' });
 }
 
 /** Redraws only the flowchart (keeps scroll position and the open editor). `force` bypasses the result cache. */

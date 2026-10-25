@@ -2,7 +2,7 @@ import { config } from '../config.ts';
 import { DataError } from '../domain/codec.ts';
 import type { ActionKind, Side, SlotKind, LineColor } from '../domain/types.ts';
 import { simService, store } from '../state/instance.ts';
-import { addNode, addTab, selectTab, startRenameTab, tabMenu, createPlan, createTeam, deleteNode, deletePlan, deleteTeam, duplicatePlan, duplicateTeam, editPaste, pickSlot, pickTopTeam, renameTeam, showExport, copyShowdownPaste, downloadShowdownPaste } from './actions.ts';
+import { addNode, copyNode, addTab, selectTab, startRenameTab, tabMenu, createPlan, createTeam, deleteNode, deletePlan, deleteTeam, duplicatePlan, duplicateTeam, editPaste, pickSlot, pickTopTeam, renameTeam, showExport, copyShowdownPaste, downloadShowdownPaste } from './actions.ts';
 import { accountMenu, openSignIn, signInWith } from './account.ts';
 import { openPalettePicker } from './theme.ts';
 import { requestRender } from './bus.ts';
@@ -15,7 +15,10 @@ import { openReplayImport } from './replay-import.ts';
 import { openImport } from './bulk-import.ts';
 import { openMenu, toast } from './overlays.ts';
 import { editingTargetRule, isPivotMove, renderDrawer } from './views/drawer.ts';
-import { rerenderCanvas, setZoom } from './views/plan-view.ts';
+import { rerenderCanvas, revealTurn, setZoom } from './views/plan-view.ts';
+import { followTo } from './views/mobile-plan.ts';
+import { isMobile } from './mobile.ts';
+import { COFFEE_URL, FEEDBACK_URL, GITHUB_URL, X_URL } from './ext-links.ts';
 import { applyNavCollapsed, renderNav } from './views/sidebar.ts';
 import { LINE_COLORS } from '../domain/types.ts';
 import { cleanTags } from '../domain/codec.ts';
@@ -40,7 +43,51 @@ async function handleClick(el: HTMLElement, e: MouseEvent): Promise<void> {
   const d = el.dataset;
   const team = d.team ?? '';
   const plan = d.plan ?? '';
+  // Phones: picking something in the team menu closes it.
+  if (store.ui.navOpen && NAV_CLOSERS.has(d.act ?? '')) { store.ui.navOpen = false; applyNavCollapsed(); }
   switch (d.act) {
+    case 'open-nav': store.ui.navOpen = true; applyNavCollapsed(); qs<HTMLElement>('#nav')?.focus(); return;
+    case 'close-nav': store.ui.navOpen = false; applyNavCollapsed(); return;
+    case 'plan-more': {
+      e.stopPropagation();
+      const link = (url: string): (() => void) => () => { window.open(url, '_blank', 'noopener,noreferrer'); };
+      openMenu(el, [
+        { label: 'Add branch from replay', run: () => { void openReplayImport(); } },
+        { label: 'Export gameplan', run: () => void showExport({ type: 'plan', teamId: team, planId: plan }) },
+        '-',
+        { label: 'Send feedback', run: link(FEEDBACK_URL) },
+        { label: 'Buy me a coffee', run: link(COFFEE_URL) },
+        { label: 'Source code on GitHub', run: link(GITHUB_URL) },
+        { label: '@PeteVGC_ on X', run: link(X_URL) },
+      ]);
+      return;
+    }
+    case 'm-setup':
+      // The section opens or closes itself; remember it, so redrawing the plan leaves it as it was.
+      store.ui.setupOpen = !(el.closest('details')?.open ?? false);
+      return;
+    case 'm-view':
+      store.ui.mobileView = d.view === 'tree' ? 'tree' : 'path';
+      rerenderCanvas();
+      qs('#canvas')?.scrollTo({ top: 0 });
+      return;
+    case 'm-pick':
+      if (d.key && d.node) store.ui.pathPick[d.key] = d.node;
+      rerenderCanvas();
+      return;
+    case 'm-fold':
+      if (d.node) store.ui.folded[d.node] = !store.ui.folded[d.node];
+      rerenderCanvas();
+      return;
+    case 'm-goto': {
+      const sheet = store.sheet;
+      if (!sheet || !d.node) return;
+      followTo(sheet, d.node);
+      store.ui.mobileView = 'path';
+      rerenderCanvas();
+      revealTurn(d.node);
+      return;
+    }
     case 'new-team': return createTeam();
     case 'import': if (el.tagName === 'A') e.preventDefault(); openImport(d.tab === 'backup' ? 'backup' : 'pastes'); return;
     case 'bulk-import': openImport('pastes'); return;
@@ -145,12 +192,18 @@ async function handleClick(el: HTMLElement, e: MouseEvent): Promise<void> {
       store.ui.selectedNode = d.node ?? null;
       rerenderCanvas();
       renderDrawer();
+      // The editor takes the canvas's right side: keep the clicked turn in view beside it.
+      if (d.node) revealTurn(d.node);
       return;
-    case 'close-drawer':
+    case 'close-drawer': {
+      const was = store.ui.selectedNode;
       store.ui.selectedNode = null;
       qs('#drawer')?.classList.add('hidden');
       rerenderCanvas();
+      // Phones: the editor covered the whole screen; come back to the turn that was being edited.
+      if (was && isMobile()) revealTurn(was);
       return;
+    }
     case 'select-tab':
       if (e.target instanceof HTMLInputElement) return; // clicking inside the rename box
       selectTab(d.tab ?? '');
@@ -158,10 +211,14 @@ async function handleClick(el: HTMLElement, e: MouseEvent): Promise<void> {
     case 'add-tab': addTab(); return;
     case 'tab-menu': e.stopPropagation(); tabMenu(el, d.tab ?? ''); return;
     case 'add-node': addNode(d.parent || null); return;
+    case 'copy-node': e.stopPropagation(); copyNode(d.node ?? ''); return;
     case 'add-branch-child': addNode(store.ui.selectedNode); return;
     case 'delete-node': return deleteNode();
   }
 }
+
+/** Phones: actions in the team menu that close it (opening something, or a dialog). Menus opened from it keep it open. */
+const NAV_CLOSERS: ReadonlySet<string> = new Set(['open-team', 'open-plan', 'new-plan', 'new-team', 'import', 'export-all', 'theme', 'sign-in']);
 
 type Field = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 const isField = (t: EventTarget | null): t is Field => t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement || t instanceof HTMLSelectElement;

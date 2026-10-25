@@ -11,6 +11,8 @@ import { monIcon } from '../icons.ts';
 import { moveLabel } from '../move-type.ts';
 import { formOf, renamedForms, showNames } from '../names.ts';
 
+/** The turn card's copy button. */
+export const ICON_COPY = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5V3.5a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/></svg>';
 export const ICON_CHEVRON = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>`;
 
 /** Up to two decimals, so fixed fractions read exactly (6.25%, 12.5%). */
@@ -120,9 +122,9 @@ function hpRow(x: EndMon): string {
   const charging = (x.charging ? `<span class="bchip up" title="${esc(`Charging ${x.charging}: it attacks on its next action`)}">charging ${esc(x.charging)}</span>` : '')
     + (x.effects ?? []).map((fx) => `<span class="bchip vol">${esc(fx)}</span>`).join('');
   const lost = x.lostItem ? `<s class="muted lost-item" title="${esc(`${x.lostItem}: used up or removed`)}">${esc(x.lostItem)}</s>` : '';
-  return `<div class="hp-row ${x.fainted ? 'ko' : ''}" title="${esc(tip)}">${monIcon(x.species, 'xs')}<span class="hp-name">${esc(x.species)}</span>${statusChip(x.condition)}${lost}
+  return `<div class="hp-row ${x.fainted ? 'ko' : ''}" title="${esc(tip)}">${monIcon(x.species, 'xs')}<span class="hp-name">${esc(x.species)}</span>${lost}
     <span class="hp-bar"><i class="${tone}" data-w="${x.pct}"></i></span>
-    <span class="hp-pct">${x.fainted ? 'KO' : `${x.pct}%`}</span>${range}${x.mayFaint ? '<span class="ko-tag">may KO</span>' : ''}
+    <span class="hp-pct">${x.fainted ? 'KO' : `${x.pct}%`}</span>${range}${statusChip(x.condition)}${x.mayFaint ? '<span class="ko-tag">may KO</span>' : ''}
     ${x.actual !== undefined ? '<span class="actual" title="HP at the end of the turn as recorded">actual</span>' : ''}${charging}${statChips(x.boosts)}</div>`;
 }
 

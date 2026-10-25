@@ -149,7 +149,9 @@ function monField(a: TurnAction, i: number, st: BattleState | null, actions: rea
     ? bench(st, a.side).filter((v) => v === a.mon || !taken.has(v))
     : orderedMons(a.side).filter((v) => v === a.mon || !taken.has(v));
   const label = st ? 'Replacement' : 'Pokémon';
-  return `<div><label class="lbl" for="a-mon-${i}">${label}</label><select class="field" id="a-mon-${i}" data-a="mon" data-i="${i}">${options(choices, a.mon, 'Choose…', (v) => formOf(st, a.side, v))}</select></div>`;
+  // The picked Pokémon's icon beside the list (a list's options can only hold text).
+  const icon = a.mon ? monIcon(formOf(st, a.side, a.mon), 'xs') : '';
+  return `<div><label class="lbl" for="a-mon-${i}">${label}</label><div class="act-pick">${icon}<select class="field" id="a-mon-${i}" data-a="mon" data-i="${i}">${options(choices, a.mon, 'Choose…', (v) => formOf(st, a.side, v))}</select></div></div>`;
 }
 
 const CANT_OPTIONS: readonly [string, string][] = [
@@ -214,9 +216,15 @@ function outcomeEditor(a: TurnAction, i: number, st: BattleState | null, depth: 
   if (!a.mon) return '';
   const ties = tieRows(a, st);
   const tiePicked = editingTies.some((t) => t.picked && t.keys.includes(`${a.side}:${a.mon}`));
-  // A switch has no chance results of its own, only a possible speed tie.
+  // A binding move past its 4 sure turns (Infestation, Fire Spin...): a 5th is the game's 50/50.
+  const bound = st?.mons[a.side][a.mon]?.bound;
+  const fifth = bound?.left === 0
+    ? `<label class="oc-check" title="${esc(`${bound.move} lasts 4 or 5 turns (50/50). Unchecked, it ends after 4 and ${a.mon} can switch out this turn.`)}"><input type="checkbox" data-o="stillBound" data-i="${i}" ${a.outcome?.stillBound ? 'checked' : ''}>Still bound by ${esc(bound.move)} (5th turn)</label>`
+    : '';
+  // A switch has no chance results of its own, only a possible speed tie or a 5th turn bound.
   if (a.kind === 'switch') {
-    return ties ? `<details class="outcome"${tiePicked ? ' open' : ''}><summary>Chance results${tiePicked ? ' <span class="oc-dot" aria-label="set"></span>' : ''}</summary>${ties}</details>` : '';
+    const picked = tiePicked || !!a.outcome?.stillBound;
+    return ties || fifth ? `<details class="outcome"${picked ? ' open' : ''}><summary>Chance results${picked ? ' <span class="oc-dot" aria-label="set"></span>' : ''}</summary>${fifth}${ties}</details>` : '';
   }
   const info = simService.moveInfo(a.move);
   const o = a.outcome ?? {};
@@ -246,7 +254,7 @@ function outcomeEditor(a: TurnAction, i: number, st: BattleState | null, depth: 
   const set = Object.keys(o).length > 0 || tiePicked;
   const cantSelect = `<select class="field sm" data-o="cant" data-i="${i}" aria-label="Before moving">${CANT_OPTIONS.map(([v, l]) => `<option value="${v}" ${v === cant ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
   return `<details class="outcome"${set ? ' open' : ''}><summary>Chance results${set ? ' <span class="oc-dot" aria-label="set"></span>' : ''}</summary>
-    ${cantSelect}${ties}${hits}${protect}${self}${rows}
+    ${cantSelect}${fifth}${ties}${hits}${protect}${self}${rows}
     ${!info && a.move ? '<p class="hint">Move details appear once the calculator has loaded.</p>' : ''}
   </details>`;
 }

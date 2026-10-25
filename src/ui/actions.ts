@@ -1,6 +1,6 @@
 import { buildExport, DataError, LIMITS, mergeImport, readExport } from '../domain/codec.ts';
 import type { ExportScope } from '../domain/codec.ts';
-import { cleanSelections, setEstimated, clonePlan, cloneTab, cloneTeam, countNodes, findNode, findPlan, findTeam, monsFor, newNode, newPlan, newTab, newTeam, nextTabName, seedActions } from '../domain/model.ts';
+import { cleanSelections, setEstimated, clonePlan, cloneTab, cloneTeam, copyTurn, countNodes, findNode, findPlan, findTeam, monsFor, newNode, newPlan, newTab, newTeam, nextTabName, seedActions } from '../domain/model.ts';
 import { copyNameFor } from '../domain/bulk-import.ts';
 import { parseShowdown, teamWarnings } from '../domain/showdown.ts';
 import { fileName, slug } from '../domain/strings.ts';
@@ -20,7 +20,7 @@ import { confirmDialog, modal, openMenu, toast } from './overlays.ts';
 import { turnResult } from './turn-results.ts';
 import type { MenuItem } from './overlays.ts';
 import { renderDrawer } from './views/drawer.ts';
-import { renderTabBar, rerenderCanvas } from './views/plan-view.ts';
+import { renderTabBar, rerenderCanvas, revealTurn } from './views/plan-view.ts';
 
 /* ------------------------------ teams & plans ------------------------------ */
 
@@ -461,6 +461,22 @@ export function addNode(parentId: string | null): void {
   store.persist();
   rerenderCanvas();
   renderDrawer();
+  revealTurn(node.id);
+}
+
+/** "Copy": a copy of the turn right beside it (another branch from the same parent), opened in the editor. */
+export function copyNode(nodeId: string): void {
+  const plan = store.sheet;
+  const found = plan ? findNode(plan.children, nodeId) : null;
+  if (!found) return;
+  const copy = copyTurn(found.node);
+  found.siblings.splice(found.siblings.indexOf(found.node) + 1, 0, copy);
+  store.ui.selectedNode = copy.id;
+  store.persist();
+  rerenderCanvas();
+  renderDrawer();
+  // The copy can land off screen or under the editor: bring it into view.
+  revealTurn(copy.id);
 }
 
 export async function deleteNode(): Promise<void> {
