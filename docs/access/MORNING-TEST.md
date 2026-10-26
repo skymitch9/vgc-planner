@@ -13,17 +13,16 @@
 
 ### After a PC reboot — start all four (added 2026-10-20 18:2x)
 
-None of the four start by themselves. The four commands below each open their own window. Close a window and that server stops. This is the same set the conductor restarted after the 2026-10-18 reboot, but these exact command lines have not been run yet (written 2026-10-20).
+None of the four start by themselves. Since 2026-10-25 one command starts all four as hidden background processes (no windows), in the vgc-meta folder:
 
 ```powershell
-$p = "C:\Users\nbasl\OneDrive\Documents\vs-code-repos\vgcplanner"
-Start-Process powershell -ArgumentList '-NoExit','-Command',"cd '$p\vgc-planner'; npm run dev"
-Start-Process powershell -ArgumentList '-NoExit','-Command',"cd '$p\vgc-meta'; npx serve@14.2.4 public -l 4400 --cors"
-Start-Process powershell -ArgumentList '-NoExit','-Command',"cd '$p\vgc-meta'; npm run coach"
-Start-Process powershell -ArgumentList '-NoExit','-Command',"cd '$p\vgc-meta'; npm run capture"
+cd C:\Users\nbasl\OneDrive\Documents\vs-code-repos\vgcplanner\vgc-meta
+npm run servers -- start     # then: npm run servers -- status   (stop / restart [name] too)
 ```
 
-To check them: `curl.exe -s -o NUL -w "%{http_code}\n"` against http://localhost:5173, http://localhost:4400/feed.json, http://127.0.0.1:4410/health and http://127.0.0.1:4420/version. Each should answer 200.
+Logs, PIDs and details: vgc-meta's `docs/access/RUN.md` → "The four servers, no windows".
+
+To check them by hand (`status` does this): `curl.exe -s -o NUL -w "%{http_code}\n"` against http://localhost:5173, http://localhost:4400/feed.json, http://127.0.0.1:4410/health and http://127.0.0.1:4420/version. Each should answer 200.
 
 - **Heavy runs are not auto-resumed.** The gated runner (`npm run gated` in vgc-meta) only starts when it is asked to. After a reboot it still respects the Wow.exe and Tue/Wed/Thu 18:30–22:15 stops.
 - **The planner tab:** reload it after the dev server is back (KI-4).
