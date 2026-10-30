@@ -1,9 +1,13 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { Dex, type DexData, type UsageData } from '../src/domain/dex.ts';
 import { parseShowdown } from '../src/domain/showdown.ts';
-import { NO_TOGGLES, applyStage, matchup, speedTiers, teamEntries, threatEntries, type SpeedEntry } from '../src/domain/speed-tiers.ts';
+import {
+  NO_FOE_TOGGLES, NO_TOGGLES, applyStage, filterMeta, foeSpeed, matchup, metaEntries, metaMatchup, metaSpeedList, speedTiers,
+  teamEntries, threatEntries, type MetaEntry, type SpeedEntry,
+} from '../src/domain/speed-tiers.ts';
 
 const read = <T>(file: string): T => JSON.parse(readFileSync(new URL(`../src/data/${file}`, import.meta.url), 'utf8')) as T;
 const dex = new Dex(read<DexData>('champions-mc.json'), read<UsageData>('usage-mc.json'));
@@ -92,4 +96,65 @@ test('threats come from the usage data: most common spread, max-Speed benchmark,
   assert.deepEqual(megaRows.map((r) => r.speed), [Math.floor(((mega.baseStats.spe + 52) * 11) / 10)]);
   const scarfers = top.filter((m) => m.items[0]?.[0] === 'Choice Scarf').map((m) => m.name);
   assert.deepEqual([...new Set(rows.filter((r) => r.scarf).map((r) => r.name))], scarfers);
+});
+
+// ---------- the meta speed list (an added view; the tiers above must not change) ----------
+
+test('the default tiers view is unchanged by the meta list: same rows as before it existed', () => {
+  // Hashes captured from the tiers code before the meta list was added (2026-10-29). If usage-mc.json or the Dex
+  // data is refreshed these move; re-capture them from main, never from a branch that touches speed-tiers.ts.
+  const team = parseShowdown(`Garchomp @ Garchompite Z\nEVs: 32 Spe\nJolly Nature\n- Protect\n\nSneasler @ White Herb\nEVs: 18 Spe\nJolly Nature\n- Protect\n`);
+  const hash = (t: typeof NO_TOGGLES): [number, string] => {
+    const rows = speedTiers([...teamEntries(team, dex), ...threatEntries(dex, 40)], t);
+    return [rows.length, createHash('sha256').update(JSON.stringify(rows)).digest('hex')];
+  };
+  assert.deepEqual(hash(NO_TOGGLES), [64, 'e9e1d7fea922a77fb16e10b3038404c4ebf1e5ba660de474b4659a787e52800c']);
+  assert.deepEqual(hash({ ...NO_TOGGLES, trickRoom: true, scarf: true }), [64, '72f1a5341fc52f2ae2e7c2584aa3e857ab02523e7833c947aebbfe2c265a5254']);
+});
+
+test('meta entries: Min (0 Spe neutral), Max (32 neutral), Max+ (32 +Spe), usage and the most common spread', () => {
+  for (const n of [30, 60, 100]) assert.equal(metaEntries(dex, n).length, n);
+  const sneasler = metaEntries(dex, 60).find((m) => m.name === 'Sneasler')!;
+  assert.deepEqual([sneasler.min, sneasler.max, sneasler.maxPlus], [140, 172, 189]);
+  assert.equal(sneasler.usage, dex.usage!.mons.find((m) => m.name === 'Sneasler')!.usage);
+  assert.deepEqual(sneasler.common, { speed: 172, spread: 'Adamant · 32 Spe' });
+  // A Mega entry uses the Mega forme's base Speed.
+  const megaUsage = dex.usage!.mons.slice(0, 60).find((m) => m.mega)!;
+  const mega = dex.megaFor(dex.species(megaUsage.species)!, megaUsage.mega!)!;
+  assert.equal(metaEntries(dex, 60).find((m) => m.name === megaUsage.name)!.min, mega.baseStats.spe + 20);
+});
+
+test('opponent toggles: Icy Wind -1 stage, then Scarf x1.5, then paralysis x0.5, each rounded down', () => {
+  assert.equal(foeSpeed(189, NO_FOE_TOGGLES), 189);
+  assert.equal(foeSpeed(189, { ...NO_FOE_TOGGLES, icyWind: true }), 126);
+  assert.equal(foeSpeed(189, { ...NO_FOE_TOGGLES, scarf: true }), 283);
+  assert.equal(foeSpeed(189, { ...NO_FOE_TOGGLES, paralyzed: true }), 94);
+  assert.equal(foeSpeed(189, { icyWind: true, scarf: true, paralyzed: true }), 94);
+  assert.equal(foeSpeed(100, NO_FOE_TOGGLES, true), 150);
+});
+
+const meta = (key: string, min: number, max: number, maxPlus: number, scarf = false): MetaEntry =>
+  ({ key, name: key, usage: 10, min, max, maxPlus, common: null, scarf });
+
+test('meta list order: opponents by Max+, by Min under Trick Room; team mixed in after my toggles, first on a tie', () => {
+  const team = [mine('me', 150)];
+  const foes = [meta('fast', 140, 172, 189), meta('mid', 105, 137, 150), meta('slow', 80, 112, 123, true)];
+  const rows = metaSpeedList(team, foes, NO_TOGGLES, NO_FOE_TOGGLES);
+  assert.deepEqual(rows.map((r) => r.key), ['fast', 'me', 'mid', 'slow']);
+  assert.deepEqual(metaSpeedList(team, foes, { ...NO_TOGGLES, trickRoom: true }, NO_FOE_TOGGLES).map((r) => r.key), ['slow', 'mid', 'fast', 'me']);
+  assert.deepEqual(metaSpeedList(team, foes, { ...NO_TOGGLES, tailwind: true }, NO_FOE_TOGGLES).map((r) => r.key), ['me', 'fast', 'mid', 'slow']);
+  // Icy Wind on every opponent; the tiers' Scarf toggle only on the usual Scarf holder.
+  const icy = metaSpeedList(team, foes, NO_TOGGLES, { ...NO_FOE_TOGGLES, icyWind: true });
+  assert.deepEqual(icy.find((r) => r.key === 'fast')!.maxPlus, 126);
+  const scarf = metaSpeedList(team, foes, { ...NO_TOGGLES, scarf: true }, NO_FOE_TOGGLES);
+  assert.deepEqual([scarf.find((r) => r.key === 'slow')!.maxPlus, scarf.find((r) => r.key === 'mid')!.maxPlus], [184, 150]);
+});
+
+test('meta filter keeps the team; matchup counts opponents beaten at each benchmark', () => {
+  const rows = metaSpeedList([mine('me', 150)], [meta('Sneasler', 140, 172, 189), meta('Rillaboom', 105, 137, 150), meta('Incineroar', 80, 112, 123)], NO_TOGGLES, NO_FOE_TOGGLES);
+  assert.deepEqual(filterMeta(rows, 'rilla').map((r) => r.key), ['me', 'Rillaboom']);
+  assert.equal(filterMeta(rows, '').length, 4);
+  assert.deepEqual(metaMatchup(rows, 'me', false), { min: 3, max: 2, maxPlus: 1, of: 3 });
+  assert.deepEqual(metaMatchup(rows, 'me', true), { min: 0, max: 1, maxPlus: 1, of: 3 });
+  assert.deepEqual(metaMatchup(rows, 'Sneasler', false), { min: 0, max: 0, maxPlus: 0, of: 0 });
 });
