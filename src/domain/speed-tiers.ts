@@ -137,3 +137,134 @@ function baseFor(mon: UsageMon, dex: Dex): StatTable | null {
   if (!mon.mega) return species.baseStats;
   return dex.megaFor(species, mon.mega)?.baseStats ?? null;
 }
+
+/*
+ * The meta speed list: a view added beside the tiers above, which it leaves untouched. Each of the format's most used
+ * Pokémon at three benchmarks (0 Spe neutral, 32 Spe neutral, 32 Spe +Spe nature) with its usage, and the team mixed
+ * in at its real Speed. The opponent toggles apply to every listed opponent.
+ */
+
+/** Opponent-side effects: Icy Wind (one stage down), paralysis (x1/2), Choice Scarf (x3/2) on every opponent. */
+export interface FoeToggles {
+  icyWind: boolean;
+  paralyzed: boolean;
+  scarf: boolean;
+}
+
+export const NO_FOE_TOGGLES: FoeToggles = { icyWind: false, paralyzed: false, scarf: false };
+
+/** One of the format's most used Pokémon at the three benchmark spreads. */
+export interface MetaEntry {
+  key: string;
+  name: string;
+  /** Percent of teams. */
+  usage: number;
+  /** 0 Spe, neutral nature. */
+  min: number;
+  /** 32 Spe, neutral nature. */
+  max: number;
+  /** 32 Spe, +Spe nature. */
+  maxPlus: number;
+  /** Its most common spread in the usage data, when there is one. */
+  common: { speed: number; spread: string } | null;
+  /** Most common item is Choice Scarf. */
+  scarf: boolean;
+}
+
+export interface MetaRow {
+  key: string;
+  name: string;
+  mine: boolean;
+  /** Percent of teams; null for team members. */
+  usage: number | null;
+  scarf: boolean;
+  /** After the toggles. A team member has one Speed, so all three are equal. */
+  min: number;
+  max: number;
+  maxPlus: number;
+  /** The most common spread after the toggles (opponents only). */
+  common: { speed: number; spread: string } | null;
+  /** What a team member's number assumes; empty for opponents. */
+  spread: string;
+}
+
+/** The `limit` most used entries (Megas are their own entries) at Min, Max and Max Nature+. */
+export function metaEntries(dex: Dex, limit = 60): MetaEntry[] {
+  const out: MetaEntry[] = [];
+  const plus = natureWith('spe', 'atk')!;
+  for (const mon of (dex.usage?.mons ?? []).slice(0, limit)) {
+    const base = baseFor(mon, dex);
+    if (!base) continue;
+    const at = (spe: number, nature: string): number => speOf(base, { ...emptyStatTable(), spe }, nature);
+    const top = mon.spreads[0];
+    const sp = top ? spFromSlashes(top[1]) : null;
+    out.push({
+      key: `meta-${mon.name}`,
+      name: mon.name,
+      usage: mon.usage,
+      min: at(0, ''),
+      max: at(32, ''),
+      maxPlus: at(32, plus),
+      common: top && sp ? { speed: speOf(base, sp, top[0]), spread: spreadLabel(top[0], sp.spe) } : null,
+      scarf: toID(mon.items[0]?.[0]) === 'choicescarf',
+    });
+  }
+  return out;
+}
+
+/**
+ * An opponent's Speed after the opponent toggles: Icy Wind's stage first, then Choice Scarf, then paralysis, each
+ * rounded down. `scarf` adds the Scarf for this one opponent (the tiers' "Scarf threats" toggle).
+ */
+export function foeSpeed(speed: number, f: FoeToggles, scarf = false): number {
+  const staged = f.icyWind ? applyStage(speed, -1) : speed;
+  const scarfed = f.scarf || scarf ? Math.floor((staged * 3) / 2) : staged;
+  return f.paralyzed ? Math.floor(scarfed / 2) : scarfed;
+}
+
+/**
+ * The meta list in turn order: opponents placed by Max Nature+ (their fastest), or by Min under Trick Room (slowest
+ * first); team members at their Speed after my toggles. On an equal placing team members come first.
+ */
+export function metaSpeedList(team: readonly SpeedEntry[], meta: readonly MetaEntry[], t: SpeedToggles, f: FoeToggles): MetaRow[] {
+  const rows: { row: MetaRow; order: number }[] = [];
+  for (const e of team) {
+    const s = effectiveSpeed(e, t);
+    rows.push({ row: { key: e.key, name: e.name, mine: true, usage: null, scarf: false, min: s, max: s, maxPlus: s, common: null, spread: e.spread }, order: s });
+  }
+  for (const m of meta) {
+    const fs = (n: number): number => foeSpeed(n, f, t.scarf && m.scarf);
+    const row: MetaRow = {
+      key: m.key, name: m.name, mine: false, usage: m.usage, scarf: m.scarf, min: fs(m.min), max: fs(m.max), maxPlus: fs(m.maxPlus),
+      common: m.common ? { speed: fs(m.common.speed), spread: m.common.spread } : null, spread: '',
+    };
+    rows.push({ row, order: t.trickRoom ? row.min : row.maxPlus });
+  }
+  const dir = t.trickRoom ? 1 : -1;
+  rows.sort((a, b) => dir * (a.order - b.order) || Number(b.row.mine) - Number(a.row.mine));
+  return rows.map((r) => r.row);
+}
+
+/** Opponents whose name contains the query (case and punctuation ignored); team members always stay. */
+export function filterMeta(rows: readonly MetaRow[], query: string): MetaRow[] {
+  const q = toID(query);
+  return q ? rows.filter((r) => r.mine || toID(r.name).includes(q)) : [...rows];
+}
+
+export interface MetaMatchup { min: number; max: number; maxPlus: number; of: number }
+
+/** How many listed opponents a team member strictly beats at each benchmark (moves before, under Trick Room). */
+export function metaMatchup(rows: readonly MetaRow[], key: string, trickRoom: boolean): MetaMatchup {
+  const me = rows.find((r) => r.key === key && r.mine);
+  const out: MetaMatchup = { min: 0, max: 0, maxPlus: 0, of: 0 };
+  if (!me) return out;
+  const beats = (s: number): boolean => (trickRoom ? me.min < s : me.min > s);
+  for (const r of rows) {
+    if (r.mine) continue;
+    out.of++;
+    if (beats(r.min)) out.min++;
+    if (beats(r.max)) out.max++;
+    if (beats(r.maxPlus)) out.maxPlus++;
+  }
+  return out;
+}
