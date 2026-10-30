@@ -2,6 +2,11 @@
 
 > Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-18 ~10:00 Phoenix (the newest block, moved verbatim). Before that, 2026-10-11 ~18:00 Phoenix — the next block was moved from TODO.md verbatim in this session after reading each entry's body against the repos (`git log`, `gh pr list`, the running processes, the feed); the older entries below it were not re-verified (archive: never edited). APPEND ONLY, newest first.
 
+## 2026-10-29 ~20:4x — opponent-speed ask closed: both halves shipped (TODO entry moved whole)
+
+- 2026-10-29 ~18:0x — Owner, on Robson Bittencourt's "VGC Multicalc - Speed Calc" post (x.com/rluizv/status/2115821539807641844: a Reg M-C speed list of the top-60 mons, min / max / nature+ per mon with usage %, "my whole team" highlighted, opponent-side Icy Wind / Paralyzed / Choice Scarf): "Take this and let's add it to our data, id love to get quick info about opponents speed". We already have the planner's Speed tiers panel (team vs common threats, Tailwind / Trick Room / Scarf / ±1, since PR #10). Open: WHERE he wants it — extend the planner panel to that view, or an opponent speed readout in the live coach at team preview. Asked 2026-10-29; owner ~18:3x: "Both". Planner half DONE (PR #12, see DONE 2026-10-29). Open: the coach readout at team preview (vgc-meta feat/coach-opponent-speed), two Opus agents in worktrees.
+- (closed 20:4x: coach half = vgc-meta PR #155, switched on and the coach restarted; its live check is tracked in vgc-meta's TODO.)
+
 ## 2026-10-29 ~20:4x — Meta speed list in the Speed tiers panel (planner PR #12)
 
 - **Ask (owner 2026-10-29, on Robson Bittencourt's "VGC Multicalc - Speed Calc"):** "id love to get quick info about opponents speed"; asked planner panel or live coach, he said "Both". This is the planner half; the coach half is vgc-meta `feat/coach-opponent-speed` (tracked in TODO until it lands).
