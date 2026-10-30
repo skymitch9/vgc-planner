@@ -2,6 +2,13 @@
 
 > Audience: future Claude sessions and the owner. Status: TRACKED. Last verified: 2026-10-18 ~10:00 Phoenix (the newest block, moved verbatim). Before that, 2026-10-11 ~18:00 Phoenix — the next block was moved from TODO.md verbatim in this session after reading each entry's body against the repos (`git log`, `gh pr list`, the running processes, the feed); the older entries below it were not re-verified (archive: never edited). APPEND ONLY, newest first.
 
+## 2026-10-29 ~20:4x — Meta speed list in the Speed tiers panel (planner PR #12)
+
+- **Ask (owner 2026-10-29, on Robson Bittencourt's "VGC Multicalc - Speed Calc"):** "id love to get quick info about opponents speed"; asked planner panel or live coach, he said "Both". This is the planner half; the coach half is vgc-meta `feat/coach-opponent-speed` (tracked in TODO until it lands).
+- **Resolution:** PR #12 https://github.com/skymitch9/vgc-planner/pull/12 (Opus agent in a worktree, reviewed and merged by the conductor). Speed tiers → new **View** dropdown → **Meta speed list**: top 30 / 60 / 100 by usage (Megas their own entries) at Min (0 SP neutral) / Max (32 SP neutral) / Max+ (32 SP +Spe), usage %, the most common real spread's Speed, the team mixed in at its real Speed, opponent-side Icy Wind / Paralyzed / Choice Scarf, a name filter, and click-a-member matchup colours with an "outspeeds N of M" footer. The old view stays the default (additive toggle; a frozen-hash test proves its rows are unchanged).
+- **Measured (agent):** `npm run check` 319 tests / 318 pass / 1 fail; the one failure was the live-feed test (feed 2058 > the app's 2000 cap) — fixed on the vgc-meta side the same evening (vgc-meta PR #154, feed now 2000), after which `tests/team-feed.test.ts` passes 9/9 (conductor). Browser-checked by the agent on :5181 (Sneasler 140/172/189; Icy Wind 93/114/126). Not checked: phone width, light theme, keyboard.
+- **Calls the agent made (kept):** opponents ordered by Max+ (by Min under Trick Room); team member listed first on a tie; paralysis ignores Quick Feet; Min is neutral nature, so a 0-SP Quiet/Brave Trick Room setter is slower than Min (the "Most common" column shows the real number).
+
 ## 2026-10-24 22:0x — upstream merged into our main (planner PR #11)
 
 - **Ask (conductor brief, 2026-10-24 21:4x):** merge upstream phc4rdoso/vgc-planner into our fork safely, as one PR, with both sides' behaviour intact and the owner's localStorage library provably safe.

@@ -35,3 +35,11 @@ Each entry carries: Symptom · Status (ACCEPTED/WAIVED/BLOCKED/WATCHING) · Why 
 - **Status:** WATCHING. The signed-out news box works per device (seen 2026-10-24 in the browser check).
 - **Why tolerated:** the owner uses the planner signed out on desktop. The API features need migrations 0006/0007 and `npm run dev:api`, never run in this checkout (RECOVERY.md). Upstream's unit tests cover the server side (`tests/news.test.ts`, `tests/server-auth.test.ts`, all pass).
 - **What would change it:** the owner opening the planner on a phone (or a 390 px-wide window). If the team header overflows, that becomes a TODO item. Running the local API (`npm run db:migrate:local`, then `npm run dev:api`) and signing in would exercise the account features.
+
+## KI-6 · The Speed tiers "off-state" test fails whenever usage or Dex data is refreshed (since PR #12, 2026-10-29)
+
+- **Symptom:** `tests/speed-tiers.test.ts` compares SHA-256 hashes of the old tiers view's rows, frozen from main before PR #12; a refresh of `usage-mc.json` or the Dex changes the rows and the hashes.
+- **Status:** ACCEPTED.
+- **Why tolerated:** it is the proof that the meta speed list left the old view byte-for-byte unchanged; the failure is the data moving, not a bug.
+- **What would change it:** the first data refresh — then re-capture the hashes from main (the test's comment says how), or retire the check once the new view has shipped through one refresh.
+
