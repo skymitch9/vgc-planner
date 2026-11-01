@@ -12,6 +12,7 @@ import { qs } from './dom.ts';
 import { moveTypeChip } from './move-type.ts';
 import { setOutcome } from './outcome-edit.ts';
 import { openReplayImport } from './replay-import.ts';
+import { openTeamList } from './team-list.ts';
 import { openImport } from './bulk-import.ts';
 import { openMenu, toast } from './overlays.ts';
 import { editingTargetRule, isPivotMove, renderDrawer } from './views/drawer.ts';
@@ -148,6 +149,7 @@ async function handleClick(el: HTMLElement, e: MouseEvent): Promise<void> {
     case 'export-team': return showExport({ type: 'team', teamId: team });
     case 'copy-showdown': copyShowdownPaste(team); return;
     case 'download-showdown': downloadShowdownPaste(team); return;
+    case 'team-list': openTeamList(team); return;
     case 'duplicate-team': return duplicateTeam(team);
     case 'delete-team': return deleteTeam(team);
     case 'export-plan': return showExport({ type: 'plan', teamId: team, planId: plan });

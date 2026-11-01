@@ -17,6 +17,8 @@ export const config = {
   storage: {
     libraryKey: 'vgc-planner:library',
     prefsKey: 'vgc-planner:prefs',
+    /** The player's own details for the official team list: this device only, never in the library or an export. */
+    playerDetailsKey: 'vgc-planner:player-details',
     /** Key used before the project was restructured; read once so existing data is not lost. */
     legacyKey: 'vgc-gameplan-planner:v1',
     /** Delay before changes are written, so typing doesn't write on every keystroke. */

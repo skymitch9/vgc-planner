@@ -30,6 +30,8 @@ Plan VGC matchups as flowchart gameplans for Pokémon Champions (Regulation M-C)
 
 **Duplicate a team.** **Duplicate** (on the team page, or in a team's ⋯ menu) makes a separate copy right below the original, with its gameplans too if you tick the box: handy for teams one or two Pokémon apart, or to test a variation.
 
+**Copy, download or print a team.** **Copy Showdown paste** and **Download .txt** (team page) give the team as Showdown text. **Official team list** prints the two-page Pokémon Video Game Team List handed in at in-person tournaments (page 1 for staff, with Stat Points; page 2 for opponents), filled in from the team and your player details; choose "Save as PDF" in the print dialog for a PDF. The player details (name, Player ID, date of birth, Support ID…) are stored only in this browser: never in exports, share links or account sync.
+
 **Top builds.** The format's Pokémon ranked by Smogon usage, each with its most used moves, items, abilities, Stat Point spreads and teammates. One click adds the most common build (or a chosen spread) to your team, respecting Species Clause and Item Clause.
 
 **Speed tiers.** Your team at its real Level 50 Speed (and each Mega's), in one list with the format's 40 most used Pokémon (their most common spread and the max-Speed benchmark). Toggles for Tailwind, Trick Room, Choice Scarf and a −1 / +1 Speed stage; ties are marked, and clicking one of your Pokémon counts the threats it outspeeds, ties and is slower than.

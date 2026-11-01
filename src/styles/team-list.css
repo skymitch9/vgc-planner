@@ -1,0 +1,71 @@
+/* ---------- Official team list (ui/team-list.ts, ui/team-list-pages.ts) ----------
+   The dialog uses the app's theme; the two pages do not: black on white, a plain sans, ruled boxes, drawn at their
+   printed size (US Letter less 0.5in margins = 7.5in x 10in). While the dialog is open, printing shows ONLY the copy of
+   the pages in #tl-print-root, one page each. */
+
+/* max-content rows: the preview keeps its full height and the body scrolls, instead of the rows being squeezed. */
+.tl-modal .modal-body { gap: 14px; grid-auto-rows: max-content; }
+.tl-form { border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px 12px; margin: 0; min-width: 0; }
+.tl-form legend { font-weight: 700; font-size: 13px; padding: 0 4px; }
+.tl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px 14px; }
+.tl-in { display: grid; gap: 4px; min-width: 0; }
+.tl-in .input { width: 100%; min-width: 0; }
+.tl-radios { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; min-height: 34px; font-size: 13px; }
+.tl-radios label { display: inline-flex; gap: 5px; align-items: center; }
+.tl-dob-row { display: flex; align-items: center; gap: 6px; color: var(--ink-3); }
+.tl-dob-row .tl-dob-in { flex: none; width: 4.2em; text-align: center; padding-left: 4px; padding-right: 4px; }
+.tl-dob-row .tl-dob-in[maxlength="4"] { width: 5.6em; }
+.tl-store { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.tl-preview { display: grid; gap: 14px; justify-items: center; background: var(--bg); border: 1px solid var(--line-soft); border-radius: 10px; padding: 12px 0; overflow: hidden; }
+.tl-sheet { background: #fff; width: 8.5in; padding: 0.5in; box-sizing: border-box; box-shadow: 0 1px 6px rgba(0,0,0,.25); }
+
+/* The pages themselves. */
+#tl-print-root { display: none; }
+.tl-page {
+  page: team-list;
+  box-sizing: border-box; width: 7.5in; height: 9.95in; overflow: hidden;
+  display: flex; flex-direction: column; gap: 0.14in;
+  background: #fff; color: #000;
+  font-family: Calibri, Carlito, Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 10pt; line-height: 1.2;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.tl-page * { box-sizing: border-box; }
+.tl-head { text-align: center; }
+.tl-title { margin: 0; font-size: 18pt; font-weight: 700; color: #000; }
+.tl-subtitle { font-size: 12.5pt; font-weight: 700; margin-top: 2pt; }
+.tl-instruction { margin: 4pt 0 0; font-size: 9.5pt; }
+.tl-player { display: grid; grid-template-columns: 1fr 1fr; border: 1.5pt solid #000; }
+.tl-field { display: flex; align-items: flex-end; gap: 6pt; padding: 5pt 7pt; min-height: 0.36in; border-bottom: 0.75pt solid #000; min-width: 0; }
+.tl-field:nth-child(odd) { border-right: 0.75pt solid #000; }
+.tl-player .tl-field:nth-last-child(-n + 2):nth-child(odd), .tl-player .tl-field:last-child { border-bottom: 0; }
+.tl-player .tl-field:last-child:nth-child(odd) { grid-column: 1 / -1; border-right: 0; }
+.tl-label { font-weight: 700; white-space: nowrap; flex: none; }
+.tl-value { flex: 1; min-width: 0; border-bottom: 0.75pt solid #000; min-height: 13pt; padding: 0 2pt; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tl-checks { display: flex; gap: 12pt; align-items: center; }
+.tl-check-item { display: inline-flex; align-items: center; gap: 4pt; }
+.tl-check { display: inline-flex; align-items: center; justify-content: center; width: 11pt; height: 11pt; border: 1pt solid #000; font-size: 9pt; font-weight: 700; line-height: 1; }
+.tl-dob { display: flex; align-items: flex-end; gap: 4pt; flex: 1; }
+.tl-dob .tl-value { flex: 1; text-align: center; }
+.tl-mons { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 0.12in; min-height: 0; }
+.tl-mon { display: flex; border: 1.5pt solid #000; min-width: 0; min-height: 0; }
+.tl-mon-info { flex: 1; display: grid; grid-template-rows: repeat(8, 1fr); min-width: 0; }
+.tl-mon-stats { flex: none; width: 1.15in; display: grid; grid-template-rows: repeat(6, 1fr); border-left: 1pt solid #000; }
+.tl-row { display: flex; align-items: center; gap: 5pt; padding: 0 6pt; border-bottom: 0.5pt solid #000; min-width: 0; }
+.tl-row:last-child { border-bottom: 0; }
+.tl-row .tl-value { border-bottom: 0; padding: 0; min-height: 0; }
+.tl-mon-info .tl-label { width: 0.95in; }
+.tl-mon-stats .tl-label { width: 0.55in; }
+.tl-mon-stats .tl-value { text-align: right; }
+.tl-row.tl-name { border-bottom-width: 1pt; }
+.tl-row.tl-name .tl-value { font-weight: 700; font-size: 11pt; }
+.tl-foot { text-align: center; font-size: 9.5pt; font-weight: 700; }
+
+@page team-list { size: letter; margin: 0.5in; }
+
+@media print {
+  body.tl-printing { background: #fff !important; }
+  body.tl-printing > :not(#tl-print-root) { display: none !important; }
+  body.tl-printing #tl-print-root { display: block; }
+  #tl-print-root .tl-page { break-inside: avoid; }
+  #tl-print-root .tl-page + .tl-page { break-before: page; }
+}
