@@ -3,7 +3,8 @@
    printed size (US Letter less 0.5in margins = 7.5in x 10in). While the dialog is open, printing shows ONLY the copy of
    the pages in #tl-print-root, one page each. */
 
-.tl-modal .modal-body { gap: 14px; }
+/* max-content rows: the preview keeps its full height and the body scrolls, instead of the rows being squeezed. */
+.tl-modal .modal-body { gap: 14px; grid-auto-rows: max-content; }
 .tl-form { border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px 12px; margin: 0; min-width: 0; }
 .tl-form legend { font-weight: 700; font-size: 13px; padding: 0 4px; }
 .tl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px 14px; }
@@ -12,8 +13,8 @@
 .tl-radios { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; min-height: 34px; font-size: 13px; }
 .tl-radios label { display: inline-flex; gap: 5px; align-items: center; }
 .tl-dob-row { display: flex; align-items: center; gap: 6px; color: var(--ink-3); }
-.tl-dob-in { width: 4.2em; text-align: center; }
-.tl-dob-in[maxlength="4"] { width: 5.6em; }
+.tl-dob-row .tl-dob-in { flex: none; width: 4.2em; text-align: center; padding-left: 4px; padding-right: 4px; }
+.tl-dob-row .tl-dob-in[maxlength="4"] { width: 5.6em; }
 .tl-store { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
 .tl-preview { display: grid; gap: 14px; justify-items: center; background: var(--bg); border: 1px solid var(--line-soft); border-radius: 10px; padding: 12px 0; overflow: hidden; }
 .tl-sheet { background: #fff; width: 8.5in; padding: 0.5in; box-sizing: border-box; box-shadow: 0 1px 6px rgba(0,0,0,.25); }
