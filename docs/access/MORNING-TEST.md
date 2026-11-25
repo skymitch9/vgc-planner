@@ -16,9 +16,11 @@
 None of the four start by themselves. Since 2026-10-25 one command starts all four as hidden background processes (no windows), in the vgc-meta folder:
 
 ```powershell
-cd C:\Users\nbasl\OneDrive\Documents\vs-code-repos\vgcplanner\vgc-meta
+cd C:\Users\nbasl\repos\vgcplanner\vgc-meta
 npm run servers -- start     # then: npm run servers -- status   (stop / restart [name] too)
 ```
+
+⚠️ **Start them from the REAL path above, not the old OneDrive path (2026-11-25).** vgcplanner moved out of OneDrive to `C:\Users\nbasl\repos\vgcplanner`; the old path `C:\Users\nbasl\OneDrive\Documents\vs-code-repos\vgcplanner` is now a junction to it. Started through the junction, the planner's Vite died in dependency optimization (`Cannot read properties of undefined (reading 'imports')`, `node_modules/vite/dist/node/chunks/config.js:32098`), because Vite's working folder (the junction) did not match the real module paths. Started from the real path it ran cleanly (measured 2026-11-25 11:0x: 200 on all four). The other three servers ran either way.
 
 Logs, PIDs and details: vgc-meta's `docs/access/RUN.md` → "The four servers, no windows".
 
